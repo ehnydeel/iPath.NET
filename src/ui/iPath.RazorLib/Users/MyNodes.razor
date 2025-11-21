@@ -1,0 +1,31 @@
+﻿@page "/mycases"
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+@inject IStringLocalizer T
+@inject AuthenticationStateProvider asp
+
+<IPathHeader Title=@T["My cases"] />
+
+@if (UserId.HasValue)
+{
+    <NodeListTable OwnerId="UserId" />
+}
+
+@code {
+    Guid? UserId = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var a = await asp.GetAuthenticationStateAsync();
+        if (a.User.Identity.IsAuthenticated)
+        {
+            var idc = a.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (idc != null && Guid.TryParse(idc.Value, out var uid))
+            {
+                UserId = uid;
+                StateHasChanged();
+            }
+        }
+    }
+}
