@@ -1,4 +1,4 @@
-﻿namespace iPath.Application;
+﻿namespace iPath.Domain;
 
 public class CountryService
 {

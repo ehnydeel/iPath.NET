@@ -29,12 +29,15 @@ public interface IPathApi
     [Get("/api/v1/users/{id}")]
     Task<IApiResponse<UserDto>> GetUser(Guid id);
 
-    [Get("/api/v1/user/roles")]
+    [Get("/api/v1/users/roles")]
     Task<IApiResponse<IEnumerable<RoleDto>>> GetRoles();
 
 
-    [Put("/api/v1/user/role")]
+    [Put("/api/v1/users/role")]
     Task<IApiResponse<Guid>> SetUserRole(UpdateUserRoleCommand command);
+
+    [Put("/api/v1/users/profile")]
+    Task<IApiResponse<Guid>> UpdateProfile(UpdateUserProfileCommand command);
 
     #endregion
 

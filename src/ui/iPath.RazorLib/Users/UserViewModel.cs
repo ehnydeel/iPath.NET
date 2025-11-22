@@ -1,13 +1,18 @@
 ﻿using iPath.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace iPath.Blazor.Componenents.Users;
 
-public class UserViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvDialog, IMemoryCache cache, ILogger<UserViewModel> logger) : IViewModel
+public class UserViewModel(IPathApi api, ISnackbar snackbar, 
+    IDialogService srvDialog,
+    IMemoryCache cache,
+    IStringLocalizer T,
+    ILogger<UserViewModel> logger) : IViewModel
 {
     public async Task ShowProfileAsync(Guid UserId) => ShowProfileAsync(await GetProfileAsync(UserId));
-
 
     public async Task ShowProfileAsync(UserProfile? profile)
     {
@@ -42,5 +47,44 @@ public class UserViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
             logger.LogError(ex, ex.Message);
         }
         return null;
+    }
+
+    public async Task<UserDto?> GetUserAsync(Guid id)
+    {
+        var res = await api.GetUser(id);
+        if (res.IsSuccessful) return res.Content;
+        snackbar.AddWarning(res.ErrorMessage);
+        return null;
+    }
+
+    public async Task<SessionUserDto> GetCurrentSessionAsync()
+    {
+        var res = await api.GetSession();
+        if (res.IsSuccessful) return res.Content;
+        return SessionUserDto.Anonymous;
+    }
+
+    public async Task UpdateProfile(Guid userId, UserProfile profile, bool showSuccess)
+    {
+        var resp = await api.UpdateProfile(new UpdateUserProfileCommand(userId, profile));
+        if (!resp.IsSuccessful)
+        {
+            snackbar.AddWarning(resp.ErrorMessage);
+        }
+        else if (showSuccess) 
+        { 
+            snackbar.Add(T["Profile has been saved"], Severity.Success);
+        }
+    }
+
+    public async Task<IEnumerable<UserListDto>> Search(string search, CancellationToken ct)
+    {
+        var query = new GetUserListQuery { SearchString = search, Page = 0, PageSize = 1000 };
+        var resp = await api.GetUserList(query);
+        if (resp.IsSuccessful)
+        {
+            return resp.Content.Items;
+        }
+        return new List<UserListDto>();
     }
 }

@@ -9,9 +9,12 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\aspire\iPath.NET.ServiceDefaults\iPath.NET.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\core\iPath.Application\iPath.Application.csproj" />
     <ProjectReference Include="..\..\infrastructure\iPath.API\iPath.API.csproj" />
     <ProjectReference Include="..\iPath.Blazor.Client\iPath.Blazor.Client.csproj" />
     <ProjectReference Include="..\iPath.RazorLib\iPath.Blazor.Componenents.csproj" />
+    <PackageReference Include="DispatchR.Mediator" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.*" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.*" />

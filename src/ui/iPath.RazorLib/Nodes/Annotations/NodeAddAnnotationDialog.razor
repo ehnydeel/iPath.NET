@@ -1,7 +1,4 @@
-﻿@inject NodeViewModel vm;
-
-
-<MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+﻿<MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
     <MudDialog ContentStyle="width: 720px; height: 300px;">
         <TitleContent>
             <MudText Typo="Typo.h6">Annotation</MudText>
@@ -23,7 +20,7 @@
     </MudDialog>
 </MudFocusTrap>
 
-
+@inject NodeViewModel vm
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; }

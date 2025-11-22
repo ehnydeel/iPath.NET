@@ -1,5 +1,4 @@
 ﻿using iPath.Application.Contracts;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace iPath.Blazor.Componenents.AppState;
 
@@ -9,14 +8,14 @@ public class AppState(IPathApi api) : IUserSession
 
     public SessionUserDto? User => _user;
 
-    public async Task LoadSession()
+    public async Task ReloadSession()
     {
         _user = SessionUserDto.Anonymous;
-        //var resp = await api.GetSession();
-        //if (resp.IsSuccessful)
-        //{
-        //    _user = resp.Content;
-        //}
+        var resp = await api.GetSession();
+        if (resp.IsSuccessful)
+        {
+            _user = resp.Content;
+        }
     }
 
     public async Task UnloadSession()

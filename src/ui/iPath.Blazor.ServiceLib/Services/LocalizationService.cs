@@ -1,6 +1,7 @@
 ﻿using iPath.Application.Localization;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Reflection.Metadata.Ecma335;
 
 namespace iPath.Blazor.ServiceLib.Services;
 
@@ -9,7 +10,7 @@ public class LocalizationService(IPathApi api, ILogger<LocalizationService> logg
     private Dictionary<string, TranslationData> _translationsData = new();
 
     public bool AddMissingtTranslations { get; set; } = true;
-    public bool IsModified { get; private set; }    
+    public bool IsModified { get; private set; }
 
     public async Task<TranslationData> LoadTranslationData(string locale, bool reload = false)
     {
@@ -32,7 +33,8 @@ public class LocalizationService(IPathApi api, ILogger<LocalizationService> logg
                     _translationsData.Add(locale, new TranslationData());
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 logger.LogError($"Loading Translations Error {locale}", ex);
             }
         }
@@ -40,7 +42,7 @@ public class LocalizationService(IPathApi api, ILogger<LocalizationService> logg
     }
 
 
-	private LocalizedString GetTranslation(string key, params object[] args)
+    private LocalizedString GetTranslation(string key, params object[] args)
     {
         var ret = GetTranslation(key);
         try
@@ -49,29 +51,35 @@ public class LocalizationService(IPathApi api, ILogger<LocalizationService> logg
         }
         catch (Exception ex)
         {
+            logger.LogError(ex.Message, ex);
         }
         return ret;
     }
 
 
-	private LocalizedString GetTranslation(string key)
+    private LocalizedString GetTranslation(string key)
     {
         if (_translationsData.ContainsKey(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName))
-        { 
+        {
             var data = _translationsData[System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName];
-
-            if (data.Words.ContainsKey(key))
-            {
-                string trans = string.IsNullOrEmpty(data.Words[key]) ? key : data.Words[key];
-                return new LocalizedString(key, trans, false);
+            if (data.Words != null)
+            { 
+                if (data.Words.ContainsKey(key))
+                {
+                    string trans = string.IsNullOrEmpty(data.Words[key]) ? key : data.Words[key];
+                    return new LocalizedString(key, trans, false);
+                }
+                else if (AddMissingtTranslations)
+                {
+                    data.Words.Add(key, "");
+                    IsModified = true;
+                }
             }
-            else if (AddMissingtTranslations)
+            else
             {
-                data.Words.Add(key, "");
-                IsModified = true;
+                logger.LogWarning("localization for {0} contains no words", System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
             }
         }
-
         return new LocalizedString(key, key, true);
     }
 

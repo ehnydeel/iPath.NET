@@ -8,7 +8,7 @@ namespace iPath.Domain.Entities;
 [DebuggerDisplay("User #{ipath2_id}, {UserName} {Email}")]
 public class User : IdentityUser<Guid>, IBaseEntity
 {
-    public UserProfile Profile { get; init; } = new();
+    public UserProfile Profile { get; private set; } = new();
 
     public ICollection<GroupMember> GroupMembership { get; set; } = [];
     public ICollection<CommunityMember> CommunityMembership { get; set; } = [];
@@ -23,5 +23,12 @@ public class User : IdentityUser<Guid>, IBaseEntity
     public string? ipath2_password { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+    public DateTime? ModifiedOn { get; set; }
+
+    public void UpdateProfile(UserProfile profile)
+    {
+        Profile = profile;
+        ModifiedOn = DateTime.UtcNow;
+    }
 }
 

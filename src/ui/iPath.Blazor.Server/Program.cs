@@ -10,6 +10,8 @@ using iPath.RazorLib;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.WebHost.UseStaticWebAssets();
 
 // Add MudBlazor services
@@ -45,6 +47,8 @@ builder.Services.AddSingleton<NotificationService>();
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -61,6 +65,22 @@ else
 
 // DB Migrations & Seeding
 app.UpdateDatabase();
+
+
+// Configure static file caching
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+            "Cache-Control", "no-cache, no-store, must-revalidate");
+        ctx.Context.Response.Headers.Append(
+            "Pragma", "no-cache");
+        ctx.Context.Response.Headers.Append(
+            "Expires", "0");
+    }
+});
+
 
 
 // app.UseHttpsRedirection();

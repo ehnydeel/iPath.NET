@@ -28,7 +28,7 @@ public static class RazorLibServiceRegistration
         services.AddSingleton<IStringLocalizer>(p => p.GetRequiredService<LocalizationService>());
         services.AddLocalization();
 
-        // services.AddScoped<AppState>();
+        services.AddScoped<AppState>();
 
         return services;
     }

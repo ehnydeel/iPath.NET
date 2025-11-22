@@ -6,8 +6,9 @@ public class GetNodeIdListHandler(iPathDbContext db, IUserSession sess)
 {
     public async Task<IReadOnlyList<Guid>> Handle(GetNodeIdListQuery request, CancellationToken cancellationToken)
     {
-        // prepare query
-        var q = db.Nodes.AsNoTracking();
+        // prepare query (only root nodes)
+        var q = db.Nodes.AsNoTracking()
+            .Where(n => n.GroupId.HasValue);
 
         if (request.GroupId.HasValue)
         {

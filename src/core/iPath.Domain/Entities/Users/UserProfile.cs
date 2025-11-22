@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace iPath.Domain.Entities;
 
+[DebuggerDisplay("{Username} - {Initials}, {FirstName} {FamilyName}")]
 public class UserProfile
 {
     // these fields map to the User Entity
@@ -43,6 +46,8 @@ public class UserProfile
             ContactDetails = new () 
         };
     }
+
+    public UserProfile Clone() => (UserProfile)this.MemberwiseClone();
 }
 
 

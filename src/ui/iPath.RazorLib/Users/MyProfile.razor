@@ -1,0 +1,35 @@
+﻿@page "/user/profile"
+
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <IPathHeader Title=@T["My Profile"] />
+
+    <AuthorizeView>
+        <Authorized>
+            <UserProfileForm Model="Model" OnValidSubmit="OnSubmit"/>
+        </Authorized>
+        <NotAuthorized>
+            <RedirectToLogin />
+        </NotAuthorized>
+    </AuthorizeView>
+</MudContainer>
+
+@inject UserViewModel vm
+@inject IStringLocalizer T
+
+@code {
+    UserProfile Model;
+    SessionUserDto sess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sess = await vm.GetCurrentSessionAsync();
+        var tmp = await vm.GetProfileAsync(sess.Id);
+        Model = tmp.Clone();
+    }
+
+    private async Task OnSubmit()
+    {
+        await vm.UpdateProfile(sess.Id, Model, true);
+    }
+}

@@ -9,8 +9,9 @@ public static class UserSessionExtensions
 {
     extension(IUserSession session)
     {
-        public bool IsAuthenticated => session.IsAuthenticated;
+        public bool IsAuthenticated => session.User is not null;
         public bool IsAdmin => session.User.roles.Any(r => r.ToLower() == "admin");
+        public bool IsModerator => session.User.roles.Any(r => r.ToLower() == "moderator");
 
         public HashSet<Guid> GroupIds()
         {
@@ -39,6 +40,15 @@ public static class UserSessionExtensions
                 throw new NotAllowedException();
             }
         }
+
+
+        public bool IsGroupModerator(Guid groupId)
+            => session.IsAuthenticated && session.User.groups.Any(g => g.GroupId == groupId && g.Role == eMemberRole.Moderator);
+
+        // Admin or user himself
+        public bool CanModifyUser(Guid UserId)
+            => session.IsAuthenticated && (session.IsAdmin || UserId == session.User.Id);
+
 
         public string Username => session.Username;
     }

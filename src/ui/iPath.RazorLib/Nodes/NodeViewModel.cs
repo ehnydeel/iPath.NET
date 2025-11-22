@@ -1,10 +1,12 @@
 ﻿using iPath.Application.Features.Nodes;
+using iPath.Blazor.Componenents.Nodes.Annotations;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
-public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService dialog, NavigationManager nm)
+public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvDialog, NavigationManager nm)
     : IViewModel, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -72,9 +74,9 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService dial
                 if (LastQuery.GroupId.HasValue)
                     return $"groups/{LastQuery.GroupId}";
                 else if (LastQuery.OwnerId.HasValue)
-                    return "mygroups";
+                    return "mycases";
             }
-            return "";
+            return "groups";
         } 
     }
     public IReadOnlyList<Guid>? IdList { get; set; } = null;
@@ -176,7 +178,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService dial
     }
 
 
-    public bool CreateNewDisabled => true;
+    public bool CreateNewDisabled => false;
 
     public async Task CreateNew()
     {
@@ -240,11 +242,27 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService dial
 
 
 
-    public bool AnnotateDisabled => true;
+    public bool AnnotateDisabled => false;
 
     public async Task Annotate()
     {
-        snackbar.AddWarning("not implemented");
+        var parameters = new DialogParameters<NodeAddAnnotationDialog> { };
+        var dialog = await srvDialog.ShowAsync<NodeAddAnnotationDialog>("New Annotation", parameters);
+        var result = await dialog.Result;
+        if (!result.Canceled && result.Data != null)
+        {
+            var text = result.Data.ToString().Trim();
+
+            if (string.IsNullOrEmpty(text)) return;
+
+            var cmd = new CreateNodeAnnotationCommand(RootNode.Id, text, null);
+
+            var resp = await api.CreateAnnotation(cmd);
+            if (resp.IsSuccessful)
+            {
+                await ReloadNode();
+            }
+        }
     }
 
 

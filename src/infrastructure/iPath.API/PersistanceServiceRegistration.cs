@@ -34,8 +34,17 @@ public static class PersistanceServiceRegistration
                 )
                 .UseSnakeCaseNamingConvention();
             }
-        }, ServiceLifetime.Scoped);
+        });
 
+        // services.AddDbFactory(config);
+
+        services.AddScoped<DbSeeder>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddDbFactory(this IServiceCollection services, IConfiguration config)
+    {
         services.AddDbContextFactory<iPathDbContext>(cfg =>
         {
             var provider = config.GetSection("DbProvider").Value ?? DBProvider.Postgres.Name;
@@ -58,14 +67,10 @@ public static class PersistanceServiceRegistration
                 )
                 .UseSnakeCaseNamingConvention();
             }
-        }, ServiceLifetime.Scoped);
-
-        services.AddTransient<DbSeeder>();
+        });
 
         return services;
     }
-
-
 
     public static IHost UpdateDatabase(this IHost host)
     {
