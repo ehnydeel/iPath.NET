@@ -1,8 +1,6 @@
-using System.Text.Json.Serialization;
-
 namespace iPath.Domain.Entities;
 
-public class Node : AuditableEntity
+public class Node : AuditableEntityWithEvents
 {
     public int? ipath2_id { get; set; }
 
@@ -22,7 +20,7 @@ public class Node : AuditableEntity
     public Guid? ParentNodeId { get; set; }
 
     public int? SortNr { get; set; } = 0;
-
+    public bool IsDraft { get; set; }
 
     public ICollection<Node> ChildNodes { get; set; } = [];
     public ICollection<Annotation> Annotations { get; set; } = [];
@@ -38,6 +36,7 @@ public class Node : AuditableEntity
     public NodeFile? File { get; set; } = null!;
 
     public ICollection<QuestionnaireResponse> QuestionnaireResponses { get; set; } = [];
+
 }
 
 

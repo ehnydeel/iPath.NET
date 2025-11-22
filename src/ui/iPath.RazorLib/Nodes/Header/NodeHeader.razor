@@ -14,7 +14,7 @@
         <div class="ipath_header_toolbar">
             <MudToolBar>
                 <MudIconButton Icon="@Icons.Material.Outlined.Edit" OnClick="@(() => vm.Edit())" Disabled="vm.EditDisabled" />
-                <MudIconButton Icon="@Icons.Material.Outlined.Save" OnClick="@(() => vm.Save())" hidden="@hideSave" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Save" OnClick="@(() => vm.Save(false))" hidden="@hideSave" />
                 <MudIconButton Icon="@Icons.Material.Outlined.Cancel" OnClick="@(() => vm.CancelEdit())" hidden="@hideSave">Cancel</MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => vm.Delete())" Disabled="vm.DeleteDisabled" />
                 <MudIconButton Icon="@Icons.Material.Outlined.AttachFile" OnClick="@(() => vm.AttachFile())" Disabled="vm.AttachFileDisabled" />

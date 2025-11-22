@@ -1,12 +1,17 @@
 ﻿using iPath.Application.Features.Nodes;
 using iPath.Blazor.Componenents.Nodes.Annotations;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
-public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvDialog, NavigationManager nm)
+public class NodeViewModel(IPathApi api, 
+    ISnackbar snackbar, 
+    IDialogService srvDialog, 
+    IStringLocalizer T,
+    NavigationManager nm)
     : IViewModel, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -45,7 +50,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
     public async Task LoadNode(Guid id)
     {
         var resp = await api.GetNodeById(id);
-        if (resp.IsSuccessful )
+        if (resp.IsSuccessful)
         {
             RootNode = resp.Content;
             SelectedNode = RootNode;
@@ -65,6 +70,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
     }
 
 
+
     public async Task MarkAsVisited()
     {
         if (RootNode is not null)
@@ -78,7 +84,9 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
 
     #region "-- Navigation --"
     public GetNodesQuery LastQuery { get; set; }
-    public string NavUrl {  get
+    public string NavUrl
+    {
+        get
         {
             if (LastQuery != null)
             {
@@ -88,7 +96,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
                     return "mycases";
             }
             return "groups";
-        } 
+        }
     }
     public IReadOnlyList<Guid>? IdList { get; set; } = null;
 
@@ -106,7 +114,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
             // go back to nodelist (group, search, mynode)
             nm.NavigateTo(NavUrl);
         }
-        else if(SelectedNode != null && SelectedNode.ParentNodeId.HasValue)
+        else if (SelectedNode != null && SelectedNode.ParentNodeId.HasValue)
         {
             // go up to parent
             var tmp = RootNode.ChildNodes.FirstOrDefault(n => n.Id == SelectedNode.ParentNodeId.Value);
@@ -127,7 +135,7 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
             // find index of current child Node in parents child list
             var list = RootNode.ChildNodes.Where(n => n.ParentNodeId == SelectedNode.ParentNodeId).OrderBy(n => n.SortNr).ToList();
             var idx = list.IndexOf(SelectedNode);
-            if ( idx < list.Count() - 1)
+            if (idx < list.Count() - 1)
             {
                 // there is one more in list => select
                 SelectedNode = list[idx + 1];
@@ -191,6 +199,21 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
 
     public bool CreateNewDisabled => false;
 
+    public async Task CreateNewNode(Guid GroupId)
+    {
+        ClearData();
+        var resp = await api.CreateNode(new CreateNodeCommand(GroupId: GroupId, NodeType: "Case"));
+        if (resp.IsSuccessful)
+        {
+            RootNode = resp.Content;
+            IsEditing = true;
+        }
+        else
+        {
+            snackbar.AddError(resp.ErrorMessage);
+        }
+    }
+
     public async Task CreateNew()
     {
         snackbar.AddWarning("not implemented");
@@ -200,9 +223,32 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
 
     public bool DeleteDisabled => true;
 
-    public async Task Delete(NodeDto? node = null)
+    public async Task Delete(NodeDto? node = null, bool AskConfirmation = true)
     {
-        snackbar.AddWarning("not implemented");
+        // Delete root node if none îs selected
+        node ??= RootNode;
+
+        if (AskConfirmation) {
+            bool? result = await srvDialog.ShowMessageBox(
+                T["Warning"],
+                T["Are you sure that you want to delete !"],
+                yesText: T["yes"], cancelText: T["Cancel"]);
+            if (result is null)
+                return;
+        }
+        if (node != null)
+        {
+            var resp = await api.DeleteNode(node.Id);
+            if (resp.IsSuccessful)
+            {
+                IsEditing = false;
+                GoUp();
+            }
+            else
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
+        }
     }
 
 
@@ -220,20 +266,30 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
     }
 
 
-    public bool SaveDisabled => true;
+    public bool SaveDisabled => false;
 
-    public async Task Save()
+    public async Task Save(bool IsDraft)
     {
-        if ( !SaveDisabled && IsEditing)
+        if (!SaveDisabled && IsEditing)
         {
-            snackbar.AddWarning("not implemented");
+            var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, IsDraft);
+            var resp = await api.UpdateNode(cmd);
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
+            else
+            {
+                nm.NavigateTo($"node/{RootNode.Id}");
+            }
             IsEditing = false;
         }
     }
 
     public async Task CancelEdit()
     {
-        if (RootNode != null) {
+        if (RootNode != null)
+        {
             IsEditing = false;
             await ReloadNode();
         }
@@ -284,6 +340,6 @@ public class NodeViewModel(IPathApi api, ISnackbar snackbar, IDialogService srvD
         snackbar.AddWarning("not implemented");
     }
 
-    
+
     #endregion
 }

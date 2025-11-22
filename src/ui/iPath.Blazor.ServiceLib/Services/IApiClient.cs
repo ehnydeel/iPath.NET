@@ -88,13 +88,13 @@ public interface IPathApi
     Task<IApiResponse<IReadOnlyList<Guid>>> GetNodeIdList(GetNodeIdListQuery query);
 
     [Post("/api/v1/nodes/create")]
-    Task<IApiResponse<NodeListDto>> CreateNode(CreateNodeCommand query);
+    Task<IApiResponse<NodeDto>> CreateNode(CreateNodeCommand query);
 
     [Delete("/api/v1/nodes/{id}")]
     Task<IApiResponse<NodeDeletedEvent>> DeleteNode(Guid id);
 
     [Put("/api/v1/nodes/update")]
-    Task<IApiResponse<bool>> UpdateNodeDescription(UpdateNodeDescriptionCommand request);
+    Task<IApiResponse<bool>> UpdateNode(UpdateNodeCommand request);
 
     [Put("/api/v1/nodes/order")]
     Task<IApiResponse<ChildNodeSortOrderUpdatedEvent>> UpdateNodeSortOrder(UpdateChildNodeSortOrderCommand request);

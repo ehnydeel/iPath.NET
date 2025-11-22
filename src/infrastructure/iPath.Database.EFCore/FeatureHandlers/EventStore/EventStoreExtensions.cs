@@ -24,4 +24,30 @@ public static class EventStoreExtensions
         await db.EventStore.AddAsync(e, ct);
         return e;
     }
+
+
+    public static async Task<TEvent> CreateEventAsync<TEvent, TInput, TEntity>(this iPathDbContext db,
+        TInput input,
+        TEntity entity,
+        Guid? userId = null,
+        CancellationToken ct = default)
+        where TEvent : EventEntity, new() 
+        where TInput : IEventInput
+        where TEntity : class, IHasDomainEvents
+    {
+        var e = new TEvent
+        {
+            EventId = Guid.CreateVersion7(),
+            EventDate = DateTime.UtcNow,
+            UserId = userId,
+            EventName = typeof(TEvent).Name,
+            ObjectName = input.ObjectName,
+            ObjectId = entity.Id,
+            Payload = JsonSerializer.Serialize(input)
+        };
+        await db.EventStore.AddAsync(e, ct);
+        entity.AddDomainEvent(e);
+        // db.Set<TEntity>().Update(entity);
+        return e;
+    }
 }

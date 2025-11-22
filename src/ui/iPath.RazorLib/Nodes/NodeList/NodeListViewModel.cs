@@ -1,11 +1,13 @@
 ﻿using iPath.Application.Features.Nodes;
 using iPath.Blazor.Componenents.Nodes;
+using Microsoft.AspNetCore.Components;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
 public class NodeListViewModel(IPathApi api,
     ISnackbar snackbar, 
     IDialogService dialog,
+    NavigationManager nm,
     NodeViewModel nvm) : IViewModel
 {
     public Guid? GroupId { get; set; }
@@ -36,4 +38,16 @@ public class NodeListViewModel(IPathApi api,
         }
         return new TableData<NodeListDto>();
     }
+
+
+
+    public async Task CreateNewCase()
+    {
+        if (GroupId.HasValue)
+        {
+            nm.NavigateTo($"node/new/{GroupId}");
+        }
+    }
+
+    public bool CreateNewCaseDisabled => !GroupId.HasValue;
 }

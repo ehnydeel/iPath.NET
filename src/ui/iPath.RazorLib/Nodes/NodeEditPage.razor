@@ -1,0 +1,47 @@
+﻿@page "/node/new/{groupId}"
+@page "/node/edit/{id}"
+
+@inject IStringLocalizer T
+@inject NodeViewModel vm
+
+
+<IPathHeader Title=@T["New Case"] />
+
+@if (vm.RootNode != null)
+{
+    <iPath.Blazor.Componenents.Nodes.Edit.NodeEditForm Model="vm.RootNode.Description" />
+
+    <MudStack Row Spacing="4">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                   OnClick=@(() => vm.Save(false))
+                   StartIcon="@Icons.Material.Filled.Save">@SaveText</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel"
+                   OnClick=@(() => vm.Save(true))>Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete">Delete</MudButton>
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public string groupId { get; set; }
+
+    [Parameter]
+    public string id { get; set; }
+
+    string SaveText = "Save";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Guid.TryParse(groupId, out var GroupId))
+        {
+            await vm.CreateNewNode(GroupId);
+            SaveText = T["Publish"];
+        }
+        else if (Guid.TryParse(id, out var nodeId))
+        {
+            await vm.LoadNode(nodeId);
+            SaveText = T["Save"];
+        }
+    }
+
+}

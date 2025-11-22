@@ -1,7 +1,7 @@
 ﻿namespace iPath.Application.Features.Nodes;
 
-public record UpdateNodeDescriptionCommand(Guid NodeId, NodeDescription Data)
-    : IRequest<UpdateNodeDescriptionCommand, Task<bool>>
+public record UpdateNodeCommand(Guid NodeId, NodeDescription? Description, bool? IsDraft)
+    : IRequest<UpdateNodeCommand, Task<bool>>
     , IEventInput
 {
     public string ObjectName => nameof(Node);

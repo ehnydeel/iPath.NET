@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Scalar.AspNetCore;
+﻿using Scalar.AspNetCore;
 using System.Runtime.CompilerServices;
 
 namespace iPath.API;

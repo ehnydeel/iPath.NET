@@ -56,7 +56,7 @@ public static class NodeEndpoints
         // Commands
         grp.MapPost("create", (CreateNodeCommand request, IMediator mediator, CancellationToken ct)
             => mediator.Send(request, ct))
-            .Produces<NodeListDto>()
+            .Produces<NodeDto>()
             .RequireAuthorization();
 
         grp.MapDelete("{id}", (string id, IMediator mediator, CancellationToken ct)
@@ -64,7 +64,7 @@ public static class NodeEndpoints
             .Produces<NodeDeletedEvent>()
             .RequireAuthorization();
 
-        grp.MapPut("update", (UpdateNodeDescriptionCommand request, IMediator mediator, CancellationToken ct)
+        grp.MapPut("update", (UpdateNodeCommand request, IMediator mediator, CancellationToken ct)
             => mediator.Send(request, ct))
             .Produces<bool>()
             .RequireAuthorization();

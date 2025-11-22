@@ -1,0 +1,32 @@
+﻿@inject IStringLocalizer T
+
+<MudForm Model="Model">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField Label=@T["Title"] @bind-Value="Model.Title" Variant="Variant"
+                          AutoFocus="true" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField Label=@T["Subtitle"] @bind-Value="Model.Subtitle" Variant="Variant" />
+        </MudItem>
+        <MudItem xs="12" sm="8">
+            <MudTextField Label=@T["Case Type"] @bind-Value="Model.CaseType" Variant="Variant" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudTextField Label=@T["Accession No"] @bind-Value="Model.AccessionNo" Variant="Variant" />
+        </MudItem>
+
+        <MudItem xs="12">
+            <MudTextField Label=@T["Desciption"] @bind-Value="Model.Text"
+                          Lines="6" AutoGrow="true"
+                          Variant="Variant" />
+        </MudItem>
+    </MudGrid>
+</MudForm>
+
+@code {
+    [Parameter]
+    public NodeDescription Model { get; set; }
+
+    public Variant Variant { get; set; } = Variant.Outlined;
+}

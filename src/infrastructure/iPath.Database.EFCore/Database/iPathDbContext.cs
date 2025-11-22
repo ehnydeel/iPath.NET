@@ -1,12 +1,10 @@
 using iPath.Domain.Entities.Mails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace iPath.EF.Core.Database;
 
-public class iPathDbContext(DbContextOptions<iPathDbContext> options)
+public class iPathDbContext(DbContextOptions<iPathDbContext> options, IMediator mediator)
     : IdentityDbContext<User, Role, Guid>(options)
 {
 
@@ -89,7 +87,6 @@ public class iPathDbContext(DbContextOptions<iPathDbContext> options)
             }
         }
 
-
         builder.Entity<EventEntity>(b =>
         {
             b.ToTable("eventstore");
@@ -104,6 +101,39 @@ public class iPathDbContext(DbContextOptions<iPathDbContext> options)
 
             b.HasIndex(x => x.ObjectId);
         });
+    }
 
+
+
+    private readonly Stack<object> _savesChangesTracker = new();
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        _savesChangesTracker.Push(new object());
+
+        var entitiesWithEvents = ChangeTracker
+            .Entries<IHasDomainEvents>()
+            .Where(e => e.Entity.Events.Any())
+            .Select(e => e.Entity)
+            .ToArray();
+
+        foreach (var entity in entitiesWithEvents)
+        {
+            var events = entity.Events.ToArray();
+            entity.ClearDomainEvents();
+
+            foreach (var domainEvent in events)
+            {
+                await  mediator.Publish(domainEvent, cancellationToken);
+            }
+        }
+
+        _savesChangesTracker.Pop();
+
+        if (!_savesChangesTracker.Any())
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        return 0;
     }
 }

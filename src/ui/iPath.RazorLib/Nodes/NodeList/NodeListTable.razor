@@ -6,7 +6,8 @@
     <ToolBarContent>
         <MudToolBar>
             <MudTooltip Text="create a new case">
-                <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Add"
+                               OnClick="vm.CreateNewCase" Disabled="vm.CreateNewCaseDisabled" />
             </MudTooltip>
             <MudTooltip Text="export data">
                 <MudIconButton Icon="@Icons.Material.Outlined.Save" />
@@ -68,8 +69,9 @@
     }
 
     [Parameter]
-    public Guid? OwnerId { 
-        get => vm.OwnerId; 
+    public Guid? OwnerId
+    {
+        get => vm.OwnerId;
         set => vm.OwnerId = value;
     }
 

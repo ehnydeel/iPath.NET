@@ -2,5 +2,4 @@
 
 public class RootNodeCreatedEvent : NodeEvent, INotification
 {
-    public Guid? GroupId { get; set; }
 }
