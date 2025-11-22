@@ -6,7 +6,8 @@ using System.Security.Claims;
 
 namespace iPath.Blazor.Componenents.Users;
 
-public class UserViewModel(IPathApi api, ISnackbar snackbar, 
+public class UserViewModel(IPathApi api, 
+    ISnackbar snackbar, 
     IDialogService srvDialog,
     IMemoryCache cache,
     IStringLocalizer T,

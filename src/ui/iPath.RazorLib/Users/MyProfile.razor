@@ -1,4 +1,4 @@
-﻿@page "/user/profile"
+﻿@page "/user/profile1"
 
 
 <MudContainer MaxWidth="MaxWidth.Medium">
@@ -6,7 +6,7 @@
 
     <AuthorizeView>
         <Authorized>
-            <UserProfileForm Model="Model" OnValidSubmit="OnSubmit"/>
+            <UserProfileForm Model="Model" />
         </Authorized>
         <NotAuthorized>
             <RedirectToLogin />
@@ -18,18 +18,7 @@
 @inject IStringLocalizer T
 
 @code {
-    UserProfile Model;
+    UserProfile Model = new();
     SessionUserDto sess;
 
-    protected override async Task OnInitializedAsync()
-    {
-        sess = await vm.GetCurrentSessionAsync();
-        var tmp = await vm.GetProfileAsync(sess.Id);
-        Model = tmp.Clone();
-    }
-
-    private async Task OnSubmit()
-    {
-        await vm.UpdateProfile(sess.Id, Model, true);
-    }
 }
