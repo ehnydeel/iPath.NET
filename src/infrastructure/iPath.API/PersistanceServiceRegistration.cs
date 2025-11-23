@@ -1,4 +1,5 @@
 ﻿using iPath.EF.Core.Database;
+using iPath.EF.Core.FeatureHandlers.Emails;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,7 @@ public static class PersistanceServiceRegistration
         // services.AddDbFactory(config);
 
         services.AddScoped<DbSeeder>();
+        services.AddScoped<IEmailRepository, EmailRepository>();
 
         return services;
     }

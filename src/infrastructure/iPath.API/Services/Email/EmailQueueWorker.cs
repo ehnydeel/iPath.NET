@@ -12,6 +12,7 @@ public class EmailQueueWorker(IEmailQueue queue,
     private IServiceScope scope;
     private IEmailSender srv;
     private IMediator mediator;
+    private IEmailRepository repo;
 
 
     public override async Task StartAsync(CancellationToken cancellationToken)
@@ -19,6 +20,7 @@ public class EmailQueueWorker(IEmailQueue queue,
         scope = services.CreateScope();
         srv = scope.ServiceProvider.GetRequiredService<IEmailSender>();
         mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        repo = scope.ServiceProvider.GetRequiredService<IEmailRepository>();
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -42,11 +44,11 @@ public class EmailQueueWorker(IEmailQueue queue,
 
             if (res.IsSuccess)
             {
-                await mediator.Send(new EmailSetSentCommand(mail.Id), stoppingToken);
+                await repo.SetSent(mail.Id, stoppingToken);
             }
             else
             {
-                await mediator.Send(new EmailSetErrorCommand(mail.Id, res.ErrorMessage()), stoppingToken);
+                await repo.SetError(mail.Id, res.ErrorMessage(), stoppingToken);
             }
 
             await Task.Delay(500);

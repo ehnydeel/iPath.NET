@@ -118,4 +118,11 @@ public interface IPathApi
 
     #endregion
 
+    #region "-- Mailbox --"
+    [Delete("/api/v1/admin/mail/{id}")]
+    Task<IApiResponse> DeleteMail(Guid id);
+
+    [Delete("/api/v1/admin/mail/all")]
+    Task<IApiResponse> DeleteAllMail();
+    #endregion
 }

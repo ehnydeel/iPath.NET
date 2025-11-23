@@ -1,4 +1,5 @@
-﻿using iPath.Blazor.Componenents.Admin.Communities;
+﻿using iPath.Blazor.Componenents.Admin;
+using iPath.Blazor.Componenents.Admin.Communities;
 using iPath.Blazor.Componenents.Admin.Groups;
 using iPath.Blazor.Componenents.Admin.Users;
 using iPath.Blazor.Componenents.AppState;
@@ -40,6 +41,7 @@ public static class RazorLibServiceRegistration
         services.AddScoped<CommunityAdminViewModel>();
         services.AddScoped<GroupAdminViewModel>();
         services.AddScoped<UserAdminViewModel>();
+        services.AddScoped<MailBoxViewModel>();
 
         // users
         services.AddScoped<GroupListViewModel>();

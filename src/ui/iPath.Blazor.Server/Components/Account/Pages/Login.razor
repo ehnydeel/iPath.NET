@@ -97,8 +97,17 @@
         var attr = new EmailAddressAttribute();
         if (attr.IsValid(Input.Username))
         {
-            var user = await um.FindByEmailAsync(Input.Username);
-            Input.Username = user is not null ? user.UserName : Input.Username;
+            try
+            {
+                var user = await um.FindByEmailAsync(Input.Username);
+                Input.Username = user is not null ? user.UserName : Input.Username;
+            }
+            catch(Exception ex)
+            {
+                Logger.LogError("Login by Email falied", ex);
+                errorMessage = "Error: Email is not unique. Please login with your username.";
+                return;
+            }
         }
 
         var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);

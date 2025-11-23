@@ -12,14 +12,20 @@ public static class AdminEndpoints
     public static IEndpointRouteBuilder MapAdminApi(this IEndpointRouteBuilder route)
     {
         route.MapGet("admin/mailbox", 
-            async ([DefaultValue(0)] int page, [DefaultValue(10)] int pagesize, IMediator mediator, CancellationToken ct)
-            => {
-                var res = await mediator.Send(new GetEmailsQuery { Page = page, PageSize = pagesize }, ct);
-                return res;
-            })
+            ([DefaultValue(0)] int page, [DefaultValue(10)] int pagesize, IEmailRepository repo, CancellationToken ct)
+            => repo.GetPage(new PagedQuery<EmailMessage> { Page = page, PageSize = pagesize }, ct))
             .WithTags("Admin")
             // .RequireAuthorization()
             .Produces<PagedResult<EmailMessage>>();
+
+        route.MapDelete("admin/mail/{id}", (string id, IEmailRepository repo, CancellationToken ct)
+            => repo.Delete(Guid.Parse(id), ct))
+            .WithTags("Admin");
+
+        route.MapDelete("admin/mail/all", (IEmailRepository repo, CancellationToken ct)
+            => repo.DeleteAll(ct))
+            .WithTags("Admin");
+
 
         route.MapGet("session", (IUserSession sess) => sess.User)
             .Produces<SessionUserDto>()
