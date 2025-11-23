@@ -10,7 +10,7 @@ public record UserDto
 
     public ICollection<UserGroupMemberDto> GroupMembership { get; init; } = [];
 
-    public string[] Roles { get; init; } = [];
+    public RoleDto[] Roles { get; init; } = [];
 
     public bool IsActive { get; init; }
 

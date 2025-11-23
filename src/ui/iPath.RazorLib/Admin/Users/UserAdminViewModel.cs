@@ -53,6 +53,16 @@ public class UserAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogService
         }
     }
 
+    public async Task<IEnumerable<RoleDto>> GetRoles()
+    {
+        var resp = await api.GetRoles();
+        if (resp.IsSuccessful)
+        {
+            return resp.Content;
+        }
+        snackbar.AddError(resp.ErrorMessage);
+        return null;
+    }
 
     #region "-- Action --"
 
@@ -65,12 +75,14 @@ public class UserAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogService
         }
     }
 
-    public bool EditDisable => true;
-    public async Task Edit()
+    public bool EditDisabled => false;
+    public async Task Edit(UserListDto user)
     {
-        if (SelectedItem != null)
+        if (user != null)
         {
-            snackbar.AddWarning("not implemented yet");
+            await LoadUser(user.Id);
+            var dlg = await dialog.ShowAsync<UserAdminDialog>();
+            var res = await dlg.Result;
         }
     }
 
@@ -93,6 +105,23 @@ public class UserAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogService
     {
         snackbar.AddWarning("not implemented yet");
     }
+
+
+    public async Task<bool> SaveUserRoles(IEnumerable<RoleDto> roles)
+    {
+        if (SelectedUser != null)
+        {
+            var cmd = new UpdateUserRolesCommand(SelectedUser.Id, roles.Select(r => r.Id).ToArray());
+            var res = await api.SetUserRoles(cmd);
+            if (res.IsSuccessful) 
+            { 
+                snackbar.AddError(res.ErrorMessage);
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     #endregion
 }

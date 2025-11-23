@@ -39,6 +39,9 @@ public interface IPathApi
     [Put("/api/v1/users/role")]
     Task<IApiResponse<Guid>> SetUserRole(UpdateUserRoleCommand command);
 
+    [Put("/api/v1/users/roles")]
+    Task<IApiResponse> SetUserRoles(UpdateUserRolesCommand command);
+
     [Put("/api/v1/users/profile")]
     Task<IApiResponse<Guid>> UpdateProfile(UpdateUserProfileCommand command);
 

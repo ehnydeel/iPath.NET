@@ -15,7 +15,7 @@ public class GetUserByIdHandler(iPathDbContext db, IUserSession sess)
                 Username = u.UserName,
                 Email = u.Email,
                 Profile = u.Profile,
-                Roles = u.Roles.Select(r => r.Name).ToArray()                
+                Roles = u.Roles.Select(r => new RoleDto(r.Id, r.Name)).ToArray()                
             })
             .FirstOrDefaultAsync(u => u.Id == request.Id);
 

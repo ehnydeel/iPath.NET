@@ -26,11 +26,17 @@
         <PropertyColumn Property="x => x.Username" Title=@T["Username"] />
         <PropertyColumn Property="x => x.Email" Title=@T["Username"] />
         <PropertyColumn Property="x => x.Roles.ToCSV()" Title=@T["Roles"] />
-            <TemplateColumn Title=@T["Active"]>
-                <CellTemplate><MudCheckBox Value="@context.Item.IsActive" ReadOnly="true" /></CellTemplate>
+        <TemplateColumn Title=@T["Active"]>
+            <CellTemplate><MudCheckBox Value="@context.Item.IsActive" ReadOnly="true" /></CellTemplate>
         </TemplateColumn>
         <TemplateColumn Title=@T["Confirmed"]>
             <CellTemplate><MudCheckBox Value="@context.Item.EmailConfirmed" ReadOnly="true" /></CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudFab StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                        OnClick="@(() => vm.Edit(context.Item))" Disabled="vm.EditDisabled" />
+            </CellTemplate>
         </TemplateColumn>
     </Columns>
     <PagerContent>

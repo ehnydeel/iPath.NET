@@ -33,6 +33,10 @@ public static class UserEndpoints
             .Produces<Guid>()
             .RequireAuthorization("Admin");
 
+        grp.MapPut("roles", (UpdateUserRolesCommand cmd, IMediator mediator, CancellationToken ct)
+            => mediator.Send(cmd, ct))
+            .RequireAuthorization("Admin");
+
         grp.MapPut("profile", (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
             => mediator.Send(cmd, ct))
             .Produces<Guid>()

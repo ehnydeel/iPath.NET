@@ -1,0 +1,50 @@
+﻿<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@vm.SelectedUser.Username</MudText>
+    </TitleContent>
+    <DialogContent>
+        <h3>Roles</h3>
+        <MudToggleGroup T="RoleDto" SelectionMode="SelectionMode.MultiSelection"
+                        @bind-Values="selectedRoles" Outlined="true" Color="Color.Primary"
+                        Class="my-8">
+            @foreach (var r in allRoles)
+            {
+                <MudToggleItem T="RoleDto" Value="@r">@r.Name</MudToggleItem>
+            }
+        </MudToggleGroup>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@inject UserAdminViewModel vm
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private IEnumerable<RoleDto> allRoles = [];
+    private IEnumerable<RoleDto> selectedRoles = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        allRoles = await vm.GetRoles();
+        if (vm.SelectedUser != null)
+        {
+            selectedRoles = vm.SelectedUser.Roles.ToList();
+        }
+    }
+
+    async Task Save()
+    {
+        if (!await vm.SaveUserRoles(selectedRoles))
+        {
+            // error
+        }
+        MudDialog.Close(true);
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

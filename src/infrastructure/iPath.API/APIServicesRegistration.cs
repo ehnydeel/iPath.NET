@@ -31,6 +31,12 @@ public static class APIServicesRegistration
         services.AddPersistance(config);
         services.AddIPathAuthentication(config);
 
+        // Authorizations
+        services.AddAuthorizationBuilder()
+            .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
+            .AddPolicy("Developer", policy => policy.RequireRole("Developer"));
+
+
         // Email handling
         services.Configure<SmtpConfig>(options => config.GetSection(nameof(SmtpConfig)).Bind(options));
         services.AddTransient<IEmailSender, SmtpEmailSender>();
