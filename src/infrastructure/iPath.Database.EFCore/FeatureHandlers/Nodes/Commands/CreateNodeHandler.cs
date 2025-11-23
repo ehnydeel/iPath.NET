@@ -9,39 +9,10 @@
         var group = await db.Groups.FindAsync(request.GroupId, ct);
         Guard.Against.NotFound(request.GroupId, group);
 
-        await using var tran = await db.Database.BeginTransactionAsync(ct);
+        var node = NodeCommandExtensions.CreateNode(request, sess.User.Id);
+        await db.Nodes.AddAsync(node, ct);
+        await db.SaveChangesAsync(ct);
 
-        try
-        {
-
-            var node = new Node
-            {
-                Id = request.NodeId.HasValue ? request.NodeId.Value : Guid.CreateVersion7(),
-                CreatedOn = DateTime.UtcNow,
-                LastModifiedOn = DateTime.UtcNow,
-                GroupId = request.GroupId,
-                OwnerId = sess.User.Id,
-                Description = request.Description ?? new(),
-                NodeType = request.NodeType,
-                IsDraft = true
-            };
-
-            await db.Nodes.AddAsync(node, ct);
-            var evt = await db.CreateEventAsync<RootNodeCreatedEvent, CreateNodeCommand, Node>(request, node, sess.User.Id);
-            evt.GroupId = request.GroupId;
-            await db.SaveChangesAsync(ct);
-
-            await tran.CommitAsync(ct);
-
-            // publish domain events
-            await mediator.Publish(evt, ct);
-
-            return node.ToDto();
-        }
-        catch (Exception ex)
-        {
-            await tran.RollbackAsync(ct);
-        }
-        return null;
+        return node.ToDto();
     }
 }

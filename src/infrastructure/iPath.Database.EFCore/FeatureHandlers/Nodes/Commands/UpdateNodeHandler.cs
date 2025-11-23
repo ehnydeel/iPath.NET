@@ -1,42 +1,32 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+﻿
+namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
 
 
-public class UpdateNodeHandler(iPathDbContext db, IUserSession sess) 
+public class UpdateNodeHandler(iPathDbContext db, IUserSession sess)
     : IRequestHandler<UpdateNodeCommand, Task<bool>>
 {
     public async Task<bool> Handle(UpdateNodeCommand request, CancellationToken ct)
-    {      
-        var node = await db.Nodes.FindAsync(request.NodeId, ct);
+    {
+        var node = await db.Nodes
+            .Include(n => n.RootNode)
+            .SingleOrDefaultAsync(n => n.Id == request.NodeId, ct);
         Guard.Against.NotFound(request.NodeId, node);
 
-        await using var tran = await db.Database.BeginTransactionAsync(ct);
-        try
+        // permission
+        if (!sess.IsAdmin)
         {
-            bool isPubish = false;
-            if (node.IsDraft && request.IsDraft.HasValue && !request.IsDraft.Value)
-                isPubish = true;
-
-            if (request.Description is not null)
-                node.Description = request.Description;
-            if (request.IsDraft.HasValue)
-                node.IsDraft = request.IsDraft.Value;
-
-            node.LastModifiedOn = DateTime.UtcNow;
-            await db.CreateEventAsync<NodeDescriptionUpdatedEvent, UpdateNodeCommand, Node>(request, node);
-            if (isPubish)
+            var gid = node.GroupId.HasValue ? node.GroupId.Value : node.RootNode?.GroupId;
+            if (!gid.HasValue || !sess.IsGroupModerator(gid.Value))
             {
-                var evt = await db.CreateEventAsync<RootNodePublishedEvent, UpdateNodeCommand, Node>(request, node);
-                evt.GroupId = node.GroupId;
+                if (node.OwnerId != sess.User.Id)
+                {
+                    throw new NotAllowedException();
+                }
             }
-            await db.SaveChangesAsync(ct);
-            await tran.CommitAsync(ct);
+        }
 
-            return true;
-        }
-        catch (Exception ex)
-        {
-            await tran.RollbackAsync(ct);
-        }
-        return false;
+        node.UpdateNode(request, sess.User.Id);
+        await db.SaveChangesAsync(ct);
+        return true;
     }
 }

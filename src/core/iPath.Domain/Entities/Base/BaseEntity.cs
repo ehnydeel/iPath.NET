@@ -29,17 +29,19 @@ public class AuditableEntityWithEvents : AuditableEntity, IHasDomainEvents
     public DateTime? LastModifiedOn { get; set; }
 
     [JsonIgnore]
-    public List<EventEntity> Events => new();
+    public List<EventEntity> Events { get; set; } = new();
 
-    public void AddDomainEvent(EventEntity eventItem) => Events.Add(eventItem);
+    public void AddEventEntity(EventEntity eventItem) 
+        => Events.Add(eventItem);
 
-    public void ClearDomainEvents() => Events.Clear();
+    public void ClearDomainEvents()
+        => Events.Clear();
 }
 
 
 public interface IHasDomainEvents : IBaseEntity
 {
     public List<EventEntity> Events { get; }
-    public void AddDomainEvent(EventEntity eventItem);
+    public void AddEventEntity(EventEntity eventItem);
     public void ClearDomainEvents();
 }

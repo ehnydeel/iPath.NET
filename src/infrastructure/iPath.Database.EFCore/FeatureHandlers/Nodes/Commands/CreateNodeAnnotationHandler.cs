@@ -17,30 +17,10 @@ public class CreateNodeAnnotationCommandHandler(iPathDbContext db, IMediator med
 
         }
 
-        await using var tran = await db.Database.BeginTransactionAsync(ct);
-        try
-        {
-            var a = new Annotation
-            {
-                Text = request.Text,
-                OwnerId = sess.User.Id,
-                CreatedOn = DateTime.UtcNow,
-            };
-            node.Annotations.Add(a);
+        var a = node.CreateNodeAnnotation(request, sess.User.Id);
+        db.Nodes.Update(node);
+        await db.SaveChangesAsync(ct);
 
-            db.Nodes.Update(node);
-            var evt = await db.CreateEventAsync<AnnotationCreatedEvent, CreateNodeAnnotationCommand, Node>(request, node);
-            evt.GroupId = node.GroupId;
-            await db.SaveChangesAsync(ct);
-
-            await tran.CommitAsync(ct);
-
-            return a.ToDto();
-        }
-        catch (Exception ex) 
-        {
-            await tran.RollbackAsync(ct);
-        }
-        return null;
+        return a.ToDto();
     }
 }

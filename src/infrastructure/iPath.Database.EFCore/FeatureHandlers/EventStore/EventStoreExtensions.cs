@@ -46,7 +46,7 @@ public static class EventStoreExtensions
             Payload = JsonSerializer.Serialize(input)
         };
         await db.EventStore.AddAsync(e, ct);
-        entity.AddDomainEvent(e);
+        entity.AddEventEntity(e);
         // db.Set<TEntity>().Update(entity);
         return e;
     }

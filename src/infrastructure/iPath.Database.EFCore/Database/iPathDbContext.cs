@@ -116,24 +116,33 @@ public class iPathDbContext(DbContextOptions<iPathDbContext> options, IMediator 
             .Select(e => e.Entity)
             .ToArray();
 
+        var events = new Stack<EventEntity>();
         foreach (var entity in entitiesWithEvents)
         {
-            var events = entity.Events.ToArray();
+            entity.Events.ForEach(e => events.Push(e));
             entity.ClearDomainEvents();
+        }
 
-            foreach (var domainEvent in events)
-            {
-                await  mediator.Publish(domainEvent, cancellationToken);
-            }
+        foreach (var domainEvent in events)
+        {
+            EventStore.Add(domainEvent);
         }
 
         _savesChangesTracker.Pop();
 
+        var res = 0;
         if (!_savesChangesTracker.Any())
         {
-            return await base.SaveChangesAsync(cancellationToken);
+            res = await base.SaveChangesAsync(cancellationToken);
         }
 
-        return 0;
+
+        foreach (var domainEvent in events)
+        {
+            await mediator.Publish(domainEvent, cancellationToken);
+        }
+
+
+        return res;
     }
 }

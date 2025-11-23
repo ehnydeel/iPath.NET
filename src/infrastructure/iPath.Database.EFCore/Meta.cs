@@ -8,6 +8,7 @@ global using iPath.EF.Core.FeatureHandlers.EventStore;
 global using iPath.Domain.Entities;
 global using iPath.Application.Contracts;
 global using iPath.EF.Core.Database;
+global using iPath.Application.Exceptions;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using DispatchR;
