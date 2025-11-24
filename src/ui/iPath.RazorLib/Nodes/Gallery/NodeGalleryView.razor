@@ -1,10 +1,9 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
 
-@using System.ComponentModel
+@inherits NodeViewComponentBase
 
 @inject ISnackbar snackbar
 @inject IDialogService srvDialog
-@inject NodeViewModel vm
 
 
 @**** Gallery View **********************************************@
@@ -44,6 +43,6 @@
 @code {
 	async Task OnChildClick(NodeDto child)
 	{
-		await vm.SelectedChilNode(child);
+		await vm.SelectChilNode(child);
 	}
 }

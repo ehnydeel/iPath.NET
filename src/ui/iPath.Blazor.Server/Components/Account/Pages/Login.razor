@@ -129,7 +129,7 @@
         }
         else
         {
-            // Legacy fallback: verify old ipath2 password (MD5) and migrate account to Identity
+            // IPATH => Legacy fallback: verify old ipath2 password (MD5) and migrate account to Identity
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == Input.Username || u.Email == Input.Username);
             if (user is not null && !string.IsNullOrWhiteSpace(user.ipath2_password))
             {

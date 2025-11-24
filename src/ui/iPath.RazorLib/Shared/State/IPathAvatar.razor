@@ -1,0 +1,40 @@
+﻿@namespace iPath.Blazor.Componenents.Shared
+
+@if (appState.User != null)
+{
+    <MudMenu>
+        <ActivatorContent>
+            <MudBadge Color="@appState.PresenceColor" Overlap="true" Bordered="true">
+                <MudAvatar>@appState.User.Initials</MudAvatar>
+            </MudBadge>
+        </ActivatorContent>
+        <ChildContent>
+            <MudMenuItem Label=@T["Profile"] Icon="@Icons.Material.Filled.ManageAccounts" Href="/user/profile" />
+            <MudMenuItem Label=@T["My Cases"] Icon="@Icons.Material.Filled.Folder" Href="/user/cases" />
+            <MudMenuItem Label=@T["My Groups"] Icon="@Icons.Material.Filled.Groups" Href="/user/groups" />
+        </ChildContent>
+    </MudMenu>
+    }
+else
+{
+    <MudAvatar />
+}
+
+@inject AppState appState;
+@inject IStringLocalizer T
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // await appState.ReloadSession();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await appState.ReloadSession();
+            StateHasChanged();
+        }
+    }
+}

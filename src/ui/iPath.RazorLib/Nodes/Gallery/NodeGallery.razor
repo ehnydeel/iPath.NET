@@ -1,18 +1,14 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
-@implements IDisposable
 
+@inherits NodeViewComponentBase
 
-@using Microsoft.JSInterop
-@using System.ComponentModel
-  
 
 @inject ISnackbar snackbar
 @inject IJSRuntime JS
 @inject IHttpClientFactory httpFactory
-@inject NodeViewModel vm
 
 
-@if( !vm.IsRootNodeSelected && !vm.SelectedNode.ChildNodes.Any() )
+@if (!vm.IsRootNodeSelected && !vm.SelectedNode.ChildNodes.Any())
 {
     OnShowingChildNode.InvokeAsync(true);
     <div class="ipath_image">
@@ -34,20 +30,25 @@ else
         <div class="ipath_header_title">Gallery</div>
         <div class="ipath_header_actions">
             <MudTooltip Text="Sort Images">
-                <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.PlaylistPlay" @onclick="ActivateSort"/>
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.PlaylistPlay" @onclick="ActivateSort" />
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.AttachFile" @onclick="ActivateUpload" />
             </MudTooltip>
         </div>
     </div>
 
     @if (vm.SelectedNode != null)
     {
-        @if( !Sorting )
+        @if (Sorting)
         {
-            <NodeGalleryView  />
+            <NodeGallerySortable OnSortingFinished="SortingFinished" />
+        }
+        else if (Uploading)
+        {
+            <NodeGalleryUpload OnUploadFinished="SortingFinished" />
         }
         else
         {
-            <NodeGallerySortable OnSortingFinished="SortingFinished" />
+            <NodeGalleryView />
         }
     }
 }
@@ -56,31 +57,23 @@ else
     [Parameter]
     public EventCallback<bool> OnShowingChildNode { get; set; }
 
-    bool Sorting;
+    private bool Sorting;
 
-    protected override void OnInitialized()
+    private bool Uploading;
+
+    public void ActivateSort()
     {
-        vm.PropertyChanged += PropertyChangedEventHandler;
-    }
-
-    public void Dispose()
-    {
-        vm.PropertyChanged -= PropertyChangedEventHandler;
-    }
-
-    async void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs args)
-    {
-        InvokeAsync(() => StateHasChanged());
-    }
-
-
-
-    void ActivateSort()
-    {
+        Uploading = false;
         Sorting = true;
     }
 
-    void SortingFinished(bool sorted)
+    public void ActivateUpload()
+    {
+        Uploading = true;
+        Sorting = false;
+    }
+
+    public void SortingFinished(bool sorted)
     {
         Sorting = false;
         StateHasChanged();

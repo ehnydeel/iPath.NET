@@ -4,7 +4,8 @@ public record NodeListDto
 {
     public Guid Id { get; init; }
     public string NodeType { get; init; } = default!;
-    public DateTime CreatedOn { get; set; }
+    public DateTime CreatedOn { get; init; }
+    public bool IsDraft { get; init; }
 
     public Guid OwnerId { get; init; }
     public required OwnerDto Owner { get; init; }
@@ -30,6 +31,7 @@ public static class NodeListExtension
             Id = node.Id,
             NodeType = node.NodeType,
             CreatedOn = node.CreatedOn,
+            IsDraft = node.IsDraft,
             OwnerId = node.OwnerId,
             Owner = node.Owner.ToOwnerDto(),
             GroupId = node.GroupId,

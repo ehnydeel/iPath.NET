@@ -37,6 +37,11 @@ public static class APIServicesRegistration
             .AddPolicy("Developer", policy => policy.RequireRole("Developer"));
 
 
+        // app config
+        services.Configure<iPathConfig>(config.GetSection(iPathConfig.ConfigName));
+        //var cfg = new iPathConfig();
+        //config.GetSection(iPathConfig.ConfigName).Bind(cfg);
+
         // Email handling
         services.Configure<SmtpConfig>(options => config.GetSection(nameof(SmtpConfig)).Bind(options));
         services.AddTransient<IEmailSender, SmtpEmailSender>();
@@ -46,6 +51,8 @@ public static class APIServicesRegistration
             return new EmailQueue(capacity);
         });
         services.AddHostedService<EmailQueueWorker>();
+
+
 
         // Upload Handling
         services.AddSingleton<IUploadQueue, UploadQueue>(ctx =>

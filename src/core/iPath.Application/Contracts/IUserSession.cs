@@ -51,5 +51,22 @@ public static class UserSessionExtensions
 
 
         public string Username => session.Username;
+
+        public bool CanEditNode(NodeDto? node)
+        {
+            if (session.User is null || node is null )
+                return false;
+
+            if (session.IsAdmin)
+                return true;
+
+            if (node.GroupId.HasValue && session.IsGroupModerator(node.GroupId.Value))
+                return true;
+
+            if (node.OwnerId == session.User.Id)
+                return true;
+
+            return false;
+        }
     }
 }

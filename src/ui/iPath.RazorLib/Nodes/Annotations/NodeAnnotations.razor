@@ -1,6 +1,6 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
 
-@inject NodeViewModel vm
+@inherits NodeViewComponentBase
 
 @if (vm.RootNode != null)
 {
@@ -37,6 +37,4 @@
 	{
 		Sort = (Sort == SortDirection.Ascending) ? SortDirection.Descending : SortDirection.Ascending;
 	}
-
-
 }

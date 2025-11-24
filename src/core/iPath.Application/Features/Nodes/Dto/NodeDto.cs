@@ -13,6 +13,7 @@ public record NodeDto
     public Guid? GroupId { get; init; }
     public Guid? RootNodeId { get; init; }
     public Guid? ParentNodeId { get; init; }
+    public bool IsDraft { get; init; }
 
     public NodeDescription? Description { get; init; } = new();
     public NodeFile? File { get; init; } = null!;
@@ -34,6 +35,7 @@ public static class NodeExtension
             NodeType = node.NodeType,
             CreatedOn = node.CreatedOn,
             SortNr = node.SortNr,
+            IsDraft = node.IsDraft,
             OwnerId = node.OwnerId,
             Owner = node.Owner.ToOwnerDto(),
             GroupId = node.GroupId,
@@ -45,5 +47,10 @@ public static class NodeExtension
             ChildNodes = node.ChildNodes is not null ? node.ChildNodes.Select(n => n.ToDto()).ToArray() : [],
             Annotations = node.Annotations is not null ? node.Annotations.Select(a => a.ToDto()).ToArray() : []
         };
+    }
+
+    public static bool IsSameAs(this Node? node, Node? other)
+    {
+        return node is not null && other is not null && node.Id == other.Id;
     }
 }

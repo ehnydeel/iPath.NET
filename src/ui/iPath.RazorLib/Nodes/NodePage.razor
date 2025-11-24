@@ -1,22 +1,18 @@
 ﻿@page "/node/{id}"
 
-@inject NodeViewModel nvm
+@inherits NodeViewComponentBase
 
-@if (nvm.RootNode is null)
+
+<NodeHeader />
+
+@if (vm.RootNode is null)
 {
     <LoadingMessage />
 }
 else
 {
-    <NodeHeader />
-
-    @if (!nvm.IsEditing)
-    {
-        <NodeDescriptionView ExpandDescription="ShowDescription" />
-    }
-
+    <NodeDescriptionView ExpandDescription="ShowDescription" />
     <NodeGallery OnShowingChildNode="@(e => ShowDescription = !e)" />
-
     <NodeAnnotations />
 }
 
@@ -26,18 +22,37 @@ else
     public string id { get; set; }
 
     bool ShowDescription = true;
+    bool Loading;
 
     protected override void OnInitialized()
     {
-        nvm.ClearData();
+        vm.OnLoadingStarted += StartLoding;
+        vm.OnLoadingStarted += StartLoding;
     }
+
+    protected override void OnDisposed()
+    {
+        vm.OnLoadingStarted -= StartLoding;
+        vm.OnLoadingStarted -= StartLoding;
+    }
+
+    void StartLoding()
+    {
+        Loading = true;
+    }
+
+    void StoptLoding()
+    {
+        Loading = false;
+    }
+
 
     protected override async Task OnParametersSetAsync()
     {
-        await nvm.LoadNode(Guid.Parse(id));
+        await vm.LoadNode(Guid.Parse(id));
         StateHasChanged();
 
-        await nvm.MarkAsVisited();
+        await vm.MarkAsVisited();
     }
 
 }

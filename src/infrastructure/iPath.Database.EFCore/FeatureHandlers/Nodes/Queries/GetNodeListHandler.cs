@@ -1,5 +1,6 @@
 ﻿namespace iPath.EF.Core.FeatureHandlers.Nodes;
 
+using iPath.EF.Core.FeatureHandlers.Nodes.Queries;
 using EF = Microsoft.EntityFrameworkCore.EF;
 
 public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
@@ -22,15 +23,20 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
             q = q.Where(n => n.OwnerId == request.OwnerId.Value);
         }
 
+        // freetext search
         if (!string.IsNullOrEmpty(request.SearchString))
         {
-            var s = "%" + request.SearchString.Trim().Replace("*", "%") + "%";
-            q = q.Where(n => (
-                EF.Functions.Like(n.Description.Title, s) ||
-                EF.Functions.Like(n.Description.Subtitle, s) ||
-                EF.Functions.Like(n.Description.Text, s)
-            ));
+            q = q.ApplySearchString(request.SearchString); 
         }
+
+        if (request.Filter is not null)
+        {
+            foreach (var f in request.Filter)
+            {
+                q = q.ApplyNodeFilter(f);
+            }
+        }
+
 
         // filter & sort
         q = q.ApplyQuery(request);

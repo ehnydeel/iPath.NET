@@ -14,6 +14,7 @@
     <Project Path="src/infrastructure/iPath.Database.EFCore/iPath.Database.EFCore.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/Migrations/">
+    <File Path="src/infrastructure/iPath.Database.Sqlite/README.md" />
     <Project Path="src/infrastructure/iPath.Database.Postgres/iPath.Database.Postgres.csproj" />
     <Project Path="src/infrastructure/iPath.Database.Sqlite/iPath.Database.Sqlite.csproj" />
   </Folder>

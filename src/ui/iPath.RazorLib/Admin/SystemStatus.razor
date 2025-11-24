@@ -1,0 +1,44 @@
+﻿@page "/admin/system"
+@using Microsoft.Extensions.Options
+@using iPath.Domain.Config
+
+@attribute [ExcludeFromInteractiveRouting]
+
+<IPathHeader Title="System Satus" />
+
+<b>@RendererInfo.Name @RendererInfo.IsInteractive</b>
+
+<MudDivider />
+
+<p>
+    <b>Temp Path: </b>
+    <span>@opts.Value.TempDataPath</span>
+    @if(TempDataPathExists)
+    {
+        <MudIcon Icon="@Icons.Material.Filled.Check" />
+    }
+</p>
+
+<p>
+    <b>Data Path: </b>
+    <span>@opts.Value.LocalDataPath</span>
+    @if (LocalDataPathExists)
+    {
+        <MudIcon Icon="@Icons.Material.Filled.Check" />
+    }
+</p>
+
+@inject IOptions<iPathConfig> opts
+
+
+@code {
+    bool TempDataPathExists;
+    bool LocalDataPathExists;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        TempDataPathExists = System.IO.File.Exists(opts.Value.TempDataPath);
+        LocalDataPathExists = System.IO.File.Exists(opts.Value.LocalDataPath);
+    }
+}

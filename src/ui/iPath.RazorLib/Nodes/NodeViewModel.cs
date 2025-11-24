@@ -1,20 +1,33 @@
-﻿using iPath.Application.Features.Nodes;
+﻿using Humanizer;
+using iPath.Application.Contracts;
+using iPath.Application.Features.Nodes;
 using iPath.Blazor.Componenents.Nodes.Annotations;
+using iPath.Blazor.Componenents.Shared;
+using iPath.Domain.Entities;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel;
+using Refit;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
 public class NodeViewModel(IPathApi api, 
+    AppState appState,
     ISnackbar snackbar, 
     IDialogService srvDialog, 
     IStringLocalizer T,
-    NavigationManager nm)
-    : IViewModel, INotifyPropertyChanged
+    NavigationManager nm,
+    ILogger<NodeViewModel> logger)
+    : IViewModel
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
+    // Signal State Changes to Views
+    public event Action OnChange;
+    private void NotifyStateChanged() => OnChange?.Invoke();
+
+    public event Action OnLoadingStarted;
+    public event Action OnLoadingFinished;
+
 
     public string SearchString { get; set; }
 
@@ -22,41 +35,59 @@ public class NodeViewModel(IPathApi api,
     public NodeDto? SelectedNode { get; private set; }
     public bool IsRootNodeSelected => SelectedNode is null || SelectedNode.Id == RootNode.Id;
 
-    public async Task SelectedChilNode(NodeDto child)
+    public async Task SelectChilNode(NodeDto? child)
     {
         if (child is null)
         {
             SelectedNode = null;
         }
-        else if (RootNode is not null)
+        else if (RootNode is null)
         {
-            if (child.RootNodeId != RootNode.Id)
+            // if the child is itself a root node => select it, otherwise throw
+            if (child.RootNodeId is null)
             {
-                // child is not from this Parent => do nothing 
-                return;
+                RootNode = child;
+                SelectedNode = child;
             }
+            else
+            {
+                throw new Exception("cannot select child node without loading a root node first");
+            }
+        }
+        else if (child.RootNodeId.HasValue && child.RootNodeId != RootNode.Id)
+        {
+            throw new Exception("child node is not child of the root node");
+        }
+        else 
+        { 
             SelectedNode = child;
         }
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedNode)));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsRootNodeSelected)));
+        NotifyStateChanged();
     }
+
 
     public void ClearData()
     {
         RootNode = null;
         SelectedNode = null;
+        NotifyStateChanged();
     }
 
     public async Task LoadNode(Guid id)
     {
+        OnLoadingStarted?.Invoke();
         var resp = await api.GetNodeById(id);
         if (resp.IsSuccessful)
         {
             RootNode = resp.Content;
-            SelectedNode = RootNode;
-            return;
+            // after loading a new root node (Case) => select the root node
+            await SelectChilNode(RootNode);
         }
-        snackbar.AddWarning(resp.ErrorMessage);
+        else
+        {
+            snackbar.AddWarning(resp.ErrorMessage);
+        }
+        OnLoadingFinished?.Invoke();
     }
 
     public async Task ReloadNode()
@@ -80,8 +111,6 @@ public class NodeViewModel(IPathApi api,
     }
 
 
-
-
     #region "-- Navigation --"
     public GetNodesQuery LastQuery { get; set; }
     public string NavUrl
@@ -98,11 +127,25 @@ public class NodeViewModel(IPathApi api,
             return "groups";
         }
     }
-    public IReadOnlyList<Guid>? IdList { get; set; } = null;
+    public List<Guid>? IdList { get; set; } = null;
 
-    public async Task LoadIdList()
+    public async ValueTask<bool> LoadIdList()
     {
-
+        if (IdList is null && LastQuery is not null)
+        {
+            var cmd = new GetNodeIdListQuery(LastQuery);
+            var resp = await api.GetNodeIdList(cmd);
+            if (resp.IsSuccessful)
+            {
+                IdList = resp.Content.ToList();
+            }
+            else
+            {
+                IdList = new List<Guid>();
+            }
+            return true;
+        }
+        return false;
     }
 
     public async Task GoUp()
@@ -128,7 +171,20 @@ public class NodeViewModel(IPathApi api,
 
         if (IsRootNodeSelected)
         {
-            // next in list => to be done
+            if (await LoadIdList())
+            {
+                var idx = IdList.IndexOf(RootNode.Id);
+                if (idx < IdList.Count() - 1)
+                {
+                    // there is one more in list => select
+                    var nextId = IdList[idx + 1];
+                    ClearData();
+                    nm.NavigateTo($"node/{nextId}");
+                    return;
+                }
+            }
+            // otherwhise go up
+            await GoUp();
         }
         else
         {
@@ -138,7 +194,7 @@ public class NodeViewModel(IPathApi api,
             if (idx < list.Count() - 1)
             {
                 // there is one more in list => select
-                SelectedNode = list[idx + 1];
+                nm.NavigateTo($"node/{IdList[idx - 1]}");
             }
             else
             {
@@ -155,6 +211,18 @@ public class NodeViewModel(IPathApi api,
         if (IsRootNodeSelected)
         {
             // next in list => to be done
+            if (await LoadIdList())
+            {
+                var idx = IdList.IndexOf(RootNode.Id);
+                if (idx > 0)
+                {
+                    // there is one more in list => select
+                    await LoadNode(IdList[idx - 1]);
+                    return;
+                }
+            }
+            // otherwhise go up
+            await GoUp();
         }
         else
         {
@@ -174,8 +242,6 @@ public class NodeViewModel(IPathApi api,
         }
     }
     #endregion
-
-
 
 
     #region  "-- Actions --"
@@ -252,27 +318,29 @@ public class NodeViewModel(IPathApi api,
     }
 
 
-    public bool IsEditing { get; private set; }
+    public bool IsEditing { 
+        get;
+        set { field = value; OnChange(); } 
+    }
 
-    public bool EditDisabled => true;
+    public bool EditDisabled => !appState.CanEditNode(SelectedNode) || IsEditing;
 
     public async Task Edit(NodeDto? node = null)
     {
-        if (!EditDisabled)
+        if (!EditDisabled && RootNode is not null)
         {
-            IsEditing = true;
-            snackbar.AddWarning("not implemented");
+            nm.NavigateTo($"node/edit/{RootNode.Id}");
         }
     }
 
 
-    public bool SaveDisabled => false;
+    public bool SaveDisabled => !IsEditing;
 
-    public async Task Save(bool IsDraft)
+    public async Task Save()
     {
         if (!SaveDisabled && IsEditing)
         {
-            var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, IsDraft);
+            var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
             var resp = await api.UpdateNode(cmd);
             if (!resp.IsSuccessful)
             {
@@ -283,6 +351,7 @@ public class NodeViewModel(IPathApi api,
                 nm.NavigateTo($"node/{RootNode.Id}");
             }
             IsEditing = false;
+            OnChange();
         }
     }
 
@@ -291,7 +360,19 @@ public class NodeViewModel(IPathApi api,
         if (RootNode != null)
         {
             IsEditing = false;
-            await ReloadNode();
+
+            if (RootNode.IsDraft)
+            {
+                // when cancelling a draft, save current state ...
+                var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
+                var resp = await api.UpdateNode(cmd);
+                // and go up
+                await GoUp();
+            }
+            else
+            {
+                nm.NavigateTo($"node/{RootNode.Id}");
+            }
         }
     }
 
@@ -299,17 +380,38 @@ public class NodeViewModel(IPathApi api,
 
 
 
-    public bool AttachFileDisabled => true;
+    public bool AttachFileDisabled => EditDisabled;
 
-    public async Task AttachFile()
+
+    public async Task<NodeDto?> UploadFile(IBrowserFile f)
     {
-        snackbar.AddWarning("not implemented");
+        try
+        {
+            if (RootNode is null) return null;
+
+            logger.LogInformation("starting file upload: " + f.Name);
+
+            long maxFileSize = 2L * 1024L * 1024L * 1024L;
+            if (f.Size > maxFileSize)
+            {
+                snackbar.Add("File is larger then " + maxFileSize.Megabytes() + "MB");
+                return null;
+            }
+
+            var stream = new Refit.StreamPart(f.OpenReadStream(), f.Name, f.ContentType);
+            var resp = await api.UploadNodeFile(stream, RootNode.Id);
+            return resp.Content;
+        }
+        catch (Exception ex)
+        {
+            snackbar.AddError(ex.Message);
+        }
+        return null;
     }
 
 
 
-
-    public bool AnnotateDisabled => false;
+    public bool AnnotateDisabled => IsEditing;
 
     public async Task Annotate()
     {
@@ -343,3 +445,4 @@ public class NodeViewModel(IPathApi api,
 
     #endregion
 }
+

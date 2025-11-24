@@ -1,11 +1,14 @@
+using iPath.API;
 using iPath.Blazor.Server.Components;
 using iPath.Blazor.Server.Components.Account;
+using iPath.Domain.Config;
+using iPath.RazorLib;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using MudBlazor.Services;
-using iPath.API;
-using iPath.RazorLib;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,8 +47,17 @@ builder.Services.AddRazorLibServices("http://localhost:5000/");
 // testing SSE
 builder.Services.AddSingleton<NotificationService>();
 
+builder.Services.AddAntiforgery();
+
+
+builder.Services.Configure<iPathConfig>(builder.Configuration.GetSection(iPathConfig.ConfigName));
+
+
 
 var app = builder.Build();
+
+var opts = app.Services.GetRequiredService<IOptions<iPathConfig>>();
+
 
 app.MapDefaultEndpoints();
 

@@ -1,7 +1,8 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
 
+@inherits NodeViewComponentBase
+
 @inject IDialogService srvDialog
-@inject NodeViewModel vm
 @inject UserViewModel uvm
 
 <MudChat ChatPosition="ChatBubblePosition.Start">
@@ -44,6 +45,10 @@
 		}
 	}
 
+	protected override void OnChangedHandler()
+	{
+		// no need to redraw here
+	}
 
 	async Task Delete()
 	{

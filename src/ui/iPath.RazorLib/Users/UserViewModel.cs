@@ -24,21 +24,34 @@ public class UserViewModel(IPathApi api,
         var result = await dialog.Result;
     }
 
+
+    private readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1);
+
     public async Task<UserProfile> GetProfileAsync(Guid userid)
     {
         var cacheKey = $"User_{userid}";
 
         try
         {
+            await _cacheLock.WaitAsync();
             if (!cache.TryGetValue(cacheKey, out UserProfile profile))
             {
                 var resp = await api.GetUser(userid);
                 if (resp.IsSuccessful)
                 {
                     profile = resp.Content.Profile;
-                    var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
-                    cache.Set(cacheKey, profile, opts);
                 }
+                else
+                {
+                    logger.LogWarning("Could not find User {0}", userid);
+                    profile = new()
+                    {
+                        UserId = userid,
+                        Username = "not found"
+                    };
+                }
+                var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                cache.Set(cacheKey, profile, opts);
             }
             return profile;
         }
@@ -46,6 +59,11 @@ public class UserViewModel(IPathApi api,
         {
             logger.LogError(ex, ex.Message);
         }
+        finally
+        {
+            _cacheLock.Release();
+        }
+
         return null;
     }
 

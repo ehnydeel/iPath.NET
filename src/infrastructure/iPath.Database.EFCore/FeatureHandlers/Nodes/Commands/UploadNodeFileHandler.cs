@@ -14,9 +14,9 @@ public class UploadNodeFileCommandHandler(iPathDbContext db,
     IMediator mediator,
     IUploadQueue queue,
     ILogger<UploadNodeFileCommandHandler> logger)
-    : IRequestHandler<UploadNodeFileCommand, Task<NodeListDto>>
+    : IRequestHandler<UploadNodeFileCommand, Task<NodeDto>>
 {
-    public async Task<NodeListDto> Handle(UploadNodeFileCommand request, CancellationToken ct)
+    public async Task<NodeDto> Handle(UploadNodeFileCommand request, CancellationToken ct)
     {
         if (!System.IO.Directory.Exists(opts.Value.TempDataPath))
         {
@@ -104,7 +104,7 @@ public class UploadNodeFileCommandHandler(iPathDbContext db,
         await mediator.Publish(evt, ct);
 
         // return dto
-        return newNode.ToListDto();
+        return newNode.ToDto();
     }
 
 

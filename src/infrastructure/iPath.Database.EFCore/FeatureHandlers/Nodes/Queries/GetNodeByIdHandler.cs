@@ -14,8 +14,9 @@ public class GetRootNodeByIdQueryHandler(iPathDbContext db, IUserSession sess, I
             // Direct projection does not work with Sqlite => better call Entities in one query and project in memory
             var node = await db.Nodes.AsNoTracking()
                 .Include(n => n.Owner)
-                .Include(n => n.ChildNodes)
-                .Include(n => n.Annotations)
+                .Include(n => n.ChildNodes).ThenInclude(a => a.Owner)
+                .Include(n => n.Annotations).ThenInclude(a => a.Owner)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(n => n.Id == request.Id, cancellationToken);
 
             Guard.Against.NotFound(request.Id, node);

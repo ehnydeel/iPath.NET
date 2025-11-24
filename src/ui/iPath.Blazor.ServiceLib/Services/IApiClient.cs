@@ -11,8 +11,6 @@ namespace iPath.Blazor.ServiceLib.Services;
 [Headers("accept: application/json")]
 public interface IPathApi
 {
-    [Get("/api/v1/admin/mailbox")]
-    Task<IApiResponse<PagedResultList<EmailMessage>>> GetMailBox(int page, int pageSize);
 
     [Get("/api/v1/translations/{lang}")]
     Task<IApiResponse<TranslationData>> GetTranslations(string lang);
@@ -107,7 +105,7 @@ public interface IPathApi
 
     [Multipart]
     [Post("/api/v1/nodes/upload")]
-    Task<IApiResponse<bool>> UploadNodeFile(Guid rootNodeId, Guid? parentNodeId = null);
+    Task<IApiResponse<NodeDto>> UploadNodeFile([AliasAs("upload")] StreamPart fileInfo, Guid rootNodeId, Guid? parentNodeId = null);
 
 
     [Post("/api/v1/nodes/annotation")]
@@ -118,11 +116,21 @@ public interface IPathApi
 
     #endregion
 
+
     #region "-- Mailbox --"
-    [Delete("/api/v1/admin/mail/{id}")]
+    [Get("/api/v1/mail/list")]
+    Task<IApiResponse<PagedResultList<EmailMessage>>> GetMailBox(int page, int pageSize);
+
+    [Delete("/api/v1/mail/{id}")]
     Task<IApiResponse> DeleteMail(Guid id);
 
-    [Delete("/api/v1/admin/mail/all")]
+    [Delete("/api/v1/mail/all")]
     Task<IApiResponse> DeleteAllMail();
+
+    [Put("/api/v1/mail/read/{id}")]
+    Task<IApiResponse> SetMailAsRead(Guid id);
+
+    [Put("/api/v1/mail/unread/{id}")]
+    Task<IApiResponse>SetMailAsUnread(Guid id);
     #endregion
 }

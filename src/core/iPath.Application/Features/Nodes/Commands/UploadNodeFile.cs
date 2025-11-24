@@ -3,7 +3,7 @@
 
 public record UploadNodeFileCommand(Guid RootNodeId, Guid ParentNodeId,
     string filename, long fileSize, Stream fileStream)
-    : IRequest<UploadNodeFileCommand, Task<NodeListDto>>;
+    : IRequest<UploadNodeFileCommand, Task<NodeDto>>;
 
 
 

@@ -1,6 +1,6 @@
 ﻿using iPath.Application.Contracts;
 
-namespace iPath.Blazor.Componenents.AppState;
+namespace iPath.Blazor.Componenents.Shared;
 
 public class AppState(IPathApi api) : IUserSession
 {
@@ -22,4 +22,6 @@ public class AppState(IPathApi api) : IUserSession
     {
         _user = SessionUserDto.Anonymous;
     }
+
+    public Color PresenceColor => Color.Success;
 }

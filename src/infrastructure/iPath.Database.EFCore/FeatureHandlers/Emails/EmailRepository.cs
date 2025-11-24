@@ -60,4 +60,14 @@ public class EmailRepository(iPathDbContext db, IEmailQueue queue)
             await db.SaveChangesAsync(ct);
         }
     }
+
+    public async Task SetReadState(Guid Id, bool IsRead, CancellationToken ct)
+    {
+        var email = await db.EmailStore.FindAsync(Id, ct);
+        if (email is not null)
+        {
+            email.IsRead = true;
+            await db.SaveChangesAsync(ct);
+        }
+    }
 }

@@ -49,7 +49,7 @@ public sealed class UserSession(iPathDbContext db, UserManager<User> um, IMemory
             .Where(m => m.UserId == user.Id)
             .Select(m => new UserGroupMemberDto(m.GroupId, m.Group.Name, m.Role)).ToArrayAsync();
 
-        return new SessionUserDto(Id: user.Id, Username: user.UserName, Email: user.Email,
+        return new SessionUserDto(Id: user.Id, Username: user.UserName, Email: user.Email, Initials: user.Profile?.Initials,
             groups: groups, roles: roles.ToArray());
     }
 }

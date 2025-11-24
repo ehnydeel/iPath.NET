@@ -11,20 +11,28 @@ public static class AdminEndpoints
 {
     public static IEndpointRouteBuilder MapAdminApi(this IEndpointRouteBuilder route)
     {
-        route.MapGet("admin/mailbox", 
+#region "-- Mailbox --"
+        var mail = route.MapGroup("mail")
+            .WithTags("Mailbox");
+
+        mail.MapGet("list", 
             ([DefaultValue(0)] int page, [DefaultValue(10)] int pagesize, IEmailRepository repo, CancellationToken ct)
             => repo.GetPage(new PagedQuery<EmailMessage> { Page = page, PageSize = pagesize }, ct))
-            .WithTags("Admin")
-            // .RequireAuthorization()
             .Produces<PagedResult<EmailMessage>>();
 
-        route.MapDelete("admin/mail/{id}", (string id, IEmailRepository repo, CancellationToken ct)
-            => repo.Delete(Guid.Parse(id), ct))
-            .WithTags("Admin");
+        mail.MapDelete("{id}", (string id, IEmailRepository repo, CancellationToken ct)
+            => repo.Delete(Guid.Parse(id), ct));
 
-        route.MapDelete("admin/mail/all", (IEmailRepository repo, CancellationToken ct)
-            => repo.DeleteAll(ct))
-            .WithTags("Admin");
+        mail.MapDelete("all", (IEmailRepository repo, CancellationToken ct)
+            => repo.DeleteAll(ct));
+
+        mail.MapPut("read/{id}", (string id, IEmailRepository repo, CancellationToken ct)
+            => repo.SetReadState(Guid.Parse(id), true, ct));
+
+        mail.MapPut("unread/{id}", (string id, IEmailRepository repo, CancellationToken ct)
+            => repo.SetReadState(Guid.Parse(id), false, ct));
+#endregion "-- Mailbox --"
+
 
 
         route.MapGet("session", (IUserSession sess) => sess.User)

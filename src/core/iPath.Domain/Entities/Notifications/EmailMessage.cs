@@ -14,4 +14,5 @@ public class EmailMessage : BaseEntity
     public DateTime? SentOn { get; set; }
     public string? ErrorMessage { get; set; }
 
+    public bool IsRead { get; set; }
 }

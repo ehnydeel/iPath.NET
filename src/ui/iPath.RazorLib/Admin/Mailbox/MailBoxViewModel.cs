@@ -42,4 +42,31 @@ public class MailBoxViewModel(IPathApi api, ISnackbar snackbar, IDialogService d
         await api.DeleteMail(msg.Id);
         await grid.ReloadServerData();
     }
+
+
+
+    public async Task OnDetailsOpened(MudBlazor.Utilities.DataGridHierarchyVisibilityToggledEventArgs<EmailMessage> args)
+    {
+        if (args.Item != null && !args.Item.IsRead)
+        {
+            var resp = await api.SetMailAsRead(args.Item.Id);
+            if (resp.IsSuccessful)
+            {
+                args.Item.IsRead = true;
+            }
+            else
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
+        }
+        
+    }
+}
+
+public static class EmailMessageViewExtensions
+{
+    extension (EmailMessage msg)
+    {
+        public string ReadIcon => msg.IsRead ? Icons.Material.TwoTone.MarkEmailRead : Icons.Material.TwoTone.MarkAsUnread;
+    }
 }

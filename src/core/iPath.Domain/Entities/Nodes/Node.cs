@@ -49,6 +49,8 @@ public class NodeDescription
     public string? Status { get; set; }
     public string? Title { get; set; } = string.Empty!;
     public string? Text { get; set; } = string.Empty!;
+
+    public NodeDescription Clone() => (NodeDescription)MemberwiseClone();
 }
 
 public class NodeFile
@@ -59,4 +61,6 @@ public class NodeFile
     public string? ThumbData { get; set; }
     public int? ImageWidth { get; set; }
     public int? ImageHeight { get; set; }
+
+    public NodeFile Clone() => (NodeFile)MemberwiseClone();
 }

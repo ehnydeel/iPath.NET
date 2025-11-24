@@ -16,8 +16,11 @@ public static class UserEndpoints
             .Produces<PagedResultList<UserListDto>>()
             .RequireAuthorization();
 
-        grp.MapGet("{id}", (string id, IMediator mediator, CancellationToken ct)
-            => mediator.Send(new GetUserByIdQuery(Guid.Parse(id)), ct))
+        grp.MapGet("{id}", async (string id, IMediator mediator, CancellationToken ct)
+            => {
+                var u = await mediator.Send(new GetUserByIdQuery(Guid.Parse(id)), ct);
+                return u;
+            })
             .Produces<UserDto>()
             .RequireAuthorization();
 

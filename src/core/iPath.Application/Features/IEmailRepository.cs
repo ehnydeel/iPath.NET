@@ -12,6 +12,7 @@ public interface IEmailRepository
     Task<EmailMessage> Create([EmailAddress] string address, string subject, string body, CancellationToken ct);
     Task SetSent(Guid Id, CancellationToken ct);
     Task SetError(Guid Id, string error, CancellationToken ct);
+    Task SetReadState(Guid Id, bool IsRead, CancellationToken ct);
 }
 
 /*

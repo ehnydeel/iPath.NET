@@ -1,22 +1,20 @@
 ﻿@page "/node/new/{groupId}"
 @page "/node/edit/{id}"
 
-@inject IStringLocalizer T
-@inject NodeViewModel vm
+@inherits NodeViewComponentBase
 
-
-<IPathHeader Title=@T["New Case"] />
-
+<NodeHeader />
 @if (vm.RootNode != null)
 {
-    <iPath.Blazor.Componenents.Nodes.Edit.NodeEditForm Model="vm.RootNode.Description" />
+    <NodeEditForm Model="vm.RootNode.Description" Variant="Variant.Outlined" Class="my-8" />
+
+    <NodeGallerySortable HideSaveButtons="true" @ref="gallery" />
 
     <MudStack Row Spacing="4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                   OnClick=@(() => vm.Save(false))
-                   StartIcon="@Icons.Material.Filled.Save">@SaveText</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save"
+                    OnClick="OnSave">@SaveText</MudButton>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel"
-                   OnClick=@(() => vm.Save(true))>Cancel</MudButton>
+                    OnClick=@(() => vm.CancelEdit())>Cancel</MudButton>
         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete">Delete</MudButton>
     </MudStack>
 }
@@ -28,7 +26,10 @@
     [Parameter]
     public string id { get; set; }
 
+    NodeGallerySortable gallery;
+
     string SaveText = "Save";
+    string Title = "New Case";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -36,12 +37,20 @@
         {
             await vm.CreateNewNode(GroupId);
             SaveText = T["Publish"];
+            Title = T["New Case"];
         }
         else if (Guid.TryParse(id, out var nodeId))
         {
             await vm.LoadNode(nodeId);
             SaveText = T["Save"];
+            Title = T["Edit Case"] + ": " + vm.RootNode.Title;
         }
+        vm.IsEditing = true;
     }
 
+    async Task OnSave()
+    {
+        await gallery.SaveSortAsync();
+        await vm.Save();
+    }
 }
