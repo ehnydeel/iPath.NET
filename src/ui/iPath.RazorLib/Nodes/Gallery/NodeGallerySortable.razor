@@ -11,28 +11,21 @@
     <div id="gallery" class="gallery" style="z-index: 20;">
         @foreach (var c in vm.SelectedNode.ChildNodes.OrderBy(c => c.SortNr))
         {
-            <div class="gallery-item" data-id="@c.Id">
-                @if (c.IsImage)
-                {
-                    <img src="@c.ThumbUrl()" alt="@c.GalleryCaption.ShortenTo(25)">
-                }
-                else
-                {
-                    <MudIcon Size="Size.Large" Icon="@c.FileIcon()" />
-                    <br />
-                }
-                <div class="gallery-item-label">@c.File?.Filename.ShortenTo(12)</div>
-            </div>
+            <NodeGallerySortableItem Model="c" 
+                                     Selected="IsSelected(c.Id)"
+                                     SelectedChanged="@(val => OnChildSelectedChanged(c.Id, val))"
+                                     @key="c.Id" />
         }
     </div>
 </div>
 
 <div class="sortableGallery_footer" hidden="@HideSaveButtons">
-    Drag images to change sort order
-    <div>
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveSortAsync">Save</MudButton>
-        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" OnClick="CancelSort">Cancel</MudButton>
-    </div>
+    <p>Drag images to change sort order</p>
+    <MudStack Row Spacing="2">
+        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" OnClick="SaveSortAsync">Save</MudButton>
+        <MudButton Color="Color.Warning" StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" OnClick="DeleteSelection" Disabled="DeleteDisabled">Delete</MudButton>
+        <MudButton Variant="Variant.Outlined" OnClick="CancelSort">Cancel</MudButton>
+    </MudStack>
 </div>
 
 
@@ -49,6 +42,7 @@
     private bool sortHasChanged = false;
 
 
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -56,6 +50,7 @@
             _SortOrder = vm.SelectedNode.ChildNodes.Select(x => new { Key = x.Id.ToString(), Value = x.SortNr }).ToDictionary(i => i.Key, i => (i.Value ?? 0));
             _dotNetHelper = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("initializeSortable", "gallery", _dotNetHelper);
+            StateHasChanged();
         }
     }
 
@@ -102,5 +97,36 @@
             {
             }
         }
+    }
+
+
+
+    // --- Selection helpers added ---
+    private HashSet<Guid> Selection = new();
+
+    private bool IsSelected(Guid id)
+    {
+        return Selection.Contains(id);
+    }
+
+    private void OnChildSelectedChanged(Guid id, bool value)
+    {
+        if (!value)
+        {
+            if (Selection.Contains(id)) Selection.Remove(id);
+        }
+        else
+        {
+            if (!Selection.Contains(id)) Selection.Add(id);
+        }
+        StateHasChanged();
+    }
+
+    bool DeleteDisabled => !Selection.Any();
+
+    async Task DeleteSelection()
+    {
+        await vm.Delete(Selection);
+        await OnSortingFinished.InvokeAsync(true);
     }
 }

@@ -337,6 +337,50 @@ public class NodeViewModel(IPathApi api,
         }
     }
 
+    public async Task Delete(HashSet<Guid> ids, bool AskConfirmation = true)
+    {
+        if (RootNode is null) return;
+
+        if (AskConfirmation)
+        {
+            bool? result = await srvDialog.ShowMessageBox(
+                T["Warning"],
+                string.Format(T["Are you sure that you want to delete {0} items !"], ids.Count()),
+                yesText: T["Yes"], cancelText: T["Cancel"]);
+            if (result is null)
+                return;
+        }
+
+
+        var errors = new List<string>();
+        foreach( var id in ids)
+        {
+            var node = RootNode.ChildNodes.FirstOrDefault(n => n.Id == id);
+            if (node != null)
+            {
+                var resp = await api.DeleteNode(node.Id);
+                if (resp.IsSuccessful)
+                {
+                    RootNode.ChildNodes.Remove(node);
+                }
+                else
+                {
+                    errors.Add(resp.ErrorMessage); 
+                }
+            }
+        }
+
+        if (errors.Any())
+        {
+            snackbar.AddWarning(errors.FirstOrDefault());
+        }
+        else
+        {
+            snackbar.Add(T["Items deleted"], Severity.Success);
+        }
+        OnChange();
+    }
+
 
     public bool IsEditing { 
         get;
