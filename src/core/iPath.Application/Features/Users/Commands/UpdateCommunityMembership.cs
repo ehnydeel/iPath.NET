@@ -2,7 +2,7 @@
 
 
 public record UpdateCommunityMembershipInput(Guid UserId, CommunityMemberDto[] Membership) 
-    : IRequest<UpdateCommunityMembershipInput, Task<bool>>, IEventInput
+    : IRequest<UpdateCommunityMembershipInput, Task>, IEventInput
 {
     public string ObjectName => nameof(User);
 }

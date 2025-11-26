@@ -5,7 +5,7 @@ public record UserGroupNotificationDto (Guid GroupId, eNotification Notification
 
 
 public record UpdateUserNotificationsInput(Guid UserId, UserGroupNotificationDto[] Notifications) 
-    : IRequest<UpdateUserNotificationsInput, Task<bool>>, IEventInput
+    : IRequest<UpdateUserNotificationsInput, Task>, IEventInput
 {
     public string ObjectName => "User";
 }

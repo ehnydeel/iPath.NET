@@ -13,6 +13,17 @@ public class CommunityAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogSe
         return new GridData<CommunityListDto>();
     }
 
+    public async Task<IEnumerable<CommunityListDto>> GetAllAsync()
+    {
+        var query = new GetCommunityListQuery { PageSize= null };
+        var resp = await api.GetCommunityList(query);
+        if (resp.IsSuccessful)
+        {
+            return resp.Content.Items;
+        }
+        return [];
+    }
+
 
     public CommunityListDto SelectedItem { get; private set; }
     public async Task SetSelectedItem(CommunityListDto item)

@@ -24,21 +24,23 @@ public static class UserEndpoints
             .Produces<UserDto>()
             .RequireAuthorization();
 
-        grp.MapGet("roles", (IMediator mediator, CancellationToken ct)
-            => mediator.Send(new GetRolesQuery(), ct))
-            .Produces<IEnumerable<RoleDto>>()
-            .RequireAuthorization();
-
-
         // Commands
         grp.MapPut("role", (UpdateUserRoleCommand cmd, IMediator mediator, CancellationToken ct)
             => mediator.Send(cmd, ct))
             .Produces<Guid>()
             .RequireAuthorization("Admin");
 
-        grp.MapPut("roles", (UpdateUserRolesCommand cmd, IMediator mediator, CancellationToken ct)
+        grp.MapPut("account", (UpdateUserAccountCommand cmd, IMediator mediator, CancellationToken ct)
             => mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
+
+
+        grp.MapPut("groups", (UpdateGroupMembershipCommand cmd, IMediator mediator, CancellationToken ct)
+            => mediator.Send(cmd, ct))
+            .Produces<Guid>()
+            .RequireAuthorization("Admin");
+
+
 
         grp.MapPut("profile", (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
             => mediator.Send(cmd, ct))

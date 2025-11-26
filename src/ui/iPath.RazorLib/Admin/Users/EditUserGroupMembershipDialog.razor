@@ -1,0 +1,59 @@
+﻿<MudDialog Style="min-width: 800px;">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3 mb-n1" />
+            Edit Group Membership for @uvm.SelectedUser.Username
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (allGroups is null)
+        {
+            <MudProgressCircular Indeterminate="true" Size="Size.Large" />
+            <p>loding ...</p>
+        }
+        else if (members != null)
+        {
+            <MudPaper Style="min-width: 800px; min-height: 500px;">
+                <MudDataGrid T="GroupMemberModel" Items="displayedMembers" Dense="true" Striped="true" Hover="true"
+                             FixedHeader="true" Height="600px">
+                    <ToolBarContent>
+                        <MudText>Filter</MudText>
+                        <MudSpacer />
+                        <MudSwitch @bind-Value="ShowActiveOnly" Label="active memberships only" />
+                    </ToolBarContent>
+                    <Columns>
+                        <PropertyColumn Property="x => x.GroupName" Title="Group" Editable="false" />
+                        <TemplateColumn Title="User">
+                            <CellTemplate>
+                                <MudCheckBox @bind-Value="context.Item.IsUser" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Guest">
+                            <CellTemplate>
+                                <MudCheckBox @bind-Value="context.Item.IsGuest" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Moderator">
+                            <CellTemplate>
+                                <MudCheckBox @bind-Value="context.Item.IsModerator" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Banned">
+                            <CellTemplate>
+                                <MudCheckBox @bind-Value="context.Item.IsBanned" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+                <MudOverlay Visible="saving" DarkBackground="true" Absolute="true">
+                    <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+                    <p>saving ...</p>
+                </MudOverlay>
+            </MudPaper>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Outlined">Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+    </DialogActions>
+</MudDialog>

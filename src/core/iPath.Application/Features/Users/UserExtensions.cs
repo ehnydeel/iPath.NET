@@ -1,4 +1,7 @@
-﻿namespace iPath.Application.Features.Users;
+﻿using DispatchR.Abstractions.Send;
+using System.Text.Json;
+
+namespace iPath.Application.Features.Users;
 
 public static class UserExtensions
 {

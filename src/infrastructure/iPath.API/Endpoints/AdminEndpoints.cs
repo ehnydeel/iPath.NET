@@ -31,8 +31,15 @@ public static class AdminEndpoints
 
         mail.MapPut("unread/{id}", (string id, IEmailRepository repo, CancellationToken ct)
             => repo.SetReadState(Guid.Parse(id), false, ct));
-#endregion "-- Mailbox --"
+        #endregion "-- Mailbox --"
 
+
+
+        route.MapGet("admin/roles", (IMediator mediator, CancellationToken ct)
+            => mediator.Send(new GetRolesQuery(), ct))
+            .Produces<IEnumerable<RoleDto>>()
+            .WithTags("Admin")
+            .RequireAuthorization("Admin");
 
 
         route.MapGet("session", (IUserSession sess) => sess.User)

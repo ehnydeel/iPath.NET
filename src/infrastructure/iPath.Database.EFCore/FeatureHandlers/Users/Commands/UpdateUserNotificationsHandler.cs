@@ -3,9 +3,9 @@
 namespace iPath.Application.Features;
 
 public class UpdateUserNotificationsHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateUserNotificationsInput, Task<bool>>
+    : IRequestHandler<UpdateUserNotificationsInput, Task>
 {
-    public async Task<bool> Handle(UpdateUserNotificationsInput request, CancellationToken ct)
+    public async Task Handle(UpdateUserNotificationsInput request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -16,7 +16,6 @@ public class UpdateUserNotificationsHandler(iPathDbContext db, IUserSession sess
             throw new NotAllowedException("You are not allowed to update notifications of another user");
         }
 
-        await using var trans = await db.Database.BeginTransactionAsync(ct);
 
         var set = db.Set<GroupMember>();
 
@@ -35,12 +34,10 @@ public class UpdateUserNotificationsHandler(iPathDbContext db, IUserSession sess
             }
         }
 
+        // User is derived from Identity User and thus does not have domain events => save events directly
         var evt = EventEntity.Create<UserNotificationsUpdatedEvent, UpdateUserNotificationsInput>(request, user.Id, sess.User.Id);
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
-        await trans.CommitAsync();
-
-        return true;
     }
 }

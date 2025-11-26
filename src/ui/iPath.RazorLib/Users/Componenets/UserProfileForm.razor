@@ -45,7 +45,7 @@
         </MudItem>
     </MudGrid>
 
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSubmit" Class="mt-8 px-4">@T["Save"]</MudButton>
+    <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Primary" OnClick="OnSubmit" Class="mt-8 px-4">@T["Save"]</MudButton>
     <ValidationSummary />
 </MudForm>
 
@@ -57,7 +57,16 @@
     [Parameter]
     public EventCallback OnValidSubmit { get; set; }
 
+    [Parameter]
+    public bool HideSaveButton { get; set; }
+
     private MudForm form;
+
+    public async Task<bool> ValidateForm()
+    {
+        await form.Validate();
+        return form.IsValid;
+    }
 
     private async void OnSubmit()
     {

@@ -3,9 +3,9 @@
 namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
 
 public class UpdateCommunityMembershipHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateCommunityMembershipInput, Task<bool>>
+    : IRequestHandler<UpdateCommunityMembershipInput, Task>
 {
-    public async Task<bool> Handle(UpdateCommunityMembershipInput request, CancellationToken ct)
+    public async Task Handle(UpdateCommunityMembershipInput request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -73,15 +73,10 @@ public class UpdateCommunityMembershipHandler(iPathDbContext db, IUserSession se
             }
         }
 
-
-        await using var transation = await db.Database.BeginTransactionAsync(ct);
-
+        // User is derived from Identity User and thus does not have domain events => save events directly
         var evt = EventEntity.Create<CommunityMembershipUpdatedEvent, UpdateCommunityMembershipInput>(request, user.Id, sess.User.Id);
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
-        await transation.CommitAsync(ct);
-
-        return true;
     }
 }

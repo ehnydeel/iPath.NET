@@ -3,9 +3,9 @@
 namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
 
 public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateGroupMembershipCommand, Task<bool>>
+    : IRequestHandler<UpdateGroupMembershipCommand, Task>
 {
-    public async Task<bool> Handle(UpdateGroupMembershipCommand request, CancellationToken ct)
+    public async Task Handle(UpdateGroupMembershipCommand request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -63,15 +63,10 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
             entity.Role = dto.Role;
         }
 
-
-        await using var transation = await db.Database.BeginTransactionAsync(ct);
-
+        // User is derived from Identity User and thus does not have domain events => save events directly
         var evt = EventEntity.Create<GroupMembershipUpdatedEvent, UpdateGroupMembershipCommand>(request, user.Id, sess.User.Id);
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
-        await transation.CommitAsync(ct);
-
-        return true;
     }
 }

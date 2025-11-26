@@ -1,9 +1,9 @@
 ﻿<MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6">@vm.SelectedUser.Username</MudText>
+        <MudText Typo="Typo.h6">@User?.Username</MudText>
     </TitleContent>
     <DialogContent>
-        <h3>Roles</h3>
+        <IPathHeader Title="Roles" Typo="Typo.h6" />
         <MudToggleGroup T="RoleDto" SelectionMode="SelectionMode.MultiSelection"
                         @bind-Values="selectedRoles" Outlined="true" Color="Color.Primary"
                         Class="my-8">
@@ -12,6 +12,12 @@
                 <MudToggleItem T="RoleDto" Value="@r">@r.Name</MudToggleItem>
             }
         </MudToggleGroup>
+
+        <MudCheckBox Label="active" @bind-Value="IsActive" />
+
+        <IPathHeader Title="Profile" Typo="Typo.h6" Class="mt-8"/>
+        <UserProfileForm Model="Profile" HideSaveButton="true" @ref="frm" />
+
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
@@ -25,24 +31,40 @@
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; }
 
+    [Parameter]
+    public UserDto User { get; set; }
+
+    private UserProfileForm frm;
+
     private IEnumerable<RoleDto> allRoles = [];
     private IEnumerable<RoleDto> selectedRoles = [];
+    private UserProfile Profile;
+    private bool IsActive { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        allRoles = await vm.GetRoles();
-        if (vm.SelectedUser != null)
+        if (User != null)
         {
-            selectedRoles = vm.SelectedUser.Roles.ToList();
+            allRoles = await vm.GetRoles();
+            selectedRoles = User.Roles.ToList();
+            Profile = User.Profile.Clone();
+            IsActive = User.IsActive;
         }
     }
 
     async Task Save()
     {
-        if (!await vm.SaveUserRoles(selectedRoles))
-        {
-            // error
-        }
+        await frm.ValidateForm();
+
+        var cmd = new UpdateUserAccountCommand { UserId = User.Id };
+        if (IsActive != User.IsActive)
+            cmd.IsActive = IsActive;
+
+        if (!Profile.Equals(User.Profile))
+            cmd.Profile = Profile;
+
+        cmd.Roles = selectedRoles.Select(r => r.Id);
+        await vm.SaveUserAccount(cmd);
         MudDialog.Close(true);
     }
 

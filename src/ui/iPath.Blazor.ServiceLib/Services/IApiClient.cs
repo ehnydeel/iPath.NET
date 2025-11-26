@@ -30,15 +30,17 @@ public interface IPathApi
     [Get("/api/v1/users/{id}")]
     Task<IApiResponse<UserDto>> GetUser(Guid id);
 
-    [Get("/api/v1/users/roles")]
-    Task<IApiResponse<IEnumerable<RoleDto>>> GetRoles();
-
 
     [Put("/api/v1/users/role")]
     Task<IApiResponse<Guid>> SetUserRole(UpdateUserRoleCommand command);
 
-    [Put("/api/v1/users/roles")]
-    Task<IApiResponse> SetUserRoles(UpdateUserRolesCommand command);
+    [Put("/api/v1/users/account")]
+    Task<IApiResponse> UpdateUserAccount(UpdateUserAccountCommand command);
+
+
+    [Put("/api/v1/users/groups")]
+    Task<IApiResponse> SetGroupMemberships(UpdateGroupMembershipCommand command);
+
 
     [Put("/api/v1/users/profile")]
     Task<IApiResponse<Guid>> UpdateProfile(UpdateUserProfileCommand command);
@@ -135,5 +137,11 @@ public interface IPathApi
 
     [Put("/api/v1/mail/unread/{id}")]
     Task<IApiResponse>SetMailAsUnread(Guid id);
+    #endregion
+
+
+    #region "-- Admin --"
+    [Get("/api/v1/admin/roles")]
+    Task<IEnumerable<RoleDto>> GetRoles();
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿<MudStack Row Class="pa-2 mud-theme-info">
+﻿<MudStack Row Class=@($"pa-2 mud-theme-info {Class}")>
     <MudText Typo="@Typo">@Title</MudText>
     <MudSpacer />
     @ActionContent
@@ -11,6 +11,9 @@
 
     [Parameter]
     public Typo Typo { get; set; } = Typo.h4;
+
+    [Parameter]
+    public string Class { get; set; }
 
 
     [Parameter]

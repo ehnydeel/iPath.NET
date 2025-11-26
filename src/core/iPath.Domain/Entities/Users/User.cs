@@ -30,5 +30,11 @@ public class User : IdentityUser<Guid>, IBaseEntity
         Profile = profile;
         ModifiedOn = DateTime.UtcNow;
     }
+
+    public void UpdateActive(bool active)
+    {
+        IsActive = active;
+        ModifiedOn = DateTime.UtcNow;
+    }
 }
 

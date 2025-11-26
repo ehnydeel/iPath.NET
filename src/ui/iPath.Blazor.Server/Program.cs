@@ -55,9 +55,7 @@ builder.Services.Configure<iPathConfig>(builder.Configuration.GetSection(iPathCo
 
 
 var app = builder.Build();
-
 var opts = app.Services.GetRequiredService<IOptions<iPathConfig>>();
-
 
 app.MapDefaultEndpoints();
 
@@ -100,6 +98,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()

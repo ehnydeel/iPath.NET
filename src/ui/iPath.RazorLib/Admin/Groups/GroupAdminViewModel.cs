@@ -1,6 +1,14 @@
-﻿namespace iPath.Blazor.Componenents.Admin.Groups;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
-public class GroupAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogService dialog) : IViewModel
+namespace iPath.Blazor.Componenents.Admin.Groups;
+
+public class GroupAdminViewModel(IPathApi api, 
+    ISnackbar snackbar,
+    IDialogService dialog,
+    IMemoryCache cache,
+    ILogger<GroupAdminViewModel> logger)
+    : IViewModel
 {
     public string SearchString { get; set; } = "";
     public async Task<GridData<GroupListDto>> GetListAsync(GridState<GroupListDto> state)
@@ -13,6 +21,48 @@ public class GroupAdminViewModel(IPathApi api, ISnackbar snackbar, IDialogServic
         snackbar.AddWarning(resp.ErrorMessage);
         return new GridData<GroupListDto>();
     }
+
+
+
+    const string groupListCacheKey = "admin.grouplist";
+    private readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1);
+
+    public async Task<IEnumerable<GroupListDto>> GetAllAsync()
+    {
+        try
+        {
+            await _cacheLock.WaitAsync();
+            if (!cache.TryGetValue<IEnumerable<GroupListDto>>(groupListCacheKey, out var grouplist))
+            {
+                var query = new GetGroupListQuery { PageSize = null, AdminList = true };
+                var resp = await api.GetGroupList(query);
+                if (resp.IsSuccessful)
+                {
+                    grouplist = resp.Content.Items;
+
+                    var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                    cache.Set(groupListCacheKey, grouplist, opts);
+                }
+            }
+            return grouplist;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+        }
+        finally
+        {
+            _cacheLock.Release();
+        }
+
+        return null;
+    }
+
+    private void DeleteGroupListCache()
+    {
+        cache.Remove(groupListCacheKey);
+    }
+
 
 
     public GroupListDto SelectedItem { get; private set; }

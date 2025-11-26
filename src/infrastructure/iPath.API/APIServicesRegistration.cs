@@ -89,11 +89,13 @@ public static class APIServicesRegistration
 
         // SignalR
         services.AddSignalR();
+        /*
         services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
                 ["application/octet-stream"]);
         });
+        */
 
         // OpenAPI
         services.AddOpenApi();
