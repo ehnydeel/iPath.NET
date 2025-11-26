@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using iPath.Blazor.Componenents.Admin.Users;
+using iPath.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
@@ -104,17 +107,59 @@ public class GroupAdminViewModel(IPathApi api,
 
     public async Task Create()
     {
-        if (SelectedItem != null)
+        var p = new DialogParameters<CreateGroupDialog> { { x => x.Model, new GroupEditModel() } };
+        DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
+        var dlg = await dialog.ShowAsync<CreateGroupDialog>("Create a new group", options: opts, parameters: p);
+        var res = await dlg.Result;
+        var m = res?.Data as GroupEditModel;
+        if (m != null)
         {
-            snackbar.AddWarning("not implemented yet");
+            var cmd = new CreateGroupCommand
+            {
+                Name = m.Name,
+                OwnerId = m.Owner.Id,
+                Settings = m.Settings,
+                Visibility = eGroupVisibility.MembersOnly
+            };
+            var resp = await api.CreateGroup(cmd);
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddWarning(resp.ErrorMessage);
+            }
         }
     }
 
     public async Task Edit()
     {
-        if (SelectedItem != null)
+        if (SelectedGroup != null)
         {
-            snackbar.AddWarning("not implemented yet");
+            var m = new GroupEditModel
+            {
+                Id = SelectedGroup.Id,
+                Name = SelectedGroup.Name,
+                Settings = SelectedGroup.Settings,
+            };
+
+            var p = new DialogParameters<EditGroupDialog> { { x => x.Model, m } };
+            DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
+            var dlg = await dialog.ShowAsync<EditGroupDialog>("Edit groups", options: opts, parameters: p);
+            var res = await dlg.Result;
+            var r = res?.Data as GroupEditModel;
+            if (r != null && r.Id.HasValue)
+            {
+                var cmd = new UpdateGroupCommand
+                {
+                    Id = r.Id.Value,
+                    Name = r.Name,
+                    OwnerId = r.Owner.Id,
+                    Settings = r.Settings
+                };
+                var resp = await api.UpdateGroup(cmd);
+                if (!resp.IsSuccessful)
+                {
+                    snackbar.AddWarning(resp.ErrorMessage);
+                }
+            }
         }
     }
 
@@ -136,4 +181,14 @@ public class GroupAdminViewModel(IPathApi api,
     {
         snackbar.AddWarning("not implemented yet");
     }
+}
+
+
+public class GroupEditModel
+{
+    public Guid? Id { get; set; }
+    [Required]
+    public string Name { get; set; } = "";
+    public GroupSettings Settings { get; set; } = new();
+    public UserListDto? Owner { get; set; }
 }

@@ -56,6 +56,12 @@ public interface IPathApi
     [Get("/api/v1/groups/{id}")]
     Task<IApiResponse<GroupDto>> GetGroup(Guid id);
 
+    [Post("/api/v1/groups/create")]
+    Task<IApiResponse<GroupListDto>> CreateGroup(CreateGroupCommand command);
+
+    [Put("/api/v1/groups/update")]
+    Task<IApiResponse> UpdateGroup(UpdateGroupCommand command);
+
     #endregion
 
 

@@ -11,7 +11,25 @@ public record GroupMemberDto(Guid UserId, string Username, eMemberRole Role);
 
 
 
-#region "-- Queries --"
+public interface IGroupService
+{
+    Task<PagedResultList<GroupListDto>> GetGroupListAsync(GetGroupListQuery query, CancellationToken ct = default);
+    Task<GroupDto> GetGroupByIdAsync(Guid GroupId, CancellationToken ct = default);
+
+
+    Task<GroupDto> CreateGroupAsync(CreateGroupCommand cmd, CancellationToken ct = default);
+    Task UpdateGroupAsync(UpdateGroupCommand cmd, CancellationToken ct = default);
+    Task DeleteGroupAsync(DeleteGroupCommand  cmd, CancellationToken ct = default);
+
+
+    Task<GroupAssignedToCommunityEvent> AssignGroupToCommunityAsync(AssignGroupToCommunityCommand cmd, CancellationToken ct = default);
+    Task AssignQuestionnaireToGroupAsync(AssignQuestionnaireToGroupCommand cmd, CancellationToken ct = default);
+}
+
+
+
+
+
 public class GetGroupListQuery : PagedQuery<GroupListDto>
     , IRequest<GetGroupListQuery, Task<PagedResultList<GroupListDto>>>
 {
@@ -21,10 +39,7 @@ public class GetGroupListQuery : PagedQuery<GroupListDto>
 }
 
 public record GetGroupByIdQuery(Guid GroupId) : IRequest<GetGroupByIdQuery, Task<GroupDto>>;
-#endregion
 
-
-#region "-- Commands --"
 public record AssignGroupToCommunityCommand(Guid GroupId, Guid CommunityId, bool Remove = false)
     : IRequest<AssignGroupToCommunityCommand, Task<GroupAssignedToCommunityEvent>>, IEventInput
 {
@@ -40,11 +55,11 @@ public record AssignQuestionnaireToGroupCommand(Guid Id, Guid GroupId, eQuestion
 }
 
 
-public record CreateGroupCommand : IRequest<CreateGroupCommand, Task<Group>>, IEventInput
+public record CreateGroupCommand : IRequest<CreateGroupCommand, Task<GroupDto>>, IEventInput
 {
     [MinLength(4)]
     public string Name { get; init; }
-    public string? Purpose { get; init; } = null;
+    public GroupSettings Settings { get; init; }
     public eGroupVisibility? Visibility { get; init; } = null;
 
     public Guid OwnerId { get; init; }
@@ -58,7 +73,7 @@ public record DeleteGroupCommand(Guid Id) : IRequest<DeleteGroupCommand, Task<Gu
     public string ObjectName => nameof(Group);
 }
 
-public class UpdateGroupCommand : IRequest<UpdateGroupCommand, Task<Group>>, IEventInput
+public class UpdateGroupCommand : IRequest<UpdateGroupCommand, Task>, IEventInput
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -70,15 +85,9 @@ public class UpdateGroupCommand : IRequest<UpdateGroupCommand, Task<Group>>, IEv
 }
 
 
-#endregion
-
-
-
-#region "-- Commands --"
 public class GroupAssignedToCommunityEvent : EventEntity;
 public class QuestionnaireAssignedToGroupEvent : EventEntity { }
 
 public class GroupCreatedEvent : EventEntity;
 public class GroupDeletedEvent : EventEntity;
 public class GroupUpdatedEvent : EventEntity;
-#endregion

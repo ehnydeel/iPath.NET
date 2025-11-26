@@ -1,5 +1,6 @@
 ﻿using iPath.EF.Core.Database;
 using iPath.EF.Core.FeatureHandlers.Emails;
+using iPath.EF.Core.FeatureHandlers.Groups;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,7 @@ public static class PersistanceServiceRegistration
 
         services.AddScoped<DbSeeder>();
         services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddScoped<IGroupService, GroupService>();
 
         return services;
     }
@@ -74,15 +76,12 @@ public static class PersistanceServiceRegistration
         return services;
     }
 
-    public static IHost UpdateDatabase(this IHost host)
+    public static async Task UpdateDatabase(this IHost host)
     {
         using var scope = host.Services.CreateScope();
         var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
 
-        seeder.UpdateDatabase();
-        // seeder.Seed();
-
-        return host;
+        await seeder.UpdateDatabase();
     }
 }
 

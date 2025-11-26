@@ -1,4 +1,6 @@
-﻿namespace iPath.API;
+﻿using Microsoft.EntityFrameworkCore.Update.Internal;
+
+namespace iPath.API;
 
 public static class GroupEndpoints
 {
@@ -7,20 +9,34 @@ public static class GroupEndpoints
         var grp = route.MapGroup("groups")
             .WithTags("Groups");
 
-        grp.MapPost("list", (GetGroupListQuery query, IMediator mediator, CancellationToken ct)
-            => mediator.Send(query, ct))
+        grp.MapPost("list", (GetGroupListQuery query, IGroupService srv, CancellationToken ct)
+            => srv.GetGroupListAsync(query, ct))
             .Produces<PagedResultList<GroupListDto>>()
             .RequireAuthorization();
 
-        grp.MapGet("{id}", (string id, IMediator mediator, CancellationToken ct)
-            => mediator.Send(new GetGroupByIdQuery(Guid.Parse(id)), ct))
+        grp.MapGet("{id}", (string id, IGroupService srv, CancellationToken ct)
+            => srv.GetGroupByIdAsync(Guid.Parse(id), ct))
             .Produces<GroupDto>()
             .RequireAuthorization();
 
 
-        grp.MapPut("community/assign", (AssignGroupToCommunityCommand request, IMediator mediator, CancellationToken ct)
-            => mediator.Send(request, ct))
+        grp.MapPut("community/assign", (AssignGroupToCommunityCommand request, IGroupService srv, CancellationToken ct)
+            => srv.AssignGroupToCommunityAsync(request, ct))
             .Produces<GroupAssignedToCommunityEvent>()
+            .RequireAuthorization("Admin");
+
+
+        grp.MapPost("create", (CreateGroupCommand cmd, IGroupService srv, CancellationToken ct)
+            => srv.CreateGroupAsync(cmd, ct))
+            .Produces<GroupDto>()
+            .RequireAuthorization("Admin");
+
+        grp.MapPut("update", (UpdateGroupCommand cmd, IGroupService srv, CancellationToken ct)
+            => srv.UpdateGroupAsync(cmd, ct))
+            .RequireAuthorization("Admin");
+
+        grp.MapDelete("delete/{id}", (Guid id, IGroupService srv, CancellationToken ct)
+            => srv.DeleteGroupAsync(new DeleteGroupCommand(id), ct))
             .RequireAuthorization("Admin");
 
 
