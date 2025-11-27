@@ -7,9 +7,6 @@ public class GetCommunityMembersQueryHandler(iPathDbContext db, IUserSession ses
 {
     public async Task<IEnumerable<CommunityMemberDto>> Handle(GetCommunityMembersQuery request, CancellationToken cancellationToken)
     {
-
-
-
         var c = await db.Communities
             .Include(c => c.Members)
             .ThenInclude(m => m.User)

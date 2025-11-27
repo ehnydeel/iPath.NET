@@ -6,7 +6,7 @@ namespace iPath.Application.Features;
 
 #region "-- DTO --"
 public record GroupListDto(Guid Id, string Name, eGroupVisibility Visibility, int? TotalNodes = null, int? NewNodes = null, int? NewAnnotation = null);
-public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, OwnerDto Owner, GroupSettings Settings, GroupMemberDto[]? Members);
+public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, OwnerDto Owner, GroupSettings Settings, GroupMemberDto[]? Members, CommunityListDto[]? Communities);
 
 public record UserGroupMemberDto(Guid GroupId, string Groupname, eMemberRole Role);
 
@@ -28,6 +28,7 @@ public interface IGroupService
 {
     Task<PagedResultList<GroupListDto>> GetGroupListAsync(GetGroupListQuery query, CancellationToken ct = default);
     Task<GroupDto> GetGroupByIdAsync(Guid GroupId, CancellationToken ct = default);
+    Task<PagedResultList<GroupMemberDto>> GetGroupMembersAsync(GetGroupMembersQuery query, CancellationToken ct = default);
 
 
     Task<GroupListDto> CreateGroupAsync(CreateGroupCommand cmd, CancellationToken ct = default);
@@ -52,6 +53,19 @@ public class GetGroupListQuery : PagedQuery<GroupListDto>
 }
 
 public record GetGroupByIdQuery(Guid GroupId) : IRequest<GetGroupByIdQuery, Task<GroupDto>>;
+
+
+
+public class GetGroupMembersQuery : PagedQuery<GroupMemberDto>
+// , IRequest<GetGroupListQuery, Task<PagedResultList<GroupListDto>>>
+{
+    required public Guid GroupId { get; init; }
+    public string SearchString { get; set; }
+}
+
+
+
+
 
 public record AssignGroupToCommunityCommand(Guid GroupId, Guid CommunityId, bool Remove = false)
     : IEventInput
@@ -108,8 +122,10 @@ public static class GroupExtensions
 {
     public static GroupDto ToDto(this Group group)
     {
-        return new GroupDto(Id: group.Id, Name: group.Name, Visibility: group.Visibility, Owner: group.Owner.ToOwnerDto(), Settings: group.Settings, 
-            Members: group.Members?.Select(m => new GroupMemberDto(UserId: m.UserId, Role: m.Role, Username: m.User?.UserName)).ToArray());
+        return new GroupDto(Id: group.Id, Name: group.Name, Visibility: group.Visibility, Owner: group.Owner.ToOwnerDto(), Settings: group.Settings,
+
+            Members: group.Members?.Select(m => new GroupMemberDto(UserId: m.UserId, Role: m.Role, Username: m.User?.UserName)).ToArray(),
+            Communities: group.Communities.Select(c => new CommunityListDto(Id: c.Community.Id, Name: c.Community.Name)).ToArray());
     }
     
     public static GroupListDto ToListDto(this Group group)

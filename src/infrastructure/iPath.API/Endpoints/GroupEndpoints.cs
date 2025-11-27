@@ -1,4 +1,7 @@
-﻿namespace iPath.API;
+﻿using iPath.Application.Querying;
+using Microsoft.OpenApi.MicrosoftExtensions;
+
+namespace iPath.API;
 
 public static class GroupEndpoints
 {
@@ -15,6 +18,11 @@ public static class GroupEndpoints
         grp.MapGet("{id}", (string id, IGroupService srv, CancellationToken ct)
             => srv.GetGroupByIdAsync(Guid.Parse(id), ct))
             .Produces<GroupDto>()
+            .RequireAuthorization();
+
+        grp.MapPost("members", (GetGroupMembersQuery query, IGroupService srv, CancellationToken ct)
+            => srv.GetGroupMembersAsync(query, ct))
+            .Produces<PagedResultList<GroupMemberDto>>()
             .RequireAuthorization();
 
 

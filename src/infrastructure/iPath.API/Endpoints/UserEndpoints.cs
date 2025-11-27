@@ -49,6 +49,10 @@ public static class UserEndpoints
             => mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
 
+        grp.MapPut("assign/group", (AssignUserToGroupCommand cmd, IMediator mediator, CancellationToken ct)
+            => mediator.Send(cmd, ct))
+            .RequireAuthorization("Admin");
+
 
         grp.MapPut("profile", (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
             => mediator.Send(cmd, ct))

@@ -50,6 +50,9 @@ public interface IPathApi
 
     [Put("/api/v1/users/assign/community")]
     Task<IApiResponse> AssignUserToCommunity(AssignUserToCommunityCommand command);
+
+    [Put("/api/v1/users/assign/group")]
+    Task<IApiResponse> AssignUserToGroup(AssignUserToGroupCommand command);
     #endregion
 
 
@@ -60,6 +63,9 @@ public interface IPathApi
 
     [Get("/api/v1/groups/{id}")]
     Task<IApiResponse<GroupDto>> GetGroup(Guid id);
+
+    [Post("/api/v1/groups/members")]
+    Task<IApiResponse<PagedResultList<GroupMemberDto>>> GetGrouMembers(GetGroupMembersQuery query);
 
     [Post("/api/v1/groups/create")]
     Task<IApiResponse<GroupListDto>> CreateGroup(CreateGroupCommand command);

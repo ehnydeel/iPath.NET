@@ -5,6 +5,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
@@ -15,7 +16,11 @@ public class GroupAdminViewModel(IPathApi api,
     IStringLocalizer T,
     ILogger<GroupAdminViewModel> logger)
     : IViewModel
-{    
+{
+
+    public Action OnChange { get; set; }
+
+
     public string SearchString { get; set; } = "";
     public MudDataGrid<GroupListDto> grid;
 
@@ -106,20 +111,38 @@ public class GroupAdminViewModel(IPathApi api,
 
 
     public GroupDto SelectedGroup { get; private set; }
+    public bool IsLoading;
     private async Task LoadGroup(Guid? id)
     {
-        if (!id.HasValue)
-        {
-            SelectedGroup = null;
-        }
-        else
-        {
-            var resp = await api.GetGroup(id.Value);
-            if (resp.IsSuccessful)
+        IsLoading = true;
+        SelectedGroup = null;
+        if (id.HasValue)
+        { 
+            try
             {
-                SelectedGroup = resp.Content;
+                var resp = await api.GetGroup(id.Value);
+                if (resp.IsSuccessful)
+                {
+                    SelectedGroup = resp.Content;
+                }
+                snackbar.AddError(resp.ErrorMessage);
             }
-            snackbar.AddError(resp.ErrorMessage);
+            catch(Exception ex)
+            {
+                snackbar.AddError(ex.Message);
+            }
+        }
+
+        IsLoading = false;
+
+        OnChange?.Invoke();
+    }
+
+    public async Task ReloadGroup()
+    {
+        if (SelectedGroup != null)
+        {
+            await LoadGroup(SelectedGroup.Id);
         }
     }
 
@@ -187,14 +210,63 @@ public class GroupAdminViewModel(IPathApi api,
     }
 
 
-    public async Task AddToCommunity(CommunityListDto group)
+    public async Task AddToCommunity(CommunityListDto community) => ToggleCommunity(community, false);
+    public async Task RemoveFromCommunity(CommunityListDto community) => ToggleCommunity(community, true);
+
+    public async Task ToggleCommunity(CommunityListDto community, bool remove)
     {
-        snackbar.AddWarning("not implemented yet");
+        if (SelectedGroup != null)
+        {
+            var cmd = new AssignGroupToCommunityCommand(GroupId: SelectedGroup.Id, CommunityId: community.Id, Remove: remove);
+            var resp = await api.AssignGroupToCommunity(cmd);
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
+        }
     }
 
-    public async Task RemnoveFromCommunity(CommunityListDto group)
+
+    public string MemberSearchString { get; set; }
+
+    public async Task<GridData<GroupMemberDto>> GetMembersAsync(GridState<GroupMemberDto> state)
     {
-        snackbar.AddWarning("not implemented yet");
+        if (SelectedGroup is not null)
+        {
+            var query = state.BuildQuery(new GetGroupMembersQuery { GroupId = SelectedGroup.Id, SearchString = this.MemberSearchString });
+            var resp = await api.GetGrouMembers(query);
+
+            if (resp.IsSuccessful) return resp.Content.ToGridData();
+
+            snackbar.AddWarning(resp.ErrorMessage);
+        }
+        return new GridData<GroupMemberDto>();
+    }
+
+
+    public async Task AddGroupMember(OwnerDto owner)
+    {
+        if (SelectedGroup is not null)
+        {
+            var cmd = new AssignUserToGroupCommand(userId: owner.Id, groupId: SelectedGroup.Id);
+            var resp = await api.AssignUserToGroup(cmd);
+            if (!resp.IsSuccessful)
+                snackbar.AddError(resp.ErrorMessage);
+        }
+    }
+
+    public async Task RemoveGroupMember(GroupMemberDto member)
+    {
+        if (SelectedGroup is not null)
+        {
+            UserGroupMemberDto[] list = {
+                new UserGroupMemberDto(GroupId: SelectedGroup.Id, Groupname: "", Role: eMemberRole.None)
+            };
+            var cmd = new UpdateGroupMembershipCommand(member.UserId, list);
+            var resp = await api.SetGroupMemberships(cmd);
+            if (!resp.IsSuccessful)
+                snackbar.AddError(resp.ErrorMessage);
+        }
     }
 }
 

@@ -41,7 +41,7 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
         // remove those set to None
         foreach (var entity in list)
         {
-            if (!request.Membership.Any(dto => dto.GroupId == entity.GroupId))
+            if (request.Membership.Where(m => m.Role == eMemberRole.None).Any(dto => dto.GroupId == entity.GroupId))
             {
                 set.Remove(entity);
             }

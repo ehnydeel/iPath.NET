@@ -1,0 +1,41 @@
+﻿@if (Model != null)
+{
+    <MudText Typo="Typo.h6" Style="border-bottom: 1px solid;">@T["Communities"]</MudText>
+
+    <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+        <CommunityLookup Label=@T["add to community"] Dense="true" @bind-Value="communityToAdd" />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddCommunity" />
+    </MudStack>
+    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="mt-4">
+        <Columns>
+            <PropertyColumn Property="c => c.Name" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick=@(() => RemoveCommunity(context.Item)) />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+
+
+    <MudText Typo="Typo.h6" Class="mt-10" Style="border-bottom: 1px solid;">@T["Members"]</MudText>
+
+    <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+        <OwnerLookup Label=@T["select user"] Dense="true" @bind-Value="userToAdd" />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddUser" />
+    </MudStack>
+    <MudDataGrid T="GroupMemberDto" ServerData="vm.GetMembersAsync" Dense="true" Class="mt-4" @ref="memberGrid">
+        <Columns>
+            <PropertyColumn Property="g => g.Username" />
+            <PropertyColumn Property="g => g.Role" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick=@(() => RemoveUser(context.Item)) />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="GroupMemberDto" />
+        </PagerContent>
+    </MudDataGrid>
+}

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DispatchR.Abstractions.Send;
+using Microsoft.Extensions.Logging;
 using EFunc = Microsoft.EntityFrameworkCore.EF;
 
 namespace iPath.EF.Core.FeatureHandlers.Groups;
@@ -11,15 +12,17 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
     {
         sess.AssertInGroup(GroupId);
 
-        var community = await db.Groups.AsNoTracking()
+        var group = await db.Groups
+            .AsNoTracking()
             .Where(g => g.Id == GroupId)
             .Select(g => new GroupDto(Id: g.Id, Name: g.Name, Visibility: g.Visibility, Owner: g.Owner.ToOwnerDto(), Settings: g.Settings,
-                                      Members: g.Members.Select(m => new GroupMemberDto(UserId: m.User.Id, Username: m.User.UserName, Role: m.Role)).ToArray()))
+                                      Members: g.Members.Select(m => new GroupMemberDto(UserId: m.User.Id, Username: m.User.UserName, Role: m.Role)).ToArray(),
+                                      Communities: g.Communities.Select(c => new CommunityListDto(Id: c.Community.Id, Name: c.Community.Name)).ToArray()))
             .FirstOrDefaultAsync(ct);
 
-        Guard.Against.NotFound(GroupId, community);
+        Guard.Against.NotFound(GroupId, group);
 
-        return community;
+        return group;
     }
 
     public async Task<PagedResultList<GroupListDto>> GetGroupListAsync(GetGroupListQuery request, CancellationToken ct = default)
@@ -67,6 +70,31 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
         var data = await dtoQuery.ToPagedResultAsync(request, ct);
         return data;
     }
+
+
+
+    public async Task<PagedResultList<GroupMemberDto>> GetGroupMembersAsync(GetGroupMembersQuery query, CancellationToken ct = default)
+    {
+        if (!sess.IsAdmin && !sess.IsGroupModerator(query.GroupId))
+            throw new NotAllowedException();
+
+        var q = db.Set<GroupMember>().AsNoTracking()
+            .Include(m => m.User)
+            .Where(m => m.GroupId == query.GroupId)
+            .ApplyQuery(query);
+
+
+        if (!string.IsNullOrEmpty(query.SearchString))
+        {
+            var s = $"%{query.SearchString}%";
+            q = q.Where(m => EFunc.Functions.Like(m.User.UserName, s) || EFunc.Functions.Like(m.User.Email, s));
+        }
+
+        var projected = q.Select(m => new GroupMemberDto(UserId: m.User.Id, Username: m.User.UserName, Role: m.Role));
+        return await projected.ToPagedResultAsync(query, ct);
+    }
+
+
     #endregion
 
 
