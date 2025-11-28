@@ -1,5 +1,4 @@
-﻿using DispatchR.Abstractions.Send;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using EFunc = Microsoft.EntityFrameworkCore.EF;
 
 namespace iPath.EF.Core.FeatureHandlers.Groups;
@@ -45,7 +44,7 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
         }
 
         // filter
-        q = q.ApplyQuery(request);
+        q = q.ApplyQuery(request, "Name ASC");
 
         // project
         IQueryable<GroupListDto> dtoQuery;

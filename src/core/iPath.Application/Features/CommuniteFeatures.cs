@@ -18,8 +18,11 @@ public record GetCommunityByIdQuery(Guid id)
     : IRequest<GetCommunityByIdQuery, Task<CommunityDto>>;
 
 
-public record GetCommunityMembersQuery(Guid id)
-    : IRequest<GetCommunityMembersQuery, Task<IEnumerable<CommunityMemberDto>>>;
+public class GetCommunityMembersQuery : PagedQuery<CommunityMemberDto> 
+    , IRequest<GetCommunityMembersQuery, Task<PagedResultList<CommunityMemberDto>>>
+{
+    public Guid CommunityId { get; set; }
+}
 
 
 #endregion

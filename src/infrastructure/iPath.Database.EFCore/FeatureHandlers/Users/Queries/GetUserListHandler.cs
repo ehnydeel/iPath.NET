@@ -13,7 +13,7 @@ public class GetUserListHandler(iPathDbContext db)
         var q = db.Users.AsNoTracking();
 
         // filter
-        q = q.ApplyQuery(request);
+        q = q.ApplyQuery(request, "Username ASC");
 
         if (!string.IsNullOrEmpty(request.SearchString))
         {

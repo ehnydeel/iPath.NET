@@ -8,7 +8,7 @@ public class GetCommunityListQueryHandler (iPathDbContext db)
         var q = db.Communities.AsNoTracking();
 
         // filter & sort
-        q = q.ApplyQuery(request);
+        q = q.ApplyQuery(request, "Name ASC");
 
         // project
         var projeted = q.Select(x => new CommunityListDto(x.Id, x.Name));

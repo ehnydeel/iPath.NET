@@ -7,7 +7,7 @@ internal static class QueryExtensions
 {
 
 
-    public static IQueryable<T> ApplyQuery<T>(this IQueryable<T> q, PagedQuery query) where T : class
+    public static IQueryable<T> ApplyQuery<T>(this IQueryable<T> q, PagedQuery query, string? DefaultSort = null) where T : class
     {
         if (query.Sorting is not null)
         {
@@ -19,6 +19,11 @@ internal static class QueryExtensions
                 }
             }
         }
+        else if(!string.IsNullOrEmpty(DefaultSort))
+        {
+            q = q.OrderBy(DefaultSort);
+        }
+
         return q;
     }
 

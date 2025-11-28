@@ -1,0 +1,16 @@
+﻿@using iPath.Blazor.Componenents.Admin.Groups
+
+@inject IDialogService dialog
+
+<MudButton Variant="Variant.Filled" OnClick="Test">Edit Group</MudButton>
+
+@code {
+    async Task Test()
+    {
+        var p = new DialogParameters<EditGroupDialog> { { x => x.Model, new GroupEditModel() } };
+        DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
+        var dlg = await dialog.ShowAsync<EditGroupDialog>("Edit group", options: opts, parameters: p);
+        var res = await dlg.Result;
+        var r = res?.Data as GroupEditModel;
+    }
+}

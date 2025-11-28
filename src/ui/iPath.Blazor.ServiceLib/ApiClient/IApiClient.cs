@@ -91,6 +91,9 @@ public interface IPathApi
     [Get("/api/v1/communities/{id}")]
     Task<IApiResponse<CommunityDto>> GetCommunity(Guid id);
 
+    [Get("/api/v1/communities/members")]
+    Task<IApiResponse<PagedResultList<CommunityMemberDto>>> GetCommunityMembers(GetCommunityMembersQuery query);
+
 
     [Post("/api/v1/communities/create")]
     Task<IApiResponse<CommunityListDto>> CreateCommunity(CreateCommunityCommand input);

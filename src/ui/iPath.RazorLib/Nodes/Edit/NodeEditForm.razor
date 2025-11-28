@@ -1,5 +1,4 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
-@using Tizzani.MudBlazor.HtmlEditor
 
 @inject IStringLocalizer T
 
@@ -28,9 +27,7 @@
                 }
                 else if (useHtmlEditor)
                 {
-                    <MudHtmlEditor @bind-Html=@Model.Text>
-                        <MudHtmlToolbarOptions InsertImage="false" />
-                    </MudHtmlEditor>
+                    <MudExRichTextEditor.MudExRichTextEdit @bind-Value="Model.Text" />
                 }
                 else
                 {
@@ -56,5 +53,5 @@
     public Margin Margin { get; set; } = Margin.Dense;
 
     bool useQuestionnaire;
-    bool useHtmlEditor;
+    bool useHtmlEditor = true;
 }

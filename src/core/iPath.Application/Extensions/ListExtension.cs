@@ -2,6 +2,10 @@
 
 public static class ListExtension
 {
+    public static bool IsEmpty<T>(this T[]? list)
+    {
+        return list is null || !list.Any();
+    }
     public static bool IsEmpty<T>(this IReadOnlyList<T>? list)
     {
         return list is null || !list.Any();

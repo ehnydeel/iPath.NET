@@ -1,11 +1,6 @@
-﻿using iPath.Blazor.ServiceLib.ApiClient;
-using iPath.Domain.Entities;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
@@ -268,17 +263,6 @@ public class GroupAdminViewModel(IPathApi api,
                 snackbar.AddError(resp.ErrorMessage);
         }
     }
-}
-
-
-public class GroupEditModel
-{
-    public Guid? Id { get; set; }
-    [Required]
-    public string Name { get; set; } = "";
-    public GroupSettings Settings { get; set; } = new();
-    public OwnerDto? Owner { get; set; }
-    public CommunityListDto? Community { get; set; }
 }
 
 

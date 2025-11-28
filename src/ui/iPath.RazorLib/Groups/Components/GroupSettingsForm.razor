@@ -1,0 +1,32 @@
+﻿@namespace iPath.Blazor.Componenents.Groups
+@inject IStringLocalizer T
+
+<MudForm Model="Model" Spacing="@Spacing">
+    <MudTextField Label=@T["Purpose"] @bind-Value="Model.Purpose" Variant="@Variant"
+                  Lines="4" AutoGrow="true" />
+
+    <MudText Typo="Typo.h6" Class="mt-4">@T["Annotations"]</MudText>
+    <MudSwitch Label=@T["Hide annotations"] @bind-Value="Model.AnnotationsHide"
+               Color="Color.Info"/>
+
+
+    <MudText Typo="Typo.h6" Class="mt-4">@T["Case display"]</MudText>
+
+    <MudSwitch Label=@T["Allow HTML in case description"] @bind-Value="Model.DescriptionAllowHtml"
+               Color="Color.Info" />
+
+    <MudTextField Label=@T["Template for case Dexription"] @bind-Value="Model.DescriptionTemplate"
+                  Variant="@Variant" Lines="5" />
+
+</MudForm>
+
+@code {
+    [Parameter]
+    public GroupSettings Model { get; set; }
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Outlined;
+
+    [Parameter]
+    public int Spacing { get; set; }
+}

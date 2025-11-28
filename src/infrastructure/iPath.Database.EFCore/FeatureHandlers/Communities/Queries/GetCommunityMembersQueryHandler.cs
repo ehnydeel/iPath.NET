@@ -1,19 +1,24 @@
-﻿using iPath.Application.Features; 
+﻿using iPath.Application;
 
 namespace iPath.EF.Core.FeatureHandlers.Communities.Queries;
 
 public class GetCommunityMembersQueryHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<GetCommunityMembersQuery, Task<IEnumerable<CommunityMemberDto>>>
+    : IRequestHandler<GetCommunityMembersQuery, Task<PagedResultList<CommunityMemberDto>>>
 {
-    public async Task<IEnumerable<CommunityMemberDto>> Handle(GetCommunityMembersQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResultList<CommunityMemberDto>> Handle(GetCommunityMembersQuery request, CancellationToken cancellationToken)
     {
-        var c = await db.Communities
-            .Include(c => c.Members)
-            .ThenInclude(m => m.User)
+        var q = db.Set<CommunityMember>()
+            .Include(m => m.User)
             .AsNoTracking()
-            .Where(c => c.Id == request.id)
-            .SelectMany(c => c.Members.Select(m => new CommunityMemberDto(CommunityId: c.Id, UserId: m.User.Id, Role: m.Role, Username: m.User.UserName)))
-            .ToListAsync(cancellationToken);
-        return c;
+            .Where(c => c.Id == request.CommunityId);
+
+        q.ApplyQuery(request);
+        if (request.Sorting.IsEmpty())
+        {
+            q = q.OrderBy(m => m.User.UserName);
+        }
+
+        var projected = q.Select(m => new CommunityMemberDto(CommunityId: m.CommunityId, UserId: m.UserId, Role: m.Role, Username: m.User.UserName));
+        return await projected.ToPagedResultAsync(request, cancellationToken);
     }
 }

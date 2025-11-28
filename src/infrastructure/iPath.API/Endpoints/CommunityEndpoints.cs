@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using iPath.Application.Features.Users;
+using Microsoft.AspNetCore.Mvc;
 
 namespace iPath.API;
 
@@ -18,9 +19,9 @@ public static class CommunityEndpoints
             .Produces<CommunityDto>()
             .RequireAuthorization();
 
-        grp.MapGet("members/{id}", (string id, IMediator mediator, CancellationToken ct)
-            => mediator.Send(new GetCommunityMembersQuery(Guid.Parse(id)), ct))
-            .Produces<CommunityDto>()
+        grp.MapPost("members", (string id, IMediator mediator, CancellationToken ct)
+            => mediator.Send(new GetCommunityMembersQuery { CommunityId = Guid.Parse(id) }, ct))
+            .Produces<PagedResultList<CommunityMemberDto>>()
             .RequireAuthorization();
 
 
