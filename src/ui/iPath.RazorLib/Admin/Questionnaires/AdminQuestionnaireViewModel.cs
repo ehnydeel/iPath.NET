@@ -1,12 +1,11 @@
-using Microsoft.Extensions.Localization;
+﻿namespace iPath.Blazor.Componenents.Admin.Questionnaires;
 
-namespace iPath.Blazor.Componenents.Admin.Questionnaires;
-
-public partial class AdminQuestionnaires(IStringLocalizer T, ISnackbar snackbar, IDialogService dialog, IPathApi api)
+public class AdminQuestionnaireViewModel(ISnackbar snackbar, IDialogService dialog, IPathApi api)
+    : IViewModel
 {
-    MudDataGrid<QuestionnaireListDto> grid;
+    public MudDataGrid<QuestionnaireListDto> grid;
 
-    async Task<GridData<QuestionnaireListDto>> GetData(GridState<QuestionnaireListDto> state)
+    public async Task<GridData<QuestionnaireListDto>> GetData(GridState<QuestionnaireListDto> state)
     {
         var query = state.BuildQuery(new GetQuestionnaireListQuery());
         var resp = await api.GetQuestionnnaires(query);
@@ -16,29 +15,31 @@ public partial class AdminQuestionnaires(IStringLocalizer T, ISnackbar snackbar,
     }
 
 
-    async Task Create()
+    public async Task Create()
     {
         var dlg = await dialog.ShowAsync<EditQuestionnaireDialog>();
         var res = await dlg.Result;
         if (res?.Data is EditQuestionnaireModel)
         {
-            var m = (EditQuestionnaireModel) res.Data;
+            var m = (EditQuestionnaireModel)res.Data;
             var resp = await api.CreateQuestionnaire(new CreateQuestionnaireCommand(m.QuestionnaireId, m.Resource));
             await grid.ReloadServerData();
         }
     }
 
-    async Task Edit(QuestionnaireListDto item)
+    public async Task Edit(QuestionnaireListDto item)
     {
         if (item != null)
         {
             var resp = await api.GetQuestionnaireById(item.Id);
             if (resp.IsSuccessful)
             {
-                var m = new EditQuestionnaireModel {
-                    Id = resp.Content.Id, 
-                    QuestionnaireId = resp.Content.QuestionnaireId, 
-                    Version = resp.Content.Version , 
+                var v1 = resp.Content.Resource;
+                var m = new EditQuestionnaireModel
+                {
+                    Id = resp.Content.Id,
+                    QuestionnaireId = resp.Content.QuestionnaireId,
+                    Version = resp.Content.Version,
                     Resource = resp.Content.Resource
                 };
                 var p = new DialogParameters<EditQuestionnaireDialog> { { x => x.Model, m } };
@@ -47,8 +48,17 @@ public partial class AdminQuestionnaires(IStringLocalizer T, ISnackbar snackbar,
                 if (res?.Data is EditQuestionnaireModel)
                 {
                     var r = (EditQuestionnaireModel)res.Data;
-                    var resp2 = await api.CreateQuestionnaire(new CreateQuestionnaireCommand(r.QuestionnaireId, r.Resource));
-                    await grid.ReloadServerData();
+
+                    if (v1 != r.Resource)
+                    {
+                        var resp2 = await api.CreateQuestionnaire(new CreateQuestionnaireCommand(r.QuestionnaireId, r.Resource));
+                        await grid.ReloadServerData();
+                        snackbar.Add("Questionnaire updated", Severity.Success);
+                    }
+                    else
+                    {
+                        snackbar.Add("no change", Severity.Info);
+                    }
                 }
             }
         }

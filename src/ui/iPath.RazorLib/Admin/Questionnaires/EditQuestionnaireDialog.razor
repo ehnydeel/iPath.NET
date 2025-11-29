@@ -10,7 +10,7 @@
     <DialogContent>
         <MudForm Model="@Model" @ref="frm" Spacing="4">
             <MudTextField @bind-Value="@Model.QuestionnaireId" Label=@T["Id"] Required="true" Variant="Variant.Outlined" Disabled="IdDisabled" />
-            <MudTextField @bind-Value="@Model.Resource" Label=@T["FHIR Resource"] Variant="Variant.Outlined" Lines="10" AutoGrow="true" />
+            <MudTextField @bind-Value="@Model.Resource" Label=@T["FHIR Resource"] Variant="Variant.Outlined" Lines="10" />
         </MudForm>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {

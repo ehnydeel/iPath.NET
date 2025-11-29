@@ -19,7 +19,7 @@ public record UserGroupMemberDto(Guid GroupId, string Groupname, eMemberRole Rol
 public record GroupMemberDto(Guid UserId, string Username, eMemberRole Role);
 
 
-public record QuestionnaireForGroupDto(Guid QuestionnaireId, eQuestionnaireUsage Usage, int? ExplicitVersion = null);
+public record QuestionnaireForGroupDto(Guid QuestionnaireId, string QuestinnaireName, eQuestionnaireUsage Usage, int? ExplicitVersion = null);
 
 #endregion
 
@@ -136,7 +136,7 @@ public static class GroupExtensions
 
             Members: group.Members?.Select(m => new GroupMemberDto(UserId: m.UserId, Role: m.Role, Username: m.User?.UserName)).ToArray(),
             Communities: group.Communities.Select(c => new CommunityListDto(Id: c.Community.Id, Name: c.Community.Name)).ToArray(),
-            Questionnaires: group.Quesionnaires.Select(q => new QuestionnaireForGroupDto(QuestionnaireId: q.QuestionnaireId, Usage: q.Usage, ExplicitVersion: q.ExplicitVersion)).ToArray());
+            Questionnaires: group.Quesionnaires.Select(q => new QuestionnaireForGroupDto(QuestionnaireId: q.QuestionnaireId, QuestinnaireName: q.Questionnaire.QuestionnaireId, Usage: q.Usage, ExplicitVersion: q.ExplicitVersion)).ToArray());
     }
     
     public static GroupListDto ToListDto(this Group group)

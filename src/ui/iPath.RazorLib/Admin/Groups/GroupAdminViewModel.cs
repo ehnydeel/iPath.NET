@@ -263,6 +263,19 @@ public class GroupAdminViewModel(IPathApi api,
                 snackbar.AddError(resp.ErrorMessage);
         }
     }
+
+
+
+    public async Task EditQuestionnaires()
+    {
+        if (SelectedGroup != null)
+        {
+            var p = new DialogParameters<EditGroupQuestionnairesDialog> { { x => x.Model, SelectedGroup } };
+            var dlg = await dialog.ShowAsync<EditGroupQuestionnairesDialog>("...", parameters: p);
+            var res = await dlg.Result;
+        }
+    }
+
 }
 
 
