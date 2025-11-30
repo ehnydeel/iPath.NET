@@ -85,7 +85,7 @@ public record AssignGroupToCommunityCommand(Guid GroupId, Guid CommunityId, bool
 }
 
 
-public record AssignQuestionnaireToGroupCommand(Guid Id, Guid GroupId, eQuestionnaireUsage Usage)
+public record AssignQuestionnaireToGroupCommand(Guid Id, Guid GroupId, eQuestionnaireUsage Usage, bool remove)
     : IEventInput
     // , IRequest<AssignQuestionnaireToGroupCommand, Task<QuestionnaireAssignedToGroupEvent>>
 {

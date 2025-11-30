@@ -22,7 +22,8 @@
                 {
                     <TemplateColumn Title="@e.ToString()">
                         <CellTemplate>
-                            <MudCheckBox @bind-Value="@context.Item.Usage[e]" />
+                            <MudCheckBox @bind-Value="@context.Item.Usage[e]" 
+                            @bind-Value:after="@(() => Save(context.Item, e))"/>
                         </CellTemplate>
                     </TemplateColumn>
                 }
@@ -30,8 +31,18 @@
         </MudDataGrid>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Variant="Variant.Outlined">Cancel</MudButton>
-        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" OnClick="Save">Save</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Outlined">Close</MudButton>
+        @if (saving)
+        {
+            <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+            <i>saving ...</i>
+        }
+        else if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudTooltip Text="@ErrorMessage">
+                <MudIcon Icon="@Icons.Material.Filled.Error" Size="Size.Small" Color="Color.Error" />
+            </MudTooltip>
+        }
     </DialogActions>
 </MudDialog>
 

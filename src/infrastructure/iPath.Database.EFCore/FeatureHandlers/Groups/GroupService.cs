@@ -155,9 +155,26 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
         return evt;
     }
 
-    public Task AssignQuestionnaireToGroupAsync(AssignQuestionnaireToGroupCommand cmd, CancellationToken ct = default)
+    public async Task AssignQuestionnaireToGroupAsync(AssignQuestionnaireToGroupCommand cmd, CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var item = await db.Set<QuestionnaireForGroup>()
+            .FirstOrDefaultAsync(q => q.QuestionnaireId == cmd.Id && q.GroupId == cmd.GroupId && q.Usage == cmd.Usage);
+
+        if (cmd.remove && item is not null)
+        {
+            db.Set<QuestionnaireForGroup>().Remove(item);
+        }
+        else if (!cmd.remove && item is null) 
+        {
+            var newItem = new QuestionnaireForGroup
+            {
+                GroupId = cmd.GroupId,
+                QuestionnaireId = cmd.Id,
+                Usage = cmd.Usage
+            };
+            await db.Set<QuestionnaireForGroup>().AddAsync(item, ct);
+        }
+        await db.SaveChangesAsync(ct);
     }
 
     public async Task<GroupListDto> CreateGroupAsync(CreateGroupCommand cmd, CancellationToken ct = default)

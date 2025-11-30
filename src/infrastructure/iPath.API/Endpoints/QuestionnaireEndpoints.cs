@@ -9,9 +9,20 @@ public static class QuesionnaireEndpoints
         var qr = route.MapGroup("questionnaires")
             .WithTags("Questionnaires");
 
-        qr.MapGet("{id}", async (string id, IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new GetQuestionnaireByIdQuery(Guid.Parse(id)), ct))
+        qr.MapGet("{id}", async (string id, int? Version, IMediator mediator, CancellationToken ct)
+            =>
+        {
+            if (Guid.TryParse(id, out var guid))
+            {
+                return await mediator.Send(new GetQuestionnaireByIdQuery(guid), ct);
+            }
+            else
+            {
+                return await mediator.Send(new GetQuestionnaireQuery(id, Version), ct);
+            }
+        })
             .Produces<Questionnaire>();
+
 
         qr.MapPost("list", async (GetQuestionnaireListQuery query, IMediator mediator, CancellationToken ct)
             => await mediator.Send(query, ct))

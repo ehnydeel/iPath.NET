@@ -78,7 +78,7 @@ public interface IPathApi
     Task<IApiResponse> AssignGroupToCommunity(AssignGroupToCommunityCommand command);
 
     [Put("/api/v1/groups/asignquestionnaire")]
-    Task<IApiResponse> AssignQuestionnaireToCommunity(AssignQuestionnaireToGroupCommand command);
+    Task<IApiResponse> AssignQuestionnaireToGroup(AssignQuestionnaireToGroupCommand command);
 
     #endregion
 
@@ -176,6 +176,9 @@ public interface IPathApi
     #region "-- Questionnaires --"
     [Get("/api/v1/questionnaires/{id}")]
     Task<IApiResponse<Questionnaire>> GetQuestionnaireById(Guid id);
+
+    [Get("/api/v1/questionnaires/{id}")]
+    Task<IApiResponse<Questionnaire>> GetQuestionnaire(string id, int? Version = null);
 
     [Post("/api/v1/questionnaires/list")]
     Task<IApiResponse<PagedResultList<QuestionnaireListDto>>> GetQuestionnnaires(GetQuestionnaireListQuery query);

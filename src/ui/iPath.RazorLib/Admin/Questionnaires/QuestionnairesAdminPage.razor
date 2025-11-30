@@ -1,0 +1,41 @@
+﻿@page "/admin/questionnaires"
+
+@inject IStringLocalizer T
+@inject QuestionnaireAdminViewModel vm
+
+
+
+<MudGrid Spacing="2">
+    <MudItem xs="12" sm="6">
+        <IPathHeader Title=@T["Questionnaires"]>
+            <ActionContent>
+                <MudFab StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="vm.Create" />
+            </ActionContent>
+        </IPathHeader>
+        <MudDataGrid T="QuestionnaireListDto" ServerData="vm.GetData" Dense Striped @ref="vm.grid"
+        RowClick="vm.OnRowClick">
+            <Columns>
+                <PropertyColumn Property="q => q.QuestionnaireId" Title="Id" />
+                <PropertyColumn Property="q => q.Version" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudCheckBox ReadOnly="true" Value="@context.Item.IsActive" />
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick=@(() => vm.Edit(context.Item)) />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick=@(() => vm.Delete(context.Item)) />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="QuestionnaireListDto" />
+            </PagerContent>
+        </MudDataGrid>
+    </MudItem>
+    <MudItem xs="12" sm="6">
+        <IPathHeader Title=@T["Preview"] />
+        <iPath.LHCForms.LhcForm @ref="vm.preview" />
+    </MudItem>
+</MudGrid>

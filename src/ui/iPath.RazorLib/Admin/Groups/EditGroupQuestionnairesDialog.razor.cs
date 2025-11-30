@@ -1,9 +1,11 @@
+using iPath.Blazor.Componenents.Admin.Questionnaires;
+using iPath.Blazor.Componenents.Questionaiires;
 using Microsoft.Extensions.Localization;
 using System.Security.Cryptography;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
-public partial class EditGroupQuestionnairesDialog(IStringLocalizer T)
+public partial class EditGroupQuestionnairesDialog(IPathApi api, IStringLocalizer T)
 {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; }
@@ -11,21 +13,23 @@ public partial class EditGroupQuestionnairesDialog(IStringLocalizer T)
     [Parameter]
     public GroupDto Model { get; set; }
 
+    bool saving;
     string ErrorMessage = "";
     QuestionnaireListDto selectedQ;
 
 
-    List<GroupQuestModel> Items = new();
+    List<GroupQuestionnareModel> Items = new();
 
+    eQuestionnaireUsage[] Usages => QuestionnairesViewModel.Usages;
 
     protected override async Task OnParametersSetAsync()
     {
-        foreach(var q in Model.Questionnaires)
+        foreach (var q in Model.Questionnaires)
         {
-            var item = Items.FirstOrDefault(x => x.Id == q.QuestionnaireId);
+            var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.QuestionnaireId);
             if (item is null)
             {
-                item = new GroupQuestModel(q.QuestionnaireId, q.QuestinnaireName);
+                item = new GroupQuestionnareModel(q.QuestionnaireId, q.QuestinnaireName, Model.Id);
             }
             item.Usage[q.Usage] = true;
         }
@@ -35,10 +39,10 @@ public partial class EditGroupQuestionnairesDialog(IStringLocalizer T)
     {
         if (selectedQ is not null)
         {
-            var item = Items.FirstOrDefault(x => x.Id == selectedQ.Id);
+            var item = Items.FirstOrDefault(x => x.QuestionnaireId == selectedQ.Id);
             if (item is null)
             {
-                item = new GroupQuestModel(selectedQ.Id, selectedQ.QuestionnaireId);
+                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, Model.Id);
                 Items.Add(item);
             }
             selectedQ = null;
@@ -48,48 +52,39 @@ public partial class EditGroupQuestionnairesDialog(IStringLocalizer T)
 
     private void Cancel() => MudDialog.Cancel();
 
-    private async Task Save()
+    private async Task Save(GroupQuestionnareModel model, eQuestionnaireUsage change)
     {
-        StateHasChanged();
-
-    }
-
-    public static List<eQuestionnaireUsage> Usages
-    {
-        get
+        saving = true;
+        try
         {
-            if (field is null)
-            {
-                field = new List<eQuestionnaireUsage>();
-                foreach (var e in Enum.GetValues(typeof(eQuestionnaireUsage)))
-                {
-                    if ((eQuestionnaireUsage)e != eQuestionnaireUsage.None)
-                    {
-                        field.Add((eQuestionnaireUsage)e);
-                    }
-                }
-            }
-            return field;
+            bool remove = !model.Usage[change];
+            var cmd = new AssignQuestionnaireToGroupCommand(model.QuestionnaireId, model.GrouppId, change, remove);
+            var resp = await api.AssignQuestionnaireToGroup(cmd);
         }
+        catch(Exception ex)
+        {
+        }
+        saving = false;
     }
-
 }
 
 
 
-internal class GroupQuestModel
+internal class GroupQuestionnareModel
 {
-    public Guid Id { get; init; }
+    public Guid QuestionnaireId { get; init; }
     public string Name { get; init; }
+    public Guid GrouppId {  get; init; }
 
     public Dictionary<eQuestionnaireUsage, bool> Usage = new();
 
-    public GroupQuestModel(Guid Id, string Name)
+    public GroupQuestionnareModel(Guid QuestionnaireId, string Name, Guid GroupId)
     {
-        Id = Id;
-        Name = Name;
+        this.QuestionnaireId = QuestionnaireId;
+        this.Name = Name;
+        this.GrouppId = GroupId;
 
-        foreach (var e in EditGroupQuestionnairesDialog.Usages)
+        foreach (var e in QuestionnairesViewModel.Usages)
         {
             Usage.Add((eQuestionnaireUsage)e, false);
         }

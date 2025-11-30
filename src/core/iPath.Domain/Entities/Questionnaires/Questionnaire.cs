@@ -28,10 +28,10 @@ public class QuestionnaireForGroup
     public Guid Id { get; set; }
 
     public Guid QuestionnaireId { get; set; }
-    public required Questionnaire Questionnaire { get; set; }
+    public Questionnaire Questionnaire { get; set; }
 
     public Guid GroupId { get; set; }
-    public required Group Group { get; set; }
+    public Group Group { get; set; }
 
     public eQuestionnaireUsage Usage { get; set; }
     public int? ExplicitVersion { get; set; } = null;

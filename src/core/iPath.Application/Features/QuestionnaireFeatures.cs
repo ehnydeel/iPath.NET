@@ -8,6 +8,10 @@ public record GetQuestionnaireByIdQuery(Guid Id)
     : IRequest<GetQuestionnaireByIdQuery, Task<Questionnaire>>;
 
 
+public record GetQuestionnaireQuery(string QuestionnaireId, int? Version)
+    : IRequest<GetQuestionnaireQuery, Task<Questionnaire>>;
+
+
 public class GetQuestionnaireListQuery : PagedQuery<Questionnaire>
     , IRequest<GetQuestionnaireListQuery, Task<PagedResultList<QuestionnaireListDto>>>
 { 

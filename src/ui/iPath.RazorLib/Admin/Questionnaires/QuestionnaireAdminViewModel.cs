@@ -1,9 +1,13 @@
-﻿namespace iPath.Blazor.Componenents.Admin.Questionnaires;
+﻿using iPath.Blazor.Componenents.Questionaiires;
+using MudBlazor;
 
-public class AdminQuestionnaireViewModel(ISnackbar snackbar, IDialogService dialog, IPathApi api)
+namespace iPath.Blazor.Componenents.Admin.Questionnaires;
+
+public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dialog, IPathApi api)
     : IViewModel
 {
     public MudDataGrid<QuestionnaireListDto> grid;
+    public iPath.LHCForms.LhcForm preview;
 
     public async Task<GridData<QuestionnaireListDto>> GetData(GridState<QuestionnaireListDto> state)
     {
@@ -17,7 +21,7 @@ public class AdminQuestionnaireViewModel(ISnackbar snackbar, IDialogService dial
 
     public async Task Create()
     {
-        var dlg = await dialog.ShowAsync<EditQuestionnaireDialog>();
+        var dlg = await dialog.ShowAsync<DlgEditQuestionnaire>();
         var res = await dlg.Result;
         if (res?.Data is EditQuestionnaireModel)
         {
@@ -42,8 +46,8 @@ public class AdminQuestionnaireViewModel(ISnackbar snackbar, IDialogService dial
                     Version = resp.Content.Version,
                     Resource = resp.Content.Resource
                 };
-                var p = new DialogParameters<EditQuestionnaireDialog> { { x => x.Model, m } };
-                var dlg = await dialog.ShowAsync<EditQuestionnaireDialog>("...", parameters: p);
+                var p = new DialogParameters<DlgEditQuestionnaire> { { x => x.Model, m } };
+                var dlg = await dialog.ShowAsync<DlgEditQuestionnaire>("...", parameters: p);
                 var res = await dlg.Result;
                 if (res?.Data is EditQuestionnaireModel)
                 {
@@ -60,6 +64,28 @@ public class AdminQuestionnaireViewModel(ISnackbar snackbar, IDialogService dial
                         snackbar.Add("no change", Severity.Info);
                     }
                 }
+            }
+        }
+    }
+
+    public async Task Delete(QuestionnaireListDto item)
+    {
+        snackbar.Add("not implemented yet", Severity.Info);
+    }
+
+
+    public async Task OnRowClick(DataGridRowClickEventArgs<QuestionnaireListDto> e)
+    {
+        if (e.Item != null)
+        {
+            var resp = await api.GetQuestionnaireById(e.Item.Id);
+            if (resp.IsSuccessful)
+            {
+                await preview.LoadFormAsync(resp.Content.Resource);
+            }
+            else
+            {
+                snackbar.AddError(resp.ErrorMessage);
             }
         }
     }

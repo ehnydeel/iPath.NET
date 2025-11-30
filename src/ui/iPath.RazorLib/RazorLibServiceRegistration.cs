@@ -1,13 +1,13 @@
 ﻿using iPath.Blazor.Componenents.Admin;
 using iPath.Blazor.Componenents.Admin.Communities;
 using iPath.Blazor.Componenents.Admin.Groups;
+using iPath.Blazor.Componenents.Admin.Questionnaires;
 using iPath.Blazor.Componenents.Admin.Users;
 using iPath.Blazor.Componenents.Communities;
-using iPath.Blazor.Componenents.Groups;
 using iPath.Blazor.Componenents.Nodes;
+using iPath.Blazor.Componenents.Questionaiires;
 using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
-using iPath.Blazor.ServiceLib.ApiClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Refit;
@@ -20,6 +20,7 @@ public static class RazorLibServiceRegistration
 {
     public static IServiceCollection AddRazorLibServices(this IServiceCollection services, string baseAddress)
     {
+        // Refit client with json serialization options => enums as int
         var jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -55,6 +56,7 @@ public static class RazorLibServiceRegistration
         services.AddScoped<CommunityAdminViewModel>();
         services.AddScoped<GroupAdminViewModel>();
         services.AddScoped<UserAdminViewModel>();
+        services.AddScoped<QuestionnaireAdminViewModel>();
         services.AddScoped<MailBoxViewModel>();
 
         // users
@@ -64,6 +66,7 @@ public static class RazorLibServiceRegistration
         services.AddScoped<NodeListViewModel>();
         services.AddScoped<NodeViewModel>();
         services.AddScoped<UserViewModel>();
+        services.AddScoped<QuestionnairesViewModel>();
 
         return services;
     }

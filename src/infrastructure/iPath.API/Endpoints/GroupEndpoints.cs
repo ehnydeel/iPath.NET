@@ -1,4 +1,5 @@
 ﻿using iPath.Application.Querying;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 using Microsoft.OpenApi.MicrosoftExtensions;
 
 namespace iPath.API;
@@ -45,6 +46,10 @@ public static class GroupEndpoints
             => await srv.DeleteGroupAsync(new DeleteGroupCommand(id), ct))
             .RequireAuthorization("Admin");
 
+
+        grp.MapPost("asignquestionnaire", async (AssignQuestionnaireToGroupCommand cmd, IGroupService srv, CancellationToken ct)
+            => await srv.AssignQuestionnaireToGroupAsync(cmd, ct))
+            .RequireAuthorization("Admin");
 
         return route;
     }

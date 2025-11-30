@@ -1,0 +1,26 @@
+﻿@page "/q"
+
+@inject IPathApi api
+@inject ISnackbar snackbar
+
+<h3>QuestionnaireTestPage</h3>
+
+<iPath.LHCForms.LhcForm @ref="form"/>
+
+
+@code {
+    iPath.LHCForms.LhcForm form;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resp = await api.GetQuestionnaire("followup");
+        if (resp.IsSuccessful)
+        {
+            await form.LoadFormAsync(resp.Content.Resource, "");
+        }
+        else
+        {
+            snackbar.AddError(resp.ErrorMessage);
+        }
+    }
+}
