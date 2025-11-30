@@ -1,7 +1,5 @@
-using iPath.Blazor.Componenents.Admin.Questionnaires;
 using iPath.Blazor.Componenents.Questionaiires;
 using Microsoft.Extensions.Localization;
-using System.Security.Cryptography;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
@@ -16,7 +14,6 @@ public partial class EditGroupQuestionnairesDialog(IPathApi api, IStringLocalize
     bool saving;
     string ErrorMessage = "";
     QuestionnaireListDto selectedQ;
-
 
     List<GroupQuestionnareModel> Items = new();
 
@@ -65,28 +62,5 @@ public partial class EditGroupQuestionnairesDialog(IPathApi api, IStringLocalize
         {
         }
         saving = false;
-    }
-}
-
-
-
-internal class GroupQuestionnareModel
-{
-    public Guid QuestionnaireId { get; init; }
-    public string Name { get; init; }
-    public Guid GrouppId {  get; init; }
-
-    public Dictionary<eQuestionnaireUsage, bool> Usage = new();
-
-    public GroupQuestionnareModel(Guid QuestionnaireId, string Name, Guid GroupId)
-    {
-        this.QuestionnaireId = QuestionnaireId;
-        this.Name = Name;
-        this.GrouppId = GroupId;
-
-        foreach (var e in QuestionnairesViewModel.Usages)
-        {
-            Usage.Add((eQuestionnaireUsage)e, false);
-        }
     }
 }

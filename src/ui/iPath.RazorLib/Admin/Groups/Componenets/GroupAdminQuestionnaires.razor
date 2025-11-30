@@ -1,0 +1,87 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Groups
+
+@inject GroupAdminViewModel vm
+@inject IStringLocalizer T
+@inject IPathApi api
+@inject NavigationManager nm
+
+@if (Model != null)
+{
+
+    <MudDataGrid Items="Items" Dense Striped>
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Questionnaires</MudText>
+            <MudSpacer />
+            <QuestionnaireLookup @bind-Value="selectedQ" @bind-Value:after="OnQuestionaireSelected" />
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="q => q.Name" Title="Id" />
+            @foreach (var e in Usages)
+            {
+                <TemplateColumn Title="@e.ToString()">
+                    <CellTemplate>
+                        <MudCheckBox @bind-Value="@context.Item.Usage[e]"
+                                     @bind-Value:after="@(() => Save(context.Item, e))" />
+                    </CellTemplate>
+                </TemplateColumn>
+            }
+        </Columns>
+    </MudDataGrid>
+
+    <MudButton Href="admin/groups" Variant="Variant.Filled" Class="mt-10">Ok</MudButton>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public GroupDto Model { get; set; }
+
+    List<GroupQuestionnareModel> Items = new();
+    QuestionnaireListDto selectedQ;
+    bool saving;
+
+
+    eQuestionnaireUsage[] Usages => QuestionnairesViewModel.Usages;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        foreach (var q in vm.SelectedGroup.Questionnaires)
+        {
+            var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.QuestionnaireId);
+            if (item is null)
+            {
+                item = new GroupQuestionnareModel(q.QuestionnaireId, q.QuestinnaireName, Model.Id);
+            }
+            item.Usage[q.Usage] = true;
+        }
+    }
+
+    void OnQuestionaireSelected()
+    {
+        if (selectedQ is not null)
+        {
+            var item = Items.FirstOrDefault(x => x.QuestionnaireId == selectedQ.Id);
+            if (item is null)
+            {
+                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, Model.Id);
+                Items.Add(item);
+            }
+            selectedQ = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Save(GroupQuestionnareModel model, eQuestionnaireUsage change)
+    {
+        saving = true;
+        try
+        {
+            bool remove = !model.Usage[change];
+            var cmd = new AssignQuestionnaireToGroupCommand(model.QuestionnaireId, model.GrouppId, change, remove);
+            var resp = await api.AssignQuestionnaireToGroup(cmd);
+        }
+        catch (Exception ex)
+        {
+        }
+        saving = false;
+    }
+}

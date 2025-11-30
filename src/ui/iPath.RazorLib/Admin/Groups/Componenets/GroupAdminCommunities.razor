@@ -1,0 +1,61 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Groups
+
+@inject GroupAdminViewModel vm
+@inject IStringLocalizer T
+@inject NavigationManager nm
+
+@if (Model != null)
+{
+
+    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="mt-4">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@T["Communities"]</MudText>
+            <MudSpacer />
+            <CommunityLookup Label=@T["add to community"] Variant="Variant.Outlined" Dense="true" @bind-Value="communityToAdd" />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddCommunity" />
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="c => c.Name" />
+            <TemplateColumn CellClass="d-flex justify-end">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick=@(() => RemoveCommunity(context.Item)) />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+
+    <MudButton Href="admin/groups" Variant="Variant.Filled" Class="mt-10">Ok</MudButton>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public GroupDto Model { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Model is not null)
+        {
+            Communities = Model.Communities.ToList();
+            StateHasChanged();
+        }
+    }
+
+
+    IEnumerable<CommunityListDto> Communities;
+    CommunityListDto communityToAdd;
+    private async Task AddCommunity()
+    {
+        if (communityToAdd != null)
+        {
+            await vm.AddToCommunity(communityToAdd);
+            communityToAdd = null;
+            await vm.ReloadGroup();
+        }
+    }
+    private async Task RemoveCommunity(CommunityListDto c)
+    {
+        await vm.RemoveFromCommunity(c);
+        await vm.ReloadGroup();
+    }
+
+}

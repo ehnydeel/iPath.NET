@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using iPath.Blazor.Componenents.Questionaiires;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +30,20 @@ public class GroupAdminViewModel(IPathApi api,
 
         snackbar.AddWarning(resp.ErrorMessage);
         return new GridData<GroupListDto>();
+    }
+
+
+    public MudTable<GroupListDto> table;
+
+    public async Task<TableData<GroupListDto>> GetTableAsync(TableState state, CancellationToken ct)
+    {
+        var query = state.BuildQuery(new GetGroupListQuery { AdminList = true, SearchString = this.SearchString });
+        var resp = await api.GetGroupList(query);
+
+        if (resp.IsSuccessful) return resp.Content.ToTableData();
+
+        snackbar.AddWarning(resp.ErrorMessage);
+        return new TableData<GroupListDto>();
     }
 
 
@@ -107,7 +123,7 @@ public class GroupAdminViewModel(IPathApi api,
 
     public GroupDto SelectedGroup { get; private set; }
     public bool IsLoading;
-    private async Task LoadGroup(Guid? id)
+    public async Task LoadGroup(Guid? id)
     {
         IsLoading = true;
         SelectedGroup = null;
@@ -155,7 +171,8 @@ public class GroupAdminViewModel(IPathApi api,
             {
                 snackbar.AddWarning(resp.ErrorMessage);
             }
-            await grid.ReloadServerData();
+            if (grid is not null) await grid.ReloadServerData();
+            if (table is not null) await table.ReloadServerData();
         }
     }
 
@@ -179,22 +196,32 @@ public class GroupAdminViewModel(IPathApi api,
             var r = res?.Data as GroupEditModel;
             if (r != null && r.Id.HasValue)
             {
-                var cmd = new UpdateGroupCommand
+                if (await SaveEditModel(r))
                 {
-                    Id = r.Id.Value,
-                    Name = r.Name,
-                    OwnerId = r.Owner.Id,
-                    Settings = r.Settings
-                };
-                var resp = await api.UpdateGroup(cmd);
-                if (!resp.IsSuccessful)
-                {
-                    snackbar.AddWarning(resp.ErrorMessage);
+                    await grid.ReloadServerData();
                 }
-                await grid.ReloadServerData();
             }
         }
     }
+
+    public async Task<bool> SaveEditModel(GroupEditModel editModel)
+    {
+        var cmd = new UpdateGroupCommand
+        {
+            Id = editModel.Id.Value,
+            Name = editModel.Name,
+            OwnerId = editModel.Owner.Id,
+            Settings = editModel.Settings
+        };
+        var resp = await api.UpdateGroup(cmd);
+        if (!resp.IsSuccessful)
+        {
+            snackbar.AddWarning(resp.ErrorMessage);
+            return false;
+        }
+        return true;
+    }
+
 
     public async Task Delete()
     {
@@ -307,4 +334,27 @@ public class CreateGroupCommandModel : CreateGroupCommand
     //    CommunityId = Community?.Id;
     //    return (CreateGroupCommand)this.MemberwiseClone();
     //}
+}
+
+
+
+public class GroupQuestionnareModel
+{
+    public Guid QuestionnaireId { get; init; }
+    public string Name { get; init; }
+    public Guid GrouppId { get; init; }
+
+    public Dictionary<eQuestionnaireUsage, bool> Usage = new();
+
+    public GroupQuestionnareModel(Guid QuestionnaireId, string Name, Guid GroupId)
+    {
+        this.QuestionnaireId = QuestionnaireId;
+        this.Name = Name;
+        this.GrouppId = GroupId;
+
+        foreach (var e in QuestionnairesViewModel.Usages)
+        {
+            Usage.Add((eQuestionnaireUsage)e, false);
+        }
+    }
 }

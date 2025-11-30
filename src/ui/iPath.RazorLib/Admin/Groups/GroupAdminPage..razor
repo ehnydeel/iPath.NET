@@ -1,0 +1,36 @@
+﻿@page "/admin/groups/{id}"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject IStringLocalizer T
+@inject GroupAdminViewModel vm
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text=@T["Group Settings"]>
+        <GroupAdminSettings Model="@vm.SelectedGroup" />
+    </MudTabPanel>
+    <MudTabPanel Text=@T["Members"]>
+        <GroupAdminMembers Model="@vm.SelectedGroup" />
+    </MudTabPanel>
+    <MudTabPanel Text=@T["Communities"]>
+        <GroupAdminCommunities Model="@vm.SelectedGroup" />
+    </MudTabPanel>
+    <MudTabPanel Text=@T["Questionnaires"]>
+        <GroupAdminQuestionnaires Model="@vm.SelectedGroup" />
+    </MudTabPanel>
+</MudTabs>
+
+@code{
+    [Parameter]
+    public string id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (Guid.TryParse(id, out var groupId))
+        {
+            await vm.LoadGroup(groupId);
+        }
+    }
+}

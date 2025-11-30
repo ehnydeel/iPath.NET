@@ -1,0 +1,50 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Groups
+
+@inject GroupAdminViewModel vm
+@inject IStringLocalizer T
+@inject NavigationManager nm
+
+@if (EditModel != null)
+{
+    <IPathHeader Typo="Typo.h6" Title=@T["Settings"] />
+
+    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" />
+    <OwnerLookup Label="Group Owner" Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" />
+    <iPath.Blazor.Componenents.Groups.GroupSettingsForm Model="@EditModel.Settings" />
+
+    <MudStack Row Class="mt-10" Spacing="2">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
+        <MudButton Variant="Variant.Filled">Cancel</MudButton>
+    </MudStack>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public GroupDto Model { get; set; }
+
+    GroupEditModel EditModel = new();
+
+
+    protected override void OnParametersSet()
+    {
+        if (Model is not null)
+        {
+            base.OnInitialized();
+            EditModel = new GroupEditModel
+            {
+                Id = vm.SelectedGroup.Id,
+                Name = vm.SelectedGroup.Name,
+                Owner = vm.SelectedGroup.Owner,
+                Settings = vm.SelectedGroup.Settings.Clone()
+            };
+            StateHasChanged();
+        }
+    }
+
+
+    async Task Save()
+    {
+        var res = await vm.SaveEditModel(EditModel);
+        nm.NavigateTo("admin/groups");
+    }
+}

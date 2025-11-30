@@ -1,8 +1,6 @@
-using Microsoft.Extensions.Localization;
-
 namespace iPath.Blazor.Componenents.Admin.Groups;
 
-public partial class GroupAdminPage(GroupAdminViewModel vm, IStringLocalizer T) : IDisposable
+public partial class GroupAdminPage_v1(GroupAdminViewModel vm, IStringLocalizer T) : IDisposable
 {
     int[] pageOpts => new[] { 25, 50, 100 };
 

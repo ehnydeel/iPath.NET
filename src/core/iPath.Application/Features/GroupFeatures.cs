@@ -5,7 +5,7 @@ namespace iPath.Application.Features;
 
 
 #region "-- DTO --"
-public record GroupListDto(Guid Id, string Name, eGroupVisibility Visibility,
+public record GroupListDto(Guid Id, string Name, eGroupVisibility Visibility, 
     int? TotalNodes = null, int? NewNodes = null, int? NewAnnotation = null);
 
 public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, OwnerDto Owner, 
