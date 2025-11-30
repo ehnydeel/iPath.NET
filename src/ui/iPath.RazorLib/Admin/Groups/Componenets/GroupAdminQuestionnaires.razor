@@ -5,10 +5,13 @@
 @inject IPathApi api
 @inject NavigationManager nm
 
-@if (Model != null)
+@if (Model is null)
 {
-
-    <MudDataGrid Items="Items" Dense Striped>
+    <LoadingMessage />
+}
+else
+{
+    <MudDataGrid Items="Items" Dense Striped Class="ipath_table">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Questionnaires</MudText>
             <MudSpacer />
@@ -44,14 +47,17 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        foreach (var q in vm.SelectedGroup.Questionnaires)
+        if (Model is not null)
         {
-            var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.QuestionnaireId);
-            if (item is null)
+            foreach (var q in Model.Questionnaires)
             {
-                item = new GroupQuestionnareModel(q.QuestionnaireId, q.QuestinnaireName, Model.Id);
+                var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.QuestionnaireId);
+                if (item is null)
+                {
+                    item = new GroupQuestionnareModel(q.QuestionnaireId, q.QuestinnaireName, Model.Id);
+                }
+                item.Usage[q.Usage] = true;
             }
-            item.Usage[q.Usage] = true;
         }
     }
 

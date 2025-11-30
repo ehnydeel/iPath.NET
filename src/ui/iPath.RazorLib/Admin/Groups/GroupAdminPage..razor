@@ -1,36 +1,55 @@
 ﻿@page "/admin/groups/{id}"
+@page "/admin/groups/{id}/{panel}"
 
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IStringLocalizer T
 @inject GroupAdminViewModel vm
 
-<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-    <MudTabPanel Text=@T["Group Settings"]>
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true"
+         PanelClass="pa-6" Color="Color.Info" IconColor="Color.Surface"
+         @bind-ActivePanelIndex="panelIndex">
+    <MudTabPanel Text=@T["Group Settings"] Icon="@Icons.Material.Filled.Settings">
         <GroupAdminSettings Model="@vm.SelectedGroup" />
     </MudTabPanel>
-    <MudTabPanel Text=@T["Members"]>
+    <MudTabPanel Text=@T["Members"] Icon="@Icons.Material.Filled.Person">
         <GroupAdminMembers Model="@vm.SelectedGroup" />
     </MudTabPanel>
-    <MudTabPanel Text=@T["Communities"]>
+    <MudTabPanel Text=@T["Communities"] Icon="@Icons.Material.Filled.Groups">
         <GroupAdminCommunities Model="@vm.SelectedGroup" />
     </MudTabPanel>
-    <MudTabPanel Text=@T["Questionnaires"]>
+    <MudTabPanel Text=@T["Questionnaires"] Icon="@Icons.Material.Filled.DynamicForm">
         <GroupAdminQuestionnaires Model="@vm.SelectedGroup" />
     </MudTabPanel>
 </MudTabs>
 
-@code{
+@code {
     [Parameter]
     public string id { get; set; }
+
+    [Parameter]
+    public string panel { get; set; } = "";
+
+    int panelIndex = 0;
+
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
+        panelIndex = panel switch
+        {
+            "members" => 1,
+            "communities" => 2,
+            "questionnaires" => 3,
+            _ => 0
+        };
+
         if (Guid.TryParse(id, out var groupId))
         {
             await vm.LoadGroup(groupId);
         }
+
+        StateHasChanged();
     }
 }

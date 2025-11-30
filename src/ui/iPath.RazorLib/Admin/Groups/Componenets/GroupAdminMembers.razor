@@ -4,10 +4,14 @@
 @inject IStringLocalizer T
 @inject NavigationManager nm
 
-@if (Model is not null)
+@if (Model is null)
+{
+    <LoadingMessage />
+}
+else
 {
     <MudDataGrid T="GroupMemberDto" ServerData="vm.GetMembersAsync" @ref="memberGrid"
-                 Dense="true" Striped="true">
+                 Dense="true" Striped="true" Class="ipath_table">
         <ToolBarContent>
             <MudText Typo="Typo.h6">@T["Members"]</MudText>
             <MudSpacer />

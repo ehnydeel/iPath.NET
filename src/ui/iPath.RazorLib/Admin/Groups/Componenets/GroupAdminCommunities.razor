@@ -4,10 +4,13 @@
 @inject IStringLocalizer T
 @inject NavigationManager nm
 
-@if (Model != null)
+@if (Model is null)
 {
-
-    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="mt-4">
+    <LoadingMessage />
+}
+else
+{
+    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="mt-4 ipath_table">
         <ToolBarContent>
             <MudText Typo="Typo.h6">@T["Communities"]</MudText>
             <MudSpacer />

@@ -53,7 +53,7 @@
         vertical-align: top;
     }
     .ipath_table td {
-        /*background-color: var(--mud-palette-background);*/
+        background-color: var(--mud-palette-background);
     }
 
 .ipath_table_fixed {
