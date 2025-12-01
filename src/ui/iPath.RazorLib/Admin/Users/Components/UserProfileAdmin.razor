@@ -4,31 +4,33 @@
 @inject IStringLocalizer T
 @inject ISnackbar snackbar
 
-<IPathHeader Title="Roles" Typo="Typo.h6" />
+@if (User != null)
+{
+    <MudForm Model="User">
+        <MudGrid>
+            <MudItem xs="12" sm="8">
+                <MudTextField Label="Username" Value="User.Username" ReadOnly="true" />
+                <MudTextField Label="Username" Value="User.Email" ReadOnly="true" />
+                <MudCheckBox Label="active" @bind-Value="IsActive" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudToggleGroup T="RoleDto" SelectionMode="SelectionMode.MultiSelection" Vertical="true"
+                                @bind-Values="selectedRoles" Outlined="true" Color="Color.Primary">
+                    @foreach (var r in allRoles)
+                    {
+                        <MudToggleItem T="RoleDto" Value="@r">@r.Name</MudToggleItem>
+                    }
+                </MudToggleGroup>
+            </MudItem>
+            </MudGrid>
+             
+        <UserProfileForm Model="Profile" HideSaveButton="true" @ref="frm" />
 
-<MudForm Model="User">
-    <MudTextField Label="Username" Value="User.Username" ReadOnly="true" />
-    <MudTextField Label="Username" Value="User.Email" ReadOnly="true" />
-    <MudCheckBox Label="active" @bind-Value="IsActive" />
-
-    <MudToggleGroup T="RoleDto" SelectionMode="SelectionMode.MultiSelection"
-                    @bind-Values="selectedRoles" Outlined="true" Color="Color.Primary"
-                    Class="my-8">
-        @foreach (var r in allRoles)
-        {
-            <MudToggleItem T="RoleDto" Value="@r">@r.Name</MudToggleItem>
-        }
-    </MudToggleGroup>
-
-
-    <IPathHeader Title="Profile" Typo="Typo.h6" Class="mt-8" />
-    <UserProfileForm Model="Profile" HideSaveButton="true" @ref="frm" />
-
-    <MudStack Row Class="mt-8">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
-    </MudStack>
-</MudForm>
-
+        <MudStack Row Class="mt-8">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+        </MudStack>
+    </MudForm>
+}
 
 @code {
     [Parameter]

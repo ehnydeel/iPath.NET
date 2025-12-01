@@ -169,7 +169,7 @@ public interface IPathApi
 
     #region "-- Admin --"
     [Get("/api/v1/admin/roles")]
-    Task<IEnumerable<RoleDto>> GetRoles();
+    Task<IApiResponse<IEnumerable<RoleDto>>> GetRoles();
     #endregion
 
 

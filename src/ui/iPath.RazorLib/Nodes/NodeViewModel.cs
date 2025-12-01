@@ -292,6 +292,7 @@ public class NodeViewModel(IPathApi api,
         if (resp.IsSuccessful)
         {
             RootNode = resp.Content;
+            SelectChilNode(RootNode);
             IsEditing = true;
         }
         else

@@ -30,10 +30,10 @@
             <MudLink Href=@($"admin/groups/{context.Id}")>@context.Name</MudLink>
         </MudTd>
         <MudTd Class="ipath_table d-flex justify-end">
-            <MudIconButton Href=@($"admin/groups/{context.Id}/members") Size="Size.Small"
-                           Icon="@Icons.Material.Filled.Person" />
             <MudIconButton Href=@($"admin/groups/{context.Id}/communities") Size="Size.Small"
                            Icon="@Icons.Material.Filled.Groups" />
+            <MudIconButton Href=@($"admin/groups/{context.Id}/members") Size="Size.Small"
+                           Icon="@Icons.Material.Filled.Person" />
             <MudIconButton Href=@($"admin/groups/{context.Id}/questionnaires") Size="Size.Small"
                            Icon="@Icons.Material.Filled.DynamicForm" />
         </MudTd>

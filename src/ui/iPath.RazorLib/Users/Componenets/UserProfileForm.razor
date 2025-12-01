@@ -3,52 +3,54 @@
 
 @inject IStringLocalizer T
 
-<MudForm Model="@Model" Spacing="2" @ref="form">
-    <MudText Typo="Typo.h6">@T["Personal Info"]</MudText>
-    <MudGrid>
-        <MudItem xs="12" sm="12" md="5">
-            <MudTextField Label=@T["FirstName"] For="@(() => Model.FirstName)" @bind-Value="Model.FirstName" />
-        </MudItem>
-        <MudItem xs="12" sm="12" md="5">
-            <MudTextField Label=@T["FamilyName"] For="@(() => Model.FamilyName)" @bind-Value="Model.FamilyName" />
-        </MudItem>
-        <MudItem xs="12" sm="12" md="2">
-            <MudTextField Label=@T["Initials"] For="@(() => Model.Initials)" @bind-Value="Model.Initials" />
-        </MudItem>
-    </MudGrid>
+@if (Model != null)
+{
+    <MudForm Model="@Model" Spacing="2" @ref="form">
+        <MudText Typo="Typo.h6" Class="section_header">@T["Personal Info"]</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="12" md="5">
+                <MudTextField Label=@T["FirstName"] For="@(() => Model.FirstName)" @bind-Value="Model.FirstName" />
+            </MudItem>
+            <MudItem xs="12" sm="12" md="5">
+                <MudTextField Label=@T["FamilyName"] For="@(() => Model.FamilyName)" @bind-Value="Model.FamilyName" />
+            </MudItem>
+            <MudItem xs="12" sm="12" md="2">
+                <MudTextField Label=@T["Initials"] For="@(() => Model.Initials)" @bind-Value="Model.Initials" />
+            </MudItem>
+        </MudGrid>
 
-    <MudTextField Label=@T["Specialisation"] For="@(() => Model.Specialisation)" @bind-Value="Model.Specialisation" />
+        <MudTextField Label=@T["Specialisation"] For="@(() => Model.Specialisation)" @bind-Value="Model.Specialisation" />
 
 
-    <MudText Typo="Typo.h6">@T["Address & Contact"]</MudText>
-    <MudTextField Label=@T["Organisation"] For="@(() => Model.ContactDetails.Organisation)" @bind-Value="Model.ContactDetails.Organisation" />
-    <MudTextField Label=@T["Street"] For="@(() => Model.ContactDetails.Address.Street)" @bind-Value="Model.ContactDetails.Address.Street" />
+        <MudText Typo="Typo.h6" Class="section_header">@T["Address & Contact"]</MudText>
+        <MudTextField Label=@T["Organisation"] For="@(() => Model.ContactDetails.Organisation)" @bind-Value="Model.ContactDetails.Organisation" />
+        <MudTextField Label=@T["Street"] For="@(() => Model.ContactDetails.Address.Street)" @bind-Value="Model.ContactDetails.Address.Street" />
 
-    <MudGrid>
-        <MudItem xs="12" sm="4">
-            <MudTextField Label=@T["PostalCode"] For="@(() => Model.ContactDetails.Address.PostalCode)" @bind-Value="Model.ContactDetails.Address.PostalCode" />
-        </MudItem>
-        <MudItem xs="12" sm="8">
-            <MudTextField Label=@T["City"] For="@(() => Model.ContactDetails.Address.City)" @bind-Value="Model.ContactDetails.Address.City" />
-        </MudItem>
-    </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudTextField Label=@T["PostalCode"] For="@(() => Model.ContactDetails.Address.PostalCode)" @bind-Value="Model.ContactDetails.Address.PostalCode" />
+            </MudItem>
+            <MudItem xs="12" sm="8">
+                <MudTextField Label=@T["City"] For="@(() => Model.ContactDetails.Address.City)" @bind-Value="Model.ContactDetails.Address.City" />
+            </MudItem>
+        </MudGrid>
 
-    <MudAutocomplete T="string" Label=@T["Country"] @bind-Value="Model.ContactDetails.Address.Country" SearchFunc="@SearchCountry"
-    ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="true" SelectValueOnTab="true" />
+        <MudAutocomplete T="string" Label=@T["Country"] @bind-Value="Model.ContactDetails.Address.Country" SearchFunc="@SearchCountry"
+                         ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="true" SelectValueOnTab="true" />
 
-    <MudGrid>
-        <MudItem xs="12" md="6">
-            <MudTextField Label=@T["Email"] For="@(() => Model.ContactDetails.Email)" @bind-Value="Model.ContactDetails.Email" />
-        </MudItem>
-        <MudItem xs="12" md="6">
-            <MudTextField Label=@T["PhoneNr"] For="@(() => Model.ContactDetails.PhoneNr)" @bind-Value="Model.ContactDetails.PhoneNr" />
-        </MudItem>
-    </MudGrid>
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField Label=@T["Email"] For="@(() => Model.ContactDetails.Email)" @bind-Value="Model.ContactDetails.Email" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField Label=@T["PhoneNr"] For="@(() => Model.ContactDetails.PhoneNr)" @bind-Value="Model.ContactDetails.PhoneNr" />
+            </MudItem>
+        </MudGrid>
 
-    <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Primary" OnClick="OnSubmit" Class="mt-8 px-4">@T["Save"]</MudButton>
-    <ValidationSummary />
-</MudForm>
-
+        <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Primary" OnClick="OnSubmit" Class="mt-8 px-4">@T["Save"]</MudButton>
+        <ValidationSummary />
+    </MudForm>
+}
 
 @code {
     [Parameter]

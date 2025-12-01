@@ -89,9 +89,18 @@ public class UserAdminViewModel(IPathApi api,
             await _cacheLock.WaitAsync();
             if (!cache.TryGetValue<IEnumerable<RoleDto>>(roleListCacheKey, out var roles))
             {
-                roles = await api.GetRoles();
-                var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                cache.Set(roleListCacheKey, roles, opts);
+                var resp = await api.GetRoles();
+                if (resp.IsSuccessful)
+                {
+                    roles = resp.Content;
+                    var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                    cache.Set(roleListCacheKey, roles, opts);
+                }
+                else
+                {
+                    logger.LogError("Error in GetRoles", resp.ErrorMessage);
+                    snackbar.AddError(resp.ErrorMessage);
+                }
             }
             return roles;
         }

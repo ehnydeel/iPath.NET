@@ -1,30 +1,32 @@
 ﻿@namespace iPath.Blazor.Componenents.Admin.Users
 
-<MudDataGrid T="GroupMemberModel" Items="displayedMembers" Dense="true" Striped="true" Hover="true"
+@inject IStringLocalizer T
+
+<MudDataGrid T="GroupMemberModel" Items="activeMemberShips" Dense="true" Striped="true" Hover="true"
              FixedHeader="true" Height="600px">
     <ToolBarContent>
-        <MudText>Filter</MudText>
+        <MudText Typo="Typo.h6">@T["Filter"]</MudText>
         <MudSpacer />
-        <MudSwitch @bind-Value="ShowActiveOnly" Label="active memberships only" />
+        <MudSwitch Label=@T["active memberships only"] @bind-Value="ShowActiveOnly" @bind-Value:after="OnActiveOnlyChanged" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.GroupName" Title="Group" Editable="false" />
-        <TemplateColumn Title="User">
+        <PropertyColumn Property="x => x.GroupName" Title=@T["Group"] Editable="false" />
+        <TemplateColumn Title=@T["User"]>
             <CellTemplate>
                 <MudCheckBox @bind-Value="context.Item.IsUser" />
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn Title="Guest">
+        <TemplateColumn Title=@T["Guest"]>
             <CellTemplate>
                 <MudCheckBox @bind-Value="context.Item.IsGuest" />
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn Title="Moderator">
+        <TemplateColumn Title=@T["Moderator"]>
             <CellTemplate>
                 <MudCheckBox @bind-Value="context.Item.IsModerator" />
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn Title="Banned">
+        <TemplateColumn Title=@T["Banned"]>
             <CellTemplate>
                 <MudCheckBox @bind-Value="context.Item.IsBanned" />
             </CellTemplate>

@@ -10,48 +10,47 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
     [Parameter]
     public bool ShowActiveOnly { get; set; } = true;
 
-
-    IEnumerable<GroupListDto>? allGroups = null;
-    List<GroupMemberModel>? members = null;
-    List<GroupMemberModel>? displayedMembers = null;
+    List<GroupMemberModel>? allMemberShips = null;
+    List<GroupMemberModel>? activeMemberShips = null;
 
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadData();
+        OnActiveOnlyChanged();
+    }
 
+
+    void OnActiveOnlyChanged()
+    {
         if (ShowActiveOnly)
         {
-            displayedMembers = members.Where(m => m.Role != eMemberRole.None).ToList();
+            activeMemberShips = allMemberShips.Where(m => m.Role != eMemberRole.None).ToList();
         }
         else
         {
-            displayedMembers = members;
+            activeMemberShips = allMemberShips;
         }
         StateHasChanged();
     }
 
+
+
     protected async Task LoadData()
     {
-        // get list of all groups
-        if (allGroups is null)
+        var tmp = new List<GroupMemberModel>();
+        foreach (var item in (await gvm.GetAllAsync()).OrderBy(c => c.Name))
         {
-            allGroups = await gvm.GetAllAsync();
-
-            var tmp = new List<GroupMemberModel>();
-            foreach (var item in allGroups.OrderBy(c => c.Name))
+            var m = uvm.SelectedUser.GroupMembership.FirstOrDefault(m => m.GroupId == item.Id);
+            if (m != null)
             {
-                var m = uvm.SelectedUser.GroupMembership.FirstOrDefault(m => m.GroupId == item.Id);
-                if (m != null)
-                {
-                    tmp.Add(new GroupMemberModel(m, item.Name));
-                }
-                else
-                {
-                    tmp.Add(new GroupMemberModel(item.Id, item.Name));
-                }
+                tmp.Add(new GroupMemberModel(m, item.Name));
             }
-            members = tmp;
+            else
+            {
+                tmp.Add(new GroupMemberModel(item.Id, item.Name));
+            }
         }
+        allMemberShips = tmp;
     }
 }
