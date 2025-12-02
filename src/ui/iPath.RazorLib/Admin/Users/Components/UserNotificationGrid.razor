@@ -1,4 +1,11 @@
-﻿
+﻿@namespace iPath.Blazor.Componenents.Admin.Users
+
+<MudDataGrid T="UserGroupNotificationDto">
+    <Columns>
+        <PropertyColumn Property="x => x.Groupname" />
+    </Columns>
+</MudDataGrid>
+
 
 
 @code {

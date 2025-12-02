@@ -15,11 +15,13 @@
         <UserProfileAdmin User="@vm.SelectedUser" />
     </MudTabPanel>
     <MudTabPanel Text=@T["Communities"] Icon="@Icons.Material.Filled.Person">
+        <UserCommunityMembershipGrid />
     </MudTabPanel>
     <MudTabPanel Text=@T["Groups"] Icon="@Icons.Material.Filled.Groups">
         <UserGroupMembershipGrid />
     </MudTabPanel>
     <MudTabPanel Text=@T["Notifications"] Icon="@Icons.Material.Filled.Person">
+        <UserNotificationGrid />
     </MudTabPanel>
 </MudTabs>
 
