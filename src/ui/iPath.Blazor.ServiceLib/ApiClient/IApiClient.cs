@@ -41,6 +41,11 @@ public interface IPathApi
     [Put("/api/v1/users/groups")]
     Task<IApiResponse> SetGroupMemberships(UpdateGroupMembershipCommand command);
 
+
+
+    [Get("/api/v1/users/{id}/notifications")]
+    Task<IApiResponse<IEnumerable<UserGroupNotificationDto>>> GetUserNotification(Guid id);
+
     [Post("/api/v1/users/notifications")]
     Task<IApiResponse> UpdateUserNotification(UpdateUserNotificationsCommand cmd);
 

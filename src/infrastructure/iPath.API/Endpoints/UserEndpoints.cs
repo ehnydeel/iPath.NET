@@ -50,9 +50,16 @@ public static class UserEndpoints
             => await mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
 
+
+        grp.MapGet("{id}/notifications", async (string id, IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new GetUserNotificationsQuery(Guid.Parse(id)), ct))
+            .RequireAuthorization();            
+        
         grp.MapPost("notifications", async (UpdateUserNotificationsCommand cmd, IMediator mediator, CancellationToken ct)
             => await mediator.Send(cmd, ct))
             .RequireAuthorization();
+
+
 
         grp.MapPut("profile", async (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
             => await mediator.Send(cmd, ct))

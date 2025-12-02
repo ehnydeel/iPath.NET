@@ -1,0 +1,32 @@
+﻿<MudButton Disabled="@_processing" OnClick="ProcessSomething" Variant="Variant.Filled" Color="Color.Primary">
+    @if (_processing)
+    {
+        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+        <MudText Class="ms-2">@ProcessingText</MudText>
+    }
+    else
+    {
+        <MudText>@Text</MudText>
+    }
+</MudButton>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "Click me";
+
+    [Parameter]
+    public string ProcessingText { get; set; } = "processing ...";
+
+    [Parameter, EditorRequired]
+    public Func<Task> OnClick { get; set; }
+
+
+    private bool _processing = false;
+
+    async Task ProcessSomething()
+    {
+        _processing = true;
+        await OnClick();
+        _processing = false;
+    }
+}

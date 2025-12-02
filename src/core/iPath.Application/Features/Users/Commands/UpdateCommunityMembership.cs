@@ -1,8 +1,8 @@
 ﻿namespace iPath.Application.Features.Users;
 
 
-public record UpdateCommunityMembershipInput(Guid UserId, CommunityMemberDto[] Membership) 
-    : IRequest<UpdateCommunityMembershipInput, Task>, IEventInput
+public record UpdateCommunityMembershipCommand(Guid UserId, CommunityMemberDto[] Membership) 
+    : IRequest<UpdateCommunityMembershipCommand, Task>, IEventInput
 {
     public string ObjectName => nameof(User);
 }

@@ -5,6 +5,9 @@ namespace iPath.Blazor.Componenents.Admin.Users;
 public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminViewModel uvm)
 {
     [Parameter]
+    public UserDto? User { get; set; }
+
+    [Parameter]
     public Guid? selectedCommunityId { get; set; } = null;
 
     [Parameter]
@@ -14,12 +17,15 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
     List<GroupMemberModel>? activeMemberShips = null;
 
 
+
     protected override async Task OnParametersSetAsync()
     {
-        await LoadData();
-        OnActiveOnlyChanged();
+        if (User is not null)
+        {
+            await LoadData();
+            OnActiveOnlyChanged();
+        }
     }
-
 
     void OnActiveOnlyChanged()
     {
@@ -52,5 +58,19 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
             }
         }
         allMemberShips = tmp;
+    }
+
+    async Task Save()
+    {
+        try
+        {
+            var memberships = allMemberShips.Select(m => m.ToDto()).ToArray();
+            var cmd = new UpdateGroupMembershipCommand(uvm.SelectedUser.Id, memberships);
+            await uvm.SaveGroupMemberships(cmd);
+        }
+        catch (Exception ex)
+        {
+            return;
+        }
     }
 }

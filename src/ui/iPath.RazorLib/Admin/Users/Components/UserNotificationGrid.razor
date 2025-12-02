@@ -1,13 +1,39 @@
 ﻿@namespace iPath.Blazor.Componenents.Admin.Users
 
-<MudDataGrid T="UserGroupNotificationDto">
-    <Columns>
-        <PropertyColumn Property="x => x.Groupname" />
-    </Columns>
-</MudDataGrid>
+@inject IStringLocalizer T
 
 
+<MudTable Items="Items" Dense="true" Striped="true">
+    <HeaderContent>
+        <MudTh><br />@T["Group"]</MudTh>
+        <MudTh Style="border-left: 1px solid;">
+            <i>@T["Notify as"]</i><br />
+            @T["In App"]
+        </MudTh>
+        <MudTh><br />@T["Email"]</MudTh>
+        <MudTh Style="border-left: 1px solid;">
+            <i>@T["Notify on"]</i><br />
+            @T["New case"]
+        </MudTh>
+        <MudTh><br />@T["Annotation on any case"]</MudTh>
+        <MudTh><br />@T["Annotation on my case"]</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+     <RowTemplate>
+        <MudTd DataLabel="Group">@context.Groupname</MudTd>
+        <MudTd DataLabel="InApp" Style="border-left: 1px solid;"><MudCheckBox @bind-Value="@context.InApp" /></MudTd>
+        <MudTd DataLabel="Email"><MudCheckBox @bind-Value="@context.Email" /></MudTd>
+        <MudTd DataLabel="NewCase" Style="border-left: 1px solid;"><MudCheckBox @bind-Value="@context.NewCase" /></MudTd>
+        <MudTd DataLabel="NewAnnotation"><MudCheckBox @bind-Value="@context.NewAnnotation" /></MudTd>
+        <MudTd DataLabel="NewAnnotationOnMyCase"><MudCheckBox @bind-Value="@context.NewAnnotationOnMyCase" /></MudTd>
+        <MudTd>
+            <MudIconButton Icon="@context.SettingsIcon" Size="Size.Small" OnClick=@(() => ShowSettings(context)) />
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
-@code {
 
-}
+<MudStack Row Class="mt-8">
+    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
+    <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
+</MudStack>

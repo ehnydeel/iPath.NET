@@ -17,9 +17,19 @@ public class GroupMember : BaseEntity
     // User Preferences
     public bool IsFavourite { get; set; }
 
-    public eNotificationSource Notifications { get; set; } = eNotificationSource.None;
-    public eNotificationTarget NotificationTargets { get; set; } = eNotificationTarget.None;
-    public NodeFilter? NotificationFilter { get; set; }
+    public eNotificationSource NotificationSource { get; set; } = eNotificationSource.None;
+    public eNotificationTarget NotificationTarget { get; set; } = eNotificationTarget.None;
+
+    public NotificationSettings? NotificationSettings { get; set; }
+}
+
+
+public class NotificationSettings
+{
+    public bool DailyEmailSummary { get; set; }
+    public TimeOnly? SummaryEmailTime { get; set; }
+
+    public string? IcdoTopoCode { get; set; }
 }
 
 
@@ -33,8 +43,3 @@ public enum eNotificationSource
     NewAnnotationOnMyCase = 4
 }
 
-
-public class NodeFilter
-{
-    public string? IcdoTopoCode { get; set; }
-}

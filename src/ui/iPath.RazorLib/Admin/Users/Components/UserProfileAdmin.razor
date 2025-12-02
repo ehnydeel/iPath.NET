@@ -27,14 +27,15 @@
         <UserProfileForm Model="Profile" HideSaveButton="true" @ref="frm" />
 
         <MudStack Row Class="mt-8">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Save</MudButton>
+            <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
+            <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
         </MudStack>
     </MudForm>
 }
 
 @code {
     [Parameter]
-    public UserDto User { get; set; }
+    public UserDto? User { get; set; }
 
     private UserProfileForm frm;
 
@@ -42,6 +43,7 @@
     private IEnumerable<RoleDto> selectedRoles = [];
     private UserProfile Profile;
     private bool IsActive { get; set; }
+
 
     protected override async Task OnParametersSetAsync()
     {

@@ -1,4 +1,5 @@
 ﻿using iPath.Application.Exceptions;
+using System.Linq.Expressions;
 
 namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
 
@@ -9,8 +10,6 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
-
-        var set = db.Set<GroupMember>();
 
         // Validate that User is allowed to modify groups
         if (sess.IsAdmin)
@@ -32,18 +31,19 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
 
 
         // reload from DB
+        var memberSet = db.Set<GroupMember>();
         var groupIds = request.Membership.Select(m => m.GroupId).ToHashSet();
-        var list = await set
+        var list = await memberSet
             .Where(m => m.UserId == request.UserId)
             .Where(m => groupIds.Contains(m.GroupId))
             .ToListAsync(ct);
 
         // remove those set to None
-        foreach (var entity in list)
-        {
-            if (request.Membership.Where(m => m.Role == eMemberRole.None).Any(dto => dto.GroupId == entity.GroupId))
+        foreach (var item in request.Membership.Where(m => m.Role == eMemberRole.None)){
+            var dbItem = list.FirstOrDefault(m => m.GroupId == item.GroupId);
+            if (dbItem != null)
             {
-                set.Remove(entity);
+                memberSet.Remove(dbItem);
             }
         }
 
@@ -58,7 +58,7 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
                     UserId = request.UserId,
                     GroupId = dto.GroupId,
                 };
-                await set.AddAsync(entity, ct);
+                await memberSet.AddAsync(entity, ct);
             }
             entity.Role = dto.Role;
         }
