@@ -4,11 +4,8 @@ using iPath.API.Services.Email;
 using iPath.API.Services.Storage;
 using iPath.API.Services.Thumbnail;
 using iPath.API.Services.Uploads;
-using iPath.Application.Contracts;
 using iPath.Application.Localization;
-using iPath.EF.Core.FeatureHandlers.Users.Queries;
 using iPath.RazorLib.Localization;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
@@ -43,14 +40,20 @@ public static class APIServicesRegistration
         //config.GetSection(iPathConfig.ConfigName).Bind(cfg);
 
         // Email handling
-        services.Configure<SmtpConfig>(options => config.GetSection(nameof(SmtpConfig)).Bind(options));
+        var smtp = new SmtpConfig();
+        config.GetSection(nameof(SmtpConfig)).Bind(smtp);
+        services.Configure<SmtpConfig>(config.GetSection(nameof(SmtpConfig)));
         services.AddTransient<IEmailSender, SmtpEmailSender>();
         services.AddSingleton<IEmailQueue, EmailQueue>(ctx =>
         {
             var capacity = config.GetValue<int?>("Norifications:ProcessingQueueCapacity") ?? 100;
             return new EmailQueue(capacity);
         });
-        services.AddHostedService<EmailQueueWorker>();
+        if (smtp.Active)
+        {
+            // Start mail processing queue only when smtp is set to active
+            services.AddHostedService<EmailQueueWorker>();
+        }
 
 
 

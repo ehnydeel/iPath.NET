@@ -15,6 +15,16 @@ public interface IEmailRepository
     Task SetReadState(Guid Id, bool IsRead, CancellationToken ct);
 }
 
+
+public class EmailDto
+{
+    [EmailAddress, Required]
+    public string Address { get; set; }
+    public string Subject { get; set; }
+    public string Body { get; set; }
+}
+
+
 /*
 public class GetEmailsQuery : PagedQuery<EmailMessage>
     , IRequest<GetEmailsQuery, Task<PagedResultList<EmailMessage>>>

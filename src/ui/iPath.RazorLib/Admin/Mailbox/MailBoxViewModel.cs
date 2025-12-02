@@ -1,4 +1,5 @@
-﻿using iPath.Blazor.ServiceLib.ApiClient;
+﻿using iPath.Blazor.Componenents.Admin.Mailbox;
+using iPath.Blazor.ServiceLib.ApiClient;
 using iPath.Domain.Entities;
 using Microsoft.Extensions.Localization;
 
@@ -61,6 +62,14 @@ public class MailBoxViewModel(IPathApi api, ISnackbar snackbar, IDialogService d
             }
         }
         
+    }
+
+
+    public async Task SendMail()
+    {
+        var o = new DialogOptions { MaxWidth = MaxWidth.Small };
+        var d = await dlg.ShowAsync<SendMailDialog>("", o);
+        await grid.ReloadServerData();
     }
 }
 

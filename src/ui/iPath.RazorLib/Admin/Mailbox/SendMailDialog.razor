@@ -1,0 +1,42 @@
+﻿@inject IStringLocalizer T
+@inject IPathApi api
+@inject ISnackbar snackbar
+
+<MudDialog Style="min-width: 500px;">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Email" Class="mr-3 mb-n1" />
+            Test E-Mail
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm Model="@Model" Spacing="1">
+            <MudTextField @bind-Value="@Model.Address" Label=@T["To"] Required="true" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="@Model.Subject" Label=@T["Subject"] Required="true" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="@Model.Body" Label=@T["Body"] Required="true" Variant="Variant.Outlined" Lines="10" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Variant="Variant.Outlined">Cancel</MudButton>
+        <ProgressButton Color="Color.Primary" Icon="@Icons.Material.Filled.Send" OnClick="Send" Text="Send" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public EmailDto Model { get; set; } = new();
+
+    void Cancel() => MudDialog.Cancel();
+
+    async Task Send()
+    {
+        var resp = await api.SendMail(Model);
+        if (resp.IsSuccessful) 
+            MudDialog.Close();
+
+        snackbar.AddError(resp.ErrorMessage);
+    }
+}

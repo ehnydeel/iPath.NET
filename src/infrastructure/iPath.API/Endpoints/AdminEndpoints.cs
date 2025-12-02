@@ -31,6 +31,11 @@ public static class AdminEndpoints
 
         mail.MapPut("unread/{id}", (string id, IEmailRepository repo, CancellationToken ct)
             => repo.SetReadState(Guid.Parse(id), false, ct));
+
+        mail.MapPost("send", async (EmailDto msg, IEmailRepository repo, CancellationToken ct)
+            => await repo.Create(msg.Address, msg.Subject, msg.Body, ct))
+            .Produces<EmailMessage>()
+            .RequireAuthorization("Admin");
         #endregion "-- Mailbox --"
 
 

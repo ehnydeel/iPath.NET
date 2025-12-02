@@ -178,6 +178,9 @@ public interface IPathApi
 
     [Put("/api/v1/mail/unread/{id}")]
     Task<IApiResponse>SetMailAsUnread(Guid id);
+
+    [Post("/api/v1/mail/send")]
+    Task<IApiResponse<EmailMessage>> SendMail(EmailDto email);
     #endregion
 
 

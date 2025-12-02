@@ -21,10 +21,12 @@ public class EmailQueueWorker(IEmailQueue queue,
         srv = scope.ServiceProvider.GetRequiredService<IEmailSender>();
         mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         repo = scope.ServiceProvider.GetRequiredService<IEmailRepository>();
+        await base.StartAsync(cancellationToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        await base.StopAsync(cancellationToken);
         scope.Dispose();
         scope = null;
     }

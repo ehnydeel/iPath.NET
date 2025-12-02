@@ -1,5 +1,4 @@
-﻿using iPath.Application.Contracts;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
