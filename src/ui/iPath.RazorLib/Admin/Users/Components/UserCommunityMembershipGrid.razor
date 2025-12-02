@@ -1,0 +1,37 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Users
+
+@inject IStringLocalizer T
+
+<MudDataGrid T="CommunityMemberModel" Items="activeMemberShips" Dense="true" Striped="true" Hover="true"
+             FixedHeader="true" Height="600px">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@T["Filter"]</MudText>
+        <MudSpacer />
+        <MudSwitch Label=@T["active memberships only"] @bind-Value="ShowActiveOnly" @bind-Value:after="OnActiveOnlyChanged" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.CommunityName" Title=@T["Group"] Editable="false" />
+        <TemplateColumn Title=@T["User"]>
+            <CellTemplate>
+                <MudCheckBox @bind-Value="context.Item.IsUser" />
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title=@T["Guest"]>
+            <CellTemplate>
+                <MudCheckBox @bind-Value="context.Item.IsGuest" />
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title=@T["Moderator"]>
+            <CellTemplate>
+                <MudCheckBox @bind-Value="context.Item.IsModerator" />
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title=@T["Banned"]>
+            <CellTemplate>
+                <MudCheckBox @bind-Value="context.Item.IsBanned" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+

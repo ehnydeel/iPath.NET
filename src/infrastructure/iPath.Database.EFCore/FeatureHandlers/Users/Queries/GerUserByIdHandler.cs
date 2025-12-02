@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace iPath.EF.Core.FeatureHandlers.Users.Queries;
+﻿namespace iPath.EF.Core.FeatureHandlers.Users.Queries;
 
 public class GetUserByIdHandler(iPathDbContext db, IUserSession sess)
     : IRequestHandler<GetUserByIdQuery, Task<UserDto>>

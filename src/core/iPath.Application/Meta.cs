@@ -1,5 +1,4 @@
-﻿global using iPath.Domain.Entities.Mails;
-global using DispatchR.Abstractions.Send;
+﻿global using DispatchR.Abstractions.Send;
 global using iPath.Application.Querying;
 global using iPath.Domain.Entities;
 global using iPath.Application.Exceptions;

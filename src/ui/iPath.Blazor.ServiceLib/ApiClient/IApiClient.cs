@@ -41,6 +41,9 @@ public interface IPathApi
     [Put("/api/v1/users/groups")]
     Task<IApiResponse> SetGroupMemberships(UpdateGroupMembershipCommand command);
 
+    [Post("/api/v1/users/notifications")]
+    Task<IApiResponse> UpdateUserNotification(UpdateUserNotificationsCommand cmd);
+
 
     [Put("/api/v1/users/profile")]
     Task<IApiResponse<Guid>> UpdateProfile(UpdateUserProfileCommand command);

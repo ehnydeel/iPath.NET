@@ -37,16 +37,6 @@ public enum eMemberRole
 
 
 
-[Flags]
-public enum eNotification
-{
-    None = 0,
-    NewCase = 1,
-    NewAnnotation = 2,
-    NewAnnotationOnMyCase = 4
-}
-
-
 public enum eGroupVisibility
 {
     Public = 0,

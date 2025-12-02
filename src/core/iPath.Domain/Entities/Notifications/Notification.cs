@@ -1,4 +1,4 @@
-﻿namespace iPath.Domain.Entities.Mails;
+﻿namespace iPath.Domain.Entities;
 
 public class Notification : BaseEntity
 {
@@ -9,7 +9,7 @@ public class Notification : BaseEntity
     public Guid UserId {  get; private set; }
     public User User { get; private set; }
 
-    public NotificationType Type { get; private set; } = NotificationType.None;
+    public eNotificationTarget Type { get; private set; } = eNotificationTarget.None;
 
     public string Data { get; private set; }
     public string? ErrorMessage { get; private set; }
@@ -18,7 +18,7 @@ public class Notification : BaseEntity
     {        
     }
 
-    public static Notification Create(NotificationType type, string data)
+    public static Notification Create(eNotificationTarget type, string data)
     {
         return new Notification
         {
@@ -53,16 +53,19 @@ public class Notification : BaseEntity
 }
 
 
+[Flags]
+public enum eNotificationTarget
+{
+    None = 0,
+    InApp = 1,
+    Email = 2
+}
+
+
+
 public enum NotificationStatus
 {
     Pending = 0,
     Sent = 1,
     Failed = 2
-}
-
-public enum NotificationType
-{
-    None = 0,
-    InApp = 1,
-    Email = 2
 }

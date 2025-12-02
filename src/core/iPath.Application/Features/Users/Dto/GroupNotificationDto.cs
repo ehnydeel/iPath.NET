@@ -3,4 +3,4 @@
 namespace iPath.Application.Features.Users;
 
 [DebuggerDisplay("{GroupId} => {nNtifications}")]
-public record GroupNotificationDto(Guid GroupId, Guid UserId, eNotification Notifications);
+public record GroupNotificationDto(Guid GroupId, Guid UserId, eNotificationSource Notifications);

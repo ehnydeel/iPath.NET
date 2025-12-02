@@ -1,6 +1,4 @@
-﻿using iPath.Domain.Entities.Mails;
-
-namespace iPath_EFCore.Database.Configurations;
+﻿namespace iPath_EFCore.Database.Configurations;
 
 internal class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 {

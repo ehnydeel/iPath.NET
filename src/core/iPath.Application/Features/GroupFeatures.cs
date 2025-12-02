@@ -14,6 +14,7 @@ public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, OwnerD
     CommunityListDto[]? Communities,
     QuestionnaireForGroupDto[]? Questionnaires);
 
+
 public record UserGroupMemberDto(Guid GroupId, string Groupname, eMemberRole Role);
 
 public record GroupMemberDto(Guid UserId, string Username, eMemberRole Role);

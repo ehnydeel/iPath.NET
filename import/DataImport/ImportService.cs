@@ -141,12 +141,11 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
             {
                 try
                 {
-
                     var newUser = u.ToNewEntity();
                     var res = await um.CreateAsync(newUser);
                     if (!res.Succeeded)
                         throw new Exception();
-                                        
+                                       
 
                     // User 1 = Admin
                     if (newUser.ipath2_id == 1)

@@ -1,4 +1,3 @@
-using iPath.Domain.Entities.Mails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 

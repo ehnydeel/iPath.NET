@@ -16,6 +16,25 @@ public class GroupMember : BaseEntity
 
     // User Preferences
     public bool IsFavourite { get; set; }
-    public eNotification Notifications { get; set; }
 
+    public eNotificationSource Notifications { get; set; } = eNotificationSource.None;
+    public eNotificationTarget NotificationTargets { get; set; } = eNotificationTarget.None;
+    public NodeFilter? NotificationFilter { get; set; }
+}
+
+
+
+[Flags]
+public enum eNotificationSource
+{
+    None = 0,
+    NewCase = 1,
+    NewAnnotation = 2,
+    NewAnnotationOnMyCase = 4
+}
+
+
+public class NodeFilter
+{
+    public string? IcdoTopoCode { get; set; }
 }

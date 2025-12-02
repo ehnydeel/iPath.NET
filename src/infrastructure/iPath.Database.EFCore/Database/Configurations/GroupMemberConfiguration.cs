@@ -10,6 +10,8 @@ internal class GroupMemberConfiguration : IEntityTypeConfiguration<GroupMember>
         b.HasOne(x => x.Group).WithMany(g => g.Members).HasForeignKey(x => x.GroupId).IsRequired();
         b.HasOne(x => x.User).WithMany(u => u.GroupMembership).HasForeignKey(x => x.UserId).IsRequired();
 
+        b.OwnsOne(x => x.NotificationFilter, b => b.ToJson());
+
         b.HasIndex(builder => new { builder.UserId, builder.GroupId }).IsUnique();
     }
 }

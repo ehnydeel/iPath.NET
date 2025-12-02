@@ -2,6 +2,6 @@
 
 public interface INotificationProcessor
 {
-    NotificationType notificationType { get; }
+    eNotificationTarget Target { get; }
     Task<Result> ProcessNotificationAsync(Notification notification, CancellationToken cancellationToken = default);
 }
