@@ -3,7 +3,7 @@
 @inject IStringLocalizer T
 
 
-<MudTable Items="Items" Dense="true" Striped="true">
+<MudTable Items="Items" Dense="true" Striped="true" Elevation="0">
     <HeaderContent>
         <MudTh><br />@T["Group"]</MudTh>
         <MudTh Style="border-left: 1px solid;">
@@ -19,7 +19,7 @@
         <MudTh><br />@T["Annotation on my case"]</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
-     <RowTemplate>
+    <RowTemplate>
         <MudTd DataLabel="Group">@context.Groupname</MudTd>
         <MudTd DataLabel="InApp" Style="border-left: 1px solid;"><MudCheckBox @bind-Value="@context.InApp" /></MudTd>
         <MudTd DataLabel="Email"><MudCheckBox @bind-Value="@context.Email" /></MudTd>
@@ -34,6 +34,7 @@
 
 
 <MudStack Row Class="mt-8">
-    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
+    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"]
+                    Color="@SaveButtonColor" Icon="@Icons.Material.Filled.Save" />
     <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
 </MudStack>

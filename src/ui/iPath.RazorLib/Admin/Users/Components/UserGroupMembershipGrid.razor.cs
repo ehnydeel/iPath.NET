@@ -2,13 +2,13 @@ using iPath.Blazor.Componenents.Admin.Groups;
 
 namespace iPath.Blazor.Componenents.Admin.Users;
 
-public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminViewModel uvm)
+public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminViewModel uvm, IPathApi api)
 {
     [Parameter]
     public UserDto? User { get; set; }
 
     [Parameter]
-    public Guid? selectedCommunityId { get; set; } = null;
+    public CommunityListDto? selectedCommunity { get; set; } = null;
 
     [Parameter]
     public bool ShowActiveOnly { get; set; } = true;
@@ -16,6 +16,9 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
     List<GroupMemberModel>? allMemberShips = null;
     List<GroupMemberModel>? activeMemberShips = null;
 
+    Color SaveButtonColor => allMemberShips.Any(m => m.HasChange) ? Color.Primary : Color.Default;
+
+    private CommunityDto community;
 
 
     protected override async Task OnParametersSetAsync()
@@ -23,22 +26,41 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
         if (User is not null)
         {
             await LoadData();
-            OnActiveOnlyChanged();
+            ApplyFilter();
         }
     }
 
-    void OnActiveOnlyChanged()
+    void ApplyFilter()
     {
+        var q = allMemberShips.AsQueryable();
+
         if (ShowActiveOnly)
         {
-            activeMemberShips = allMemberShips.Where(m => m.Role != eMemberRole.None).ToList();
+            q = q.Where(m => m.Role != eMemberRole.None);
+        }
+        if (community != null)
+        {
+            q = q.Where(m => community.Groups.Any(g => g.Id == m.GroupId));
+        }
+        activeMemberShips = q.ToList();
+        StateHasChanged();
+    }
+
+    async Task OnCommunityFilter()
+    {
+        if (selectedCommunity != null)
+        {
+            ShowActiveOnly = false;
+            var resp = await api.GetCommunity(selectedCommunity.Id);
+            community = resp.Content;
         }
         else
         {
-            activeMemberShips = allMemberShips;
+            community = null;
         }
-        StateHasChanged();
+        ApplyFilter();
     }
+
 
 
 
@@ -62,15 +84,12 @@ public partial class UserGroupMembershipGrid(GroupAdminViewModel gvm, UserAdminV
 
     async Task Save()
     {
-        try
+        if (uvm.SelectedUser is not null)
         {
             var memberships = allMemberShips.Select(m => m.ToDto()).ToArray();
             var cmd = new UpdateGroupMembershipCommand(uvm.SelectedUser.Id, memberships);
-            await uvm.SaveGroupMemberships(cmd);
-        }
-        catch (Exception ex)
-        {
-            return;
+            await uvm.UpdateGroupMemberships(cmd);
+            await LoadData();
         }
     }
 }

@@ -11,10 +11,14 @@ public partial class UserCommunityMembershipGrid(CommunityAdminViewModel cvm, Us
     public Guid? selectedCommunityId { get; set; } = null;
 
     [Parameter]
-    public bool ShowActiveOnly { get; set; } = true;
+    public bool ShowActiveOnly { get; set; } = false;
 
     List<CommunityMemberModel>? allMemberShips = null;
     List<CommunityMemberModel>? activeMemberShips = null;
+
+
+    Color SaveButtonColor => allMemberShips.Any(m => m.HasChange) ? Color.Primary : Color.Default;
+
 
 
     protected override async Task OnParametersSetAsync()
@@ -65,15 +69,12 @@ public partial class UserCommunityMembershipGrid(CommunityAdminViewModel cvm, Us
 
     async Task Save()
     {
-        try
+        if (uvm.SelectedUser is not null)
         {
             var memberships = allMemberShips.Select(m => m.ToDto()).ToArray();
             var cmd = new UpdateCommunityMembershipCommand(uvm.SelectedUser.Id, memberships);
-            
-        }
-        catch (Exception ex)
-        {
-            return;
+            await uvm.UpdateCommunityMemberships(cmd);
+            await LoadData();
         }
     }
 }

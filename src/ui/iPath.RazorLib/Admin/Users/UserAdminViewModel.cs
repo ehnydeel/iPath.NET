@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Refit;
+using System.Runtime.CompilerServices;
 
 namespace iPath.Blazor.Componenents.Admin.Users;
 
@@ -70,12 +72,28 @@ public class UserAdminViewModel(IPathApi api,
         }
         else
         {
-            var resp = await api.GetUser(id.Value);
-            if (resp.IsSuccessful)
+            await ProcessUserDtoQuery(api.GetUser(id.Value));
+        }
+    }
+
+    async Task ProcessUserDtoQuery(Task<IApiResponse<UserDto>> query, [CallerMemberName] string? caller = default)
+    {
+        try
+        {
+            var resp = await query;
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddWarning(resp.ErrorMessage);
+            }
+            else
             {
                 SelectedUser = resp.Content;
             }
-            snackbar.AddError(resp.ErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"{0} in {1}", ex.Message, caller, ex);
+            snackbar.AddError(ex.Message);
         }
     }
 
@@ -182,22 +200,8 @@ public class UserAdminViewModel(IPathApi api,
         }
     }
 
-    public async Task SaveGroupMemberships(UpdateGroupMembershipCommand cmd)
-    {
-        try
-        {
-            var resp = await api.SetGroupMemberships(cmd);
-            if (!resp.IsSuccessful)
-            {
-                snackbar.AddError(resp.ErrorMessage);
-            }
-        }
-        catch (Exception ex)
-        {
-            snackbar.AddError(ex.Message);
-        }
-    }
-
+    public async Task UpdateGroupMemberships(UpdateGroupMembershipCommand cmd)
+        => await ProcessUserDtoQuery(api.UpdateGroupMemberships(cmd));
 
 
     public bool DeleteDisable => true;
@@ -220,7 +224,11 @@ public class UserAdminViewModel(IPathApi api,
         snackbar.AddWarning("not implemented yet");
     }
 
+    public async Task UpdateCommunityMemberships(UpdateCommunityMembershipCommand cmd)
+        => await ProcessUserDtoQuery(api.UpdateCommunityMemberships(cmd));
 
+    public async Task UpdateNotifications(UpdateUserNotificationsCommand cmd)
+        => await ProcessUserDtoQuery(api.UpdateUserNotification(cmd));
 
     #endregion
 }

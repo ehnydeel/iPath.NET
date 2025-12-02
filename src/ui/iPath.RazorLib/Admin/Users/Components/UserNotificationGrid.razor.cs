@@ -12,7 +12,12 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, IPathApi api, I
 
 
     protected override async Task OnParametersSetAsync()
-    {        
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    { 
         if (User is not null)
         {
             var resp = await api.GetUserNotification(vm.SelectedUser.Id);
@@ -28,20 +33,10 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, IPathApi api, I
 
     async Task Save()
     {
-        try
-        {
-            var dtos = Items.Select(n => n.ToDto()).ToArray();
-            var cmd = new UpdateUserNotificationsCommand(vm.SelectedUser.Id, dtos);
-            var resp = await api.UpdateUserNotification(cmd);
-            if (!resp.IsSuccessful) 
-            {
-                snackbar.AddError(resp.ErrorMessage);
-            }
-        }
-        catch(Exception ex)
-        {
-            snackbar.AddError(ex.Message);
-        }
+        var dtos = Items.Select(n => n.ToDto()).ToArray();
+        var cmd = new UpdateUserNotificationsCommand(vm.SelectedUser.Id, dtos);
+        await vm.UpdateNotifications(cmd);
+        await LoadData();
     }
 
     async Task ShowSettings(UserNotificationModel model)
@@ -51,10 +46,13 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, IPathApi api, I
             var p = new DialogParameters<NotificationSettingsDialog> { { x => x.Model, model.Settings } };
             var o = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
             var dlg = dialog.ShowAsync<NotificationSettingsDialog>("Settings", options: o, parameters: p);
-            model.UpdateHasSettings();
+            model.UpdateHasSettings(true);
             StateHasChanged();
         }
     }
+
+
+    Color SaveButtonColor => Items.Any(m => m.HasChange) ? Color.Primary : Color.Default;
 }
 
 
@@ -74,13 +72,14 @@ public class UserNotificationModel
         Email = dto.Tartget.HasFlag(eNotificationTarget.Email);
 
         Settings = dto.Settings ?? new();
-        UpdateHasSettings();
+        UpdateHasSettings(false);
     }
 
     public Guid GroupId => Dto.GroupId;
     public string Groupname => Dto.Groupname;
 
     public NotificationSettings Settings { get; private set; }
+    private NotificationSettings _origSettings;
 
     public bool NewCase { get; set; }
     public bool NewAnnotation { get; set; }
@@ -91,11 +90,24 @@ public class UserNotificationModel
 
 
     public bool HasSettings { get; set; }
-    public void UpdateHasSettings()
+    private bool _hasSettingsUpdate;
+    public void UpdateHasSettings(bool SetChanged)
     {
         if (Dto.Settings != null)
         {
             HasSettings = !String.IsNullOrEmpty(Dto.Settings?.IcdoTopoCode) || Dto.Settings.DailyEmailSummary;
+        }
+        _hasSettingsUpdate = SetChanged;
+    }
+
+
+    public bool HasChange
+    {
+        get
+        {
+            if (Dto.Source != Source) return true;
+            if (Dto.Tartget != Target) return true;
+            return _hasSettingsUpdate; 
         }
     }
 
@@ -103,18 +115,33 @@ public class UserNotificationModel
     public string SettingsIcon => HasSettings ? Icons.Material.Filled.SettingsSuggest : Icons.Material.Filled.Settings;
 
 
+    private eNotificationSource Source
+    {
+        get
+        {
+            eNotificationSource source = eNotificationSource.None;
+            if (NewCase) source |= eNotificationSource.NewCase;
+            if (NewAnnotation) source |= eNotificationSource.NewAnnotation;
+            if (NewAnnotationOnMyCase) source |= eNotificationSource.NewAnnotationOnMyCase;
+            return source;
+        }
+    }
+
+    private eNotificationTarget Target
+    {
+        get
+        {
+            eNotificationTarget target = eNotificationTarget.None;
+            if (InApp) target |= eNotificationTarget.InApp;
+            if (Email) target |= eNotificationTarget.Email;
+            return target;
+        }
+    }
+
+
     public UserGroupNotificationDto ToDto()
     {
-        eNotificationSource source = eNotificationSource.None;
-        if (NewCase) source |= eNotificationSource.NewCase;
-        if (NewAnnotation) source |= eNotificationSource.NewAnnotation;
-        if (NewAnnotationOnMyCase) source |= eNotificationSource.NewAnnotationOnMyCase;
-
-        eNotificationTarget target = eNotificationTarget.None;
-        if (InApp) target |= eNotificationTarget.InApp;
-        if (Email) target |= eNotificationTarget.Email;
-
-        var res = Dto with { Source = source, Tartget = target, Settings = this.Settings };
+        var res = Dto with { Source = Source, Tartget = Target, Settings = this.Settings };
         return res;
     }
 }

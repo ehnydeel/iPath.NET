@@ -8,7 +8,7 @@ public record UserGroupNotificationDto(Guid UserId, Guid GroupId, eNotificationS
 
 
 public record UpdateUserNotificationsCommand(Guid UserId, UserGroupNotificationDto[] Notifications) 
-    : IRequest<UpdateUserNotificationsCommand, Task>, IEventInput
+    : IRequest<UpdateUserNotificationsCommand, Task<UserDto>>, IEventInput
 {
     public string ObjectName => "User";
 }

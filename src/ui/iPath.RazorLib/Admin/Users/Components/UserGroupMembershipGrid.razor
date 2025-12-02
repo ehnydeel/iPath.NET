@@ -2,41 +2,36 @@
 
 @inject IStringLocalizer T
 
-<MudDataGrid T="GroupMemberModel" Items="activeMemberShips" Dense="true" Striped="true" Hover="true"
-             FixedHeader="true" Height="600px">
+<MudTable T="GroupMemberModel" Items="activeMemberShips" Dense="true" Striped="true" Hover="true"
+          FixedHeader="true" Height="600px" Elevation="0">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@T["Filter"]</MudText>
         <MudSpacer />
-        <MudSwitch Label=@T["active memberships only"] @bind-Value="ShowActiveOnly" @bind-Value:after="OnActiveOnlyChanged" />
+        <CommunityLookup Label=@T["Community"] @bind-Value="selectedCommunity" @bind-Value:after="OnCommunityFilter"
+                         Variant="Variant.Outlined" Dense Clearable="true" Class="mr-5" />
+        <MudSwitch Label=@T["active memberships only"] @bind-Value="ShowActiveOnly" @bind-Value:after="ApplyFilter" />
     </ToolBarContent>
-    <Columns>
-        <PropertyColumn Property="x => x.GroupName" Title=@T["Group"] Editable="false" />
-        <TemplateColumn Title=@T["User"]>
-            <CellTemplate>
-                <MudCheckBox @bind-Value="context.Item.IsUser" />
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title=@T["Guest"]>
-            <CellTemplate>
-                <MudCheckBox @bind-Value="context.Item.IsGuest" />
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title=@T["Moderator"]>
-            <CellTemplate>
-                <MudCheckBox @bind-Value="context.Item.IsModerator" />
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title=@T["Banned"]>
-            <CellTemplate>
-                <MudCheckBox @bind-Value="context.Item.IsBanned" />
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
+    <HeaderContent>
+        <MudTh><br />@T["Group"]</MudTh>
+        <MudTh><br />@T["User"]</MudTh>
+        <MudTh><br />@T["Guest"]</MudTh>
+        <MudTh><br />@T["Moderator"]</MudTh>
+        <MudTh><br />@T["Banned"]</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Group">@context.GroupName</MudTd>
+        <MudTd DataLabel="User"><MudCheckBox @bind-Value="context.IsUser" /></MudTd>
+        <MudTd DataLabel="User"><MudCheckBox @bind-Value="context.IsGuest" /></MudTd>
+        <MudTd DataLabel="User"><MudCheckBox @bind-Value="context.IsModerator" /></MudTd>
+        <MudTd DataLabel="User"><MudCheckBox @bind-Value="context.IsBanned" Color="Color.Warning" /></MudTd>
+    </RowTemplate>
+</MudTable>
+
 
 
 <MudStack Row Class="mt-8">
-    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
+    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"]
+                    Color="@SaveButtonColor" Icon="@Icons.Material.Filled.Save" />
     <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
 </MudStack>
 

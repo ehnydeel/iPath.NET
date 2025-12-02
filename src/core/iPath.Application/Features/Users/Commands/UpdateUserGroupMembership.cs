@@ -2,7 +2,7 @@
 
 
 public record UpdateGroupMembershipCommand(Guid UserId, UserGroupMemberDto[] Membership) 
-    : IRequest<UpdateGroupMembershipCommand, Task>, IEventInput
+    : IRequest<UpdateGroupMembershipCommand, Task<UserDto>>, IEventInput
 {
     public string ObjectName => nameof(User);
 }

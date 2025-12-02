@@ -1,12 +1,9 @@
-﻿using iPath.Application.Exceptions;
-using System.Linq.Expressions;
+﻿namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
 
-namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
-
-public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateGroupMembershipCommand, Task>
+public class UpdateGroupMembershipHandler(iPathDbContext db, IMediator mediator, IUserSession sess)
+    : IRequestHandler<UpdateGroupMembershipCommand, Task<UserDto>>
 {
-    public async Task Handle(UpdateGroupMembershipCommand request, CancellationToken ct)
+    public async Task<UserDto> Handle(UpdateGroupMembershipCommand request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -68,5 +65,7 @@ public class UpdateGroupMembershipHandler(iPathDbContext db, IUserSession sess)
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
+
+        return await mediator.Send(new GetUserByIdQuery(user.Id), ct);
     }
 }

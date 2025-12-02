@@ -1,4 +1,5 @@
-﻿<MudButton Disabled="@_processing" OnClick="ProcessSomething" Variant="Variant.Filled" Color="Color.Primary">
+﻿<MudButton Disabled="@_processing" OnClick="ProcessSomething"
+           Variant="Variant.Filled" Color="@Color" StartIcon="@btnIcon">
     @if (_processing)
     {
         <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
@@ -20,8 +21,14 @@
     [Parameter, EditorRequired]
     public Func<Task> OnClick { get; set; }
 
+    [Parameter]
+    public Color Color { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string? Icon { get; set; }
 
     private bool _processing = false;
+    private string btnIcon => _processing ? string.Empty : Icon;
 
     async Task ProcessSomething()
     {

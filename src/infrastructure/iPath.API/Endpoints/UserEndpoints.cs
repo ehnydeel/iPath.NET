@@ -36,8 +36,14 @@ public static class UserEndpoints
             => await mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
 
+        grp.MapPut("profile", async (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
+            => await mediator.Send(cmd, ct))
+            .Produces<Guid>()
+            .RequireAuthorization();
 
-        grp.MapPut("groups", async (UpdateGroupMembershipCommand cmd, IMediator mediator, CancellationToken ct)
+
+        // communities
+        grp.MapPut("communities", async (UpdateCommunityMembershipCommand cmd, IMediator mediator, CancellationToken ct)
             => await mediator.Send(cmd, ct))
             .Produces<Guid>()
             .RequireAuthorization("Admin");
@@ -46,11 +52,19 @@ public static class UserEndpoints
             => await mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
 
+
+        // groups
         grp.MapPut("assign/group", async (AssignUserToGroupCommand cmd, IMediator mediator, CancellationToken ct)
             => await mediator.Send(cmd, ct))
             .RequireAuthorization("Admin");
 
+        grp.MapPut("groups", async (UpdateGroupMembershipCommand cmd, IMediator mediator, CancellationToken ct)
+            => await mediator.Send(cmd, ct))
+            .Produces<Guid>()
+            .RequireAuthorization("Admin");
 
+
+        // notifications
         grp.MapGet("{id}/notifications", async (string id, IMediator mediator, CancellationToken ct)
             => await mediator.Send(new GetUserNotificationsQuery(Guid.Parse(id)), ct))
             .RequireAuthorization();            
@@ -59,12 +73,6 @@ public static class UserEndpoints
             => await mediator.Send(cmd, ct))
             .RequireAuthorization();
 
-
-
-        grp.MapPut("profile", async (UpdateUserProfileCommand cmd, IMediator mediator, CancellationToken ct)
-            => await mediator.Send(cmd, ct))
-            .Produces<Guid>()
-            .RequireAuthorization();
 
         return route;
     }

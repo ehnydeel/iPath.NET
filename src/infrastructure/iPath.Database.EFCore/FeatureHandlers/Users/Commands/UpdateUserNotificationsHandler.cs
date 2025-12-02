@@ -1,11 +1,9 @@
-﻿using iPath.Application.Exceptions;
+﻿namespace iPath.Application.Features;
 
-namespace iPath.Application.Features;
-
-public class UpdateUserNotificationsHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateUserNotificationsCommand, Task>
+public class UpdateUserNotificationsHandler(iPathDbContext db, IMediator mediator, IUserSession sess)
+    : IRequestHandler<UpdateUserNotificationsCommand, Task<UserDto>>
 {
-    public async Task Handle(UpdateUserNotificationsCommand request, CancellationToken ct)
+    public async Task<UserDto> Handle(UpdateUserNotificationsCommand request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -36,5 +34,7 @@ public class UpdateUserNotificationsHandler(iPathDbContext db, IUserSession sess
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
+
+        return await mediator.Send(new GetUserByIdQuery(user.Id), ct);
     }
 }

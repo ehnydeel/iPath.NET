@@ -3,7 +3,7 @@
 @inject IStringLocalizer T
 
 <MudDataGrid T="CommunityMemberModel" Items="activeMemberShips" Dense="true" Striped="true" Hover="true"
-             FixedHeader="true" Height="600px">
+             FixedHeader="true" Height="600px" Elevation="0">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@T["Filter"]</MudText>
         <MudSpacer />
@@ -36,7 +36,8 @@
 
 
 <MudStack Row Class="mt-8">
-    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
+    <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"]
+                    Color="@SaveButtonColor" Icon="@Icons.Material.Filled.Save" />
     <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
 </MudStack>
 

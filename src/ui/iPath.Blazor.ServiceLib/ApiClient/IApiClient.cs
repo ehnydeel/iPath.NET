@@ -31,24 +31,12 @@ public interface IPathApi
     Task<IApiResponse<UserDto>> GetUser(Guid id);
 
 
+    // commands
     [Put("/api/v1/users/role")]
     Task<IApiResponse<Guid>> SetUserRole(UpdateUserRoleCommand command);
 
     [Put("/api/v1/users/account")]
     Task<IApiResponse> UpdateUserAccount(UpdateUserAccountCommand command);
-
-
-    [Put("/api/v1/users/groups")]
-    Task<IApiResponse> SetGroupMemberships(UpdateGroupMembershipCommand command);
-
-
-
-    [Get("/api/v1/users/{id}/notifications")]
-    Task<IApiResponse<IEnumerable<UserGroupNotificationDto>>> GetUserNotification(Guid id);
-
-    [Post("/api/v1/users/notifications")]
-    Task<IApiResponse> UpdateUserNotification(UpdateUserNotificationsCommand cmd);
-
 
     [Put("/api/v1/users/profile")]
     Task<IApiResponse<Guid>> UpdateProfile(UpdateUserProfileCommand command);
@@ -56,11 +44,29 @@ public interface IPathApi
     [Post("/api/v1/users/create")]
     Task<IApiResponse<OwnerDto>> CreateUser(CreateUserCommand command);
 
+
+    // communities
     [Put("/api/v1/users/assign/community")]
     Task<IApiResponse> AssignUserToCommunity(AssignUserToCommunityCommand command);
 
+    [Put("/api/v1/users/communities")]
+    Task<IApiResponse<UserDto>> UpdateCommunityMemberships(UpdateCommunityMembershipCommand command);
+
+
+    // groups
     [Put("/api/v1/users/assign/group")]
     Task<IApiResponse> AssignUserToGroup(AssignUserToGroupCommand command);
+
+    [Put("/api/v1/users/groups")]
+    Task<IApiResponse<UserDto>> UpdateGroupMemberships(UpdateGroupMembershipCommand command);
+
+
+    // notifications
+    [Get("/api/v1/users/{id}/notifications")]
+    Task<IApiResponse<IEnumerable<UserGroupNotificationDto>>> GetUserNotification(Guid id);
+
+    [Post("/api/v1/users/notifications")]
+    Task<IApiResponse<UserDto>> UpdateUserNotification(UpdateUserNotificationsCommand cmd);
     #endregion
 
 

@@ -285,7 +285,7 @@ public class GroupAdminViewModel(IPathApi api,
                 new UserGroupMemberDto(GroupId: SelectedGroup.Id, Groupname: "", Role: eMemberRole.None)
             };
             var cmd = new UpdateGroupMembershipCommand(member.UserId, list);
-            var resp = await api.SetGroupMemberships(cmd);
+            var resp = await api.UpdateGroupMemberships(cmd);
             if (!resp.IsSuccessful)
                 snackbar.AddError(resp.ErrorMessage);
         }

@@ -78,7 +78,7 @@ public partial class EditUserGroupMembershipDialog(GroupAdminViewModel gvm, User
         {
             var memberships = members.Select(m => m.ToDto()).ToArray();
             var cmd = new UpdateGroupMembershipCommand(uvm.SelectedItem.Id, memberships);
-            await uvm.SaveGroupMemberships(cmd);
+            await uvm.UpdateGroupMemberships(cmd);
 
             MudDialog.Close();
         }

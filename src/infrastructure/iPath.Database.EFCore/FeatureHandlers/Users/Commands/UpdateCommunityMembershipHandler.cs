@@ -2,10 +2,10 @@
 
 namespace iPath.EF.Core.FeatureHandlers.Users.Commands;
 
-public class UpdateCommunityMembershipHandler(iPathDbContext db, IUserSession sess)
-    : IRequestHandler<UpdateCommunityMembershipCommand, Task>
+public class UpdateCommunityMembershipHandler(iPathDbContext db, IMediator mediator, IUserSession sess)
+    : IRequestHandler<UpdateCommunityMembershipCommand, Task<UserDto>>
 {
-    public async Task Handle(UpdateCommunityMembershipCommand request, CancellationToken ct)
+    public async Task<UserDto> Handle(UpdateCommunityMembershipCommand request, CancellationToken ct)
     {
         var user = await db.Users.FindAsync(request.UserId, ct);
         Guard.Against.NotFound(request.UserId, user);
@@ -78,5 +78,7 @@ public class UpdateCommunityMembershipHandler(iPathDbContext db, IUserSession se
         await db.EventStore.AddAsync(evt, ct);
 
         await db.SaveChangesAsync(ct);
+
+        return await mediator.Send(new GetUserByIdQuery(user.Id), ct);
     }
 }
