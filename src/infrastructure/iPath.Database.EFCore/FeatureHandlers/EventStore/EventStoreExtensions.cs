@@ -6,8 +6,8 @@ public static class EventStoreExtensions
 {
     public static async Task<TEvent> CreateEventAsync<TEvent, TInput>(this iPathDbContext db, 
         TInput input, 
-        Guid objectId, 
-        Guid? userId = null,
+        Guid objectId,
+        IUserSession sess,
         CancellationToken ct= default) 
         where TEvent : EventEntity, new() where TInput : IEventInput
     {
@@ -15,7 +15,7 @@ public static class EventStoreExtensions
         {
             EventId = Guid.CreateVersion7(),
             EventDate = DateTime.UtcNow,
-            UserId = userId,
+            UserId = sess.User.Id,
             EventName = typeof(TEvent).Name,
             ObjectName = input.ObjectName,
             ObjectId = objectId,
@@ -29,7 +29,7 @@ public static class EventStoreExtensions
     public static async Task<TEvent> CreateEventAsync<TEvent, TInput, TEntity>(this iPathDbContext db,
         TInput input,
         TEntity entity,
-        Guid? userId = null,
+        IUserSession sess,
         CancellationToken ct = default)
         where TEvent : EventEntity, new() 
         where TInput : IEventInput
@@ -39,7 +39,7 @@ public static class EventStoreExtensions
         {
             EventId = Guid.CreateVersion7(),
             EventDate = DateTime.UtcNow,
-            UserId = userId,
+            UserId = sess.User.Id,
             EventName = typeof(TEvent).Name,
             ObjectName = input.ObjectName,
             ObjectId = entity.Id,

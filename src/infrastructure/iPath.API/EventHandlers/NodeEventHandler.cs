@@ -1,5 +1,6 @@
 ﻿using DispatchR.Abstractions.Notification;
 using iPath.API.Hubs;
+using iPath.Domain.Notificxations;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
@@ -13,14 +14,16 @@ public class DomainEventHandler(IHubContext<NodeNotificationsHub> hub,
 {
     public async ValueTask Handle(EventEntity evt, CancellationToken ct)
     {
-        if (evt is IHasNodeNotification ne)
+        if (evt is INodeNotificationEvent ne)
         {
-            await hub.Clients.All.SendAsync("NodeEvent", ne.ToNotification());
+            var msg = new NotificationMessage(evt.EventDate, ne.EventType);
+            await hub.Clients.All.SendAsync("NodeEvent", msg);
         }
         else 
         { 
             logger.LogWarning("Unhandled domain event {0}", evt.GetType().Name);
         }
     }
-
 }
+
+public record NotificationMessage(DateTime Date, eNodeEventType EventType);

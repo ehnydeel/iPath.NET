@@ -1,5 +1,4 @@
 ﻿using iPath.API.Services.Notifications.Processors;
-using iPath.Application.Features.Notifications;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -37,15 +36,15 @@ public class NotificationQueueWorker(INodeNotificationEventQueue queue,
         while (!stoppingToken.IsCancellationRequested)
         {
             var evt = await queue.DequeueAsync(stoppingToken);
-            var n = evt.ToNotification();
-            logger.LogTrace("processing event type {0}", n.type);
+
+            logger.LogTrace("processing event type {0}", evt.EventType);
 
             var processor = scope.ServiceProvider.GetService<INodeEventProcessor>();
             if (processor != null)
             {
                 try
                 {
-                    await processor.ProcessEvent(n, stoppingToken);
+                    await processor.ProcessEvent(evt, stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -54,7 +53,7 @@ public class NotificationQueueWorker(INodeNotificationEventQueue queue,
             }
             else
             {
-                logger.LogTrace("no event to notification processor for {0}", n.type);
+                logger.LogTrace("no event to notification processor for {0}", evt.EventType);
             }
 
             await Task.Delay(100);

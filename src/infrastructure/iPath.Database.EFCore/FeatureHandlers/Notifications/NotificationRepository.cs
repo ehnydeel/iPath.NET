@@ -4,16 +4,17 @@ namespace iPath.EF.Core.FeatureHandlers.Notifications;
 
 public class NotificationRepository(iPathDbContext db) : INotificationRepository
 {
-    public Task<PagedResultList<NotificationDto>> GetPage(GetNotificationsQuery query, CancellationToken ct)
+    public async Task<PagedResultList<NotificationDto>> GetPage(GetNotificationsQuery query, CancellationToken ct)
     {
         var q = db.NotificationQueue
             .Include(n => n.User)
             .AsNoTracking()
-            .Where(n => n.Target == query.Target)
+            .Where(n => n.Target.HasFlag(query.Target))
             .OrderBy(n => n.CreatedOn);
 
         var projected = q.Select(n => new NotificationDto(n.Id, n.CreatedOn, n.EventType, n.Target, n.User.UserName, n.Data));
-        return projected.ToPagedResultAsync(query, ct);
+        var data = await projected.ToPagedResultAsync(query, ct);
+        return data;
     }
 
     public async Task DeleteAll(CancellationToken ct)

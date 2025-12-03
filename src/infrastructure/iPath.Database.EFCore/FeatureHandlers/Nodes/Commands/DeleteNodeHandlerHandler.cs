@@ -31,7 +31,7 @@ public class DeleteNodeCommandHandler(iPathDbContext db, IUserSession sess)
             }
         }
         db.Nodes.Remove(node);
-        var evt = await db.CreateEventAsync<NodeDeletedEvent, DeleteNodeCommand>(request, node.Id);
+        var evt = await db.CreateEventAsync<NodeDeletedEvent, DeleteNodeCommand>(request, node.Id, sess);
         await db.SaveChangesAsync(ct);
 
         await tran.CommitAsync(ct);

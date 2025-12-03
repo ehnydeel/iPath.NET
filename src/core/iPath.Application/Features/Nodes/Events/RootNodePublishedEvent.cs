@@ -2,10 +2,9 @@
 
 namespace iPath.Application.Features.Nodes;
 
-public class RootNodePublishedEvent : NodeEvent, INotification, IHasNodeNotification
+public class RootNodePublishedEvent : NodeEvent, INotification, INodeNotificationEvent
 {
-    public NodeNofitication ToNotification()
-    {
-        return this.ToNotif(eNodeEventType.NodePublished, "new node published");
-    }
+    public eNodeEventType EventType => eNodeEventType.NodePublished;
+
+    public NodeEvent Event => this;
 }

@@ -4,6 +4,6 @@ public interface INodeNotificationEventQueue
 {
     int QueueSize { get; }
 
-    ValueTask<IHasNodeNotification> DequeueAsync(CancellationToken cancellationToken);
-    ValueTask EnqueueAsync(IHasNodeNotification item);
+    ValueTask<INodeNotificationEvent> DequeueAsync(CancellationToken cancellationToken);
+    ValueTask EnqueueAsync(INodeNotificationEvent item);
 }

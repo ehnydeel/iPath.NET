@@ -4,5 +4,5 @@ namespace iPath.API.Services.Notifications.Processors;
 
 public interface INodeEventProcessor
 {
-    Task ProcessEvent(NodeNofitication n, CancellationToken ct);
+    Task ProcessEvent(INodeNotificationEvent n, CancellationToken ct);
 }

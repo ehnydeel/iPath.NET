@@ -1,5 +1,4 @@
-﻿using DispatchR.Abstractions.Send;
-using iPath.Domain.Notificxations;
+﻿using iPath.Domain.Notificxations;
 using System.Text.Json;
 
 namespace iPath.Application.Features.Nodes;
@@ -8,7 +7,7 @@ public static class NodeEventExtensions
 {
     public static EventEntity CreateEvent<TEvent, TInput>(this Node node,
         TInput input,
-        Guid? userId = null,
+        Guid userId,
         CancellationToken ct = default)
         where TEvent : NodeEvent, new()
         where TInput : IEventInput
@@ -29,18 +28,14 @@ public static class NodeEventExtensions
         return e;
     }
 
-
-    internal static NodeNofitication ToNotif(this NodeEvent e, eNodeEventType t, string msg)
+    /*
+    internal static NodeNofitication ToNotif(this NodeEvent e, eNodeEventType t)
     {
         return new NodeNofitication(
-            NodeId: e.ObjectId,
-            UserId: e.UserId,
-            OwnerId: e.Node?.OwnerId,
-            GroupId: e.Node?.GroupId,
-            EventDate: DateTime.UtcNow,
-            type: t,
-            msg);
+            Event: e,
+            type: t);
     }
+    */
 }
 
 /*

@@ -15,7 +15,7 @@ public class DeleteNodeAnnotationCommandHandler(iPathDbContext db, IUserSession 
         Guard.Against.NotFound(request.AnnotationId, annotation);
         db.Annotations.Remove(annotation);
         if (annotation.NodeId.HasValue) {
-            var evt = await db.CreateEventAsync <NodeAnnotationDeletedEvent, DeleteNodeAnnotationCommand> (request, annotation.NodeId.Value);
+            var evt = await db.CreateEventAsync <NodeAnnotationDeletedEvent, DeleteNodeAnnotationCommand> (request, annotation.NodeId.Value, sess);
         }
         await db.SaveChangesAsync(ct);
         await tran.CommitAsync(ct);

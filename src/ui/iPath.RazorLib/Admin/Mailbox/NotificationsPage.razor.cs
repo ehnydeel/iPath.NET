@@ -5,7 +5,7 @@ namespace iPath.Blazor.Componenents.Admin.Mailbox;
 public partial class NotificationsPage(IPathApi api, ISnackbar snackbar, IDialogService dlg, IStringLocalizer T)
 {
     public MudDataGrid<NotificationDto> grid;
-    public eNotificationTarget Target = eNotificationTarget.Email;
+    public eNotificationTarget Target = eNotificationTarget.None;
 
     public async Task<GridData<NotificationDto>> GetData(GridState<NotificationDto> state)
     {
@@ -25,13 +25,13 @@ public partial class NotificationsPage(IPathApi api, ISnackbar snackbar, IDialog
 
     public async Task DeleteAll()
     {
-        var res = await dlg.ShowMessageBox("Delete Mail",
-        "Do you really want to delete all emails?",
+        var res = await dlg.ShowMessageBox("Delete Notification",
+        "Do you really want to delete all notifications?",
         yesText: "yes",
         cancelText: "cancel");
         if (res.HasValue && res.Value)
         {
-            await api.DeleteAllMail();
+            await api.DeleteAllNotifications();
             await grid.ReloadServerData();
         }
     }

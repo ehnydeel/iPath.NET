@@ -1,14 +1,10 @@
 ﻿namespace iPath.Domain.Notificxations;
 
+/*
 public record NodeNofitication(
-    Guid NodeId, 
-    Guid? UserId,
-    Guid? OwnerId,
-    Guid? GroupId,
-    DateTime EventDate, 
-    eNodeEventType type,
-    string message);
-
+    NodeEvent Event,
+    eNodeEventType type);
+*/
 
 public enum eNodeEventType
 {

@@ -24,7 +24,7 @@ public class UpdateChildNodeSortOrderCommandHandler(iPathDbContext db, IUserSess
             catch (Exception ex) { }
         }
 
-        var evt = await db.CreateEventAsync<ChildNodeSortOrderUpdatedEvent, UpdateChildNodeSortOrderCommand>(request, node.Id);
+        var evt = await db.CreateEventAsync<ChildNodeSortOrderUpdatedEvent, UpdateChildNodeSortOrderCommand>(request, node.Id, sess);
         await db.SaveChangesAsync();
         await tran.CommitAsync(ct);
 

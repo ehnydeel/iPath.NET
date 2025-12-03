@@ -7,7 +7,7 @@ public class NotificationEventHandler(INodeNotificationEventQueue queue)
 {
     public async ValueTask Handle(EventEntity evt, CancellationToken cancellationToken)
     {
-        if (evt is IHasNodeNotification ne)
+        if (evt is INodeNotificationEvent ne)
             await queue.EnqueueAsync(ne);
     }
 }

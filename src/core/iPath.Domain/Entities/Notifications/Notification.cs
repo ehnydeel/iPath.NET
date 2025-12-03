@@ -26,12 +26,13 @@ public class Notification : BaseEntity
 
 
 
-    public static Notification Create(eNodeEventType type, eNotificationTarget target, bool dailySummary, string data)
+    public static Notification Create(eNodeEventType type, eNotificationTarget target, bool dailySummary, Guid userId, string data)
     {
         return new Notification
         {
             Id = Guid.CreateVersion7(),
             CreatedOn = DateTime.UtcNow,
+            UserId = userId,
             EventType = type,
             Target = target,
             DailySummary = dailySummary,
@@ -40,7 +41,7 @@ public class Notification : BaseEntity
         };
     }
 
-    public static Notification Create(eNodeEventType type, eNotificationTarget target, bool dailySummary, NodeNofitication data)
+    public static Notification Create(eNodeEventType type, eNotificationTarget target, bool dailySummary, Guid userId, INodeNotificationEvent n)
     {
         var options = new JsonSerializerOptions
         {
@@ -49,12 +50,13 @@ public class Notification : BaseEntity
         };
 
         var context = new NodeNofiticationSerializerContext(options);
-        var json = JsonSerializer.Serialize(data, typeof(NodeNofitication), context);
+        var json = JsonSerializer.Serialize(n.Event, typeof(NodeEvent), context);
 
         return new Notification
         {
             Id = Guid.CreateVersion7(),
             CreatedOn = DateTime.UtcNow,
+            UserId = userId,
             EventType = type,
             Target = target,
             DailySummary = dailySummary,
@@ -88,7 +90,7 @@ public class Notification : BaseEntity
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     WriteIndented = false)]
-[JsonSerializable(typeof(NodeNofitication))]
+[JsonSerializable(typeof(NodeEvent))]
 internal partial class NodeNofiticationSerializerContext : JsonSerializerContext
 {
 }

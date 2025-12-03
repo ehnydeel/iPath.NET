@@ -11,8 +11,8 @@ public class TestEventHandler(IHubContext<NodeNotificationsHub> hub, IUserSessio
 {
     public async ValueTask Handle(TestEvent request, CancellationToken cancellationToken)
     {
-        var n = new NodeNofitication(Guid.Empty, Guid.Empty, Guid.Empty, sess.User.Id, 
-            DateTime.UtcNow, eNodeEventType.Test, request.Message);
-        await hub.Clients.All.SendAsync("NodeEvent", n);
+        //var n = new NodeNofitication(NodeId: Guid.Empty, UserId: sess.User.Id, EventDate: DateTime.UtcNow, 
+        //    OwnerId: sess.User.Id, GroupId: null, type: eNodeEventType.Test, message: request.Message);
+        //await hub.Clients.All.SendAsync("NodeEvent", n);
     }
 }

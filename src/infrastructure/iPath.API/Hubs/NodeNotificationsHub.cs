@@ -1,11 +1,10 @@
-﻿using iPath.Domain.Notificxations;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace iPath.API.Hubs;
 
 public class NodeNotificationsHub : Hub
 {
-    public async Task SendNotification(NodeNofitication e){
+    public async Task SendNotification(NotificationMessage e){
         await Clients.All.SendAsync("NodeEvent", e);
     }
 }
