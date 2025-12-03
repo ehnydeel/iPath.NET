@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,8 +40,8 @@ builder.Services.AddIPathAPI(builder.Configuration);
 // TODO: make configurable (development only)
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
-builder.Services.AddRazorLibServices("http://localhost:5000/");
+var baseAddress = builder.Configuration["BaseAddress"] ?? "http://localhost:5000/";
+builder.Services.AddRazorLibServices(baseAddress);
 
 // testing SSE
 builder.Services.AddSingleton<NotificationService>();
