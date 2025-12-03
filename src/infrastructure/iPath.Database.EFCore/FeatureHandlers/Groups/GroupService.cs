@@ -37,7 +37,7 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
         else if (sess.User is not null)
         {
             // users group list
-            q = q.Where(g => sess.GroupIds().Contains(g.Id));
+            q = q.Where(g => g.Members.Any(m => m.UserId == sess.User.Id));
         }
         else
         {

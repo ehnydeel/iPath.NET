@@ -46,7 +46,6 @@ public static class APIServicesRegistration
         var smtp = new SmtpConfig();
         config.GetSection(nameof(SmtpConfig)).Bind(smtp);
         services.Configure<SmtpConfig>(config.GetSection(nameof(SmtpConfig)));
-        services.AddTransient<IEmailSender, SmtpEmailSender>();
         services.AddSingleton<IEmailQueue, EmailQueue>(ctx =>
         {
             var capacity = config.GetValue<int?>("Norifications:ProcessingQueueCapacity") ?? 100;
@@ -55,7 +54,12 @@ public static class APIServicesRegistration
         if (smtp.Active)
         {
             // Start mail processing queue only when smtp is set to active
+            services.AddTransient<IEmailSender, SmtpEmailSender>();
             services.AddHostedService<EmailQueueWorker>();
+        }
+        else
+        {
+            services.AddTransient<IEmailSender, QueueEmailSender>();
         }
 
 
