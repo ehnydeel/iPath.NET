@@ -47,7 +47,12 @@ public class UserProfile
         };
     }
 
-    public UserProfile Clone() => (UserProfile)this.MemberwiseClone();
+    public UserProfile Clone()
+    {
+        var clone = (UserProfile)this.MemberwiseClone();
+        clone.ContactDetails = this.ContactDetails.Clone();
+        return clone;
+    }
 }
 
 

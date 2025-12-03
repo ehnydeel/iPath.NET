@@ -10,10 +10,11 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudForm Model="@Model" Spacing="1">
-            <MudTextField @bind-Value="@Model.Address" Label=@T["To"] Required="true" Variant="Variant.Outlined" />
-            <MudTextField @bind-Value="@Model.Subject" Label=@T["Subject"] Required="true" Variant="Variant.Outlined" />
-            <MudTextField @bind-Value="@Model.Body" Label=@T["Body"] Required="true" Variant="Variant.Outlined" Lines="10" />
+        <MudForm Model="@Model" @ref="frm" Validation="@(emailValidator.ValidateValue)" ValidationDelay="0">
+            <DataAnnotationsValidator />
+            <MudTextField @bind-Value="@Model.Address" Label=@T["To"] For="(() => Model.Address)" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="@Model.Subject" Label=@T["Subject"] For="(() => Model.Subject)" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="@Model.Body" Label=@T["Body"] For="(() => Model.Body)" Variant="Variant.Outlined" Lines="10" />
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -29,14 +30,21 @@
     [Parameter]
     public EmailDto Model { get; set; } = new();
 
+    MudForm frm;
+    EmailDtoValidator emailValidator = new EmailDtoValidator();
+
     void Cancel() => MudDialog.Cancel();
 
     async Task Send()
     {
-        var resp = await api.SendMail(Model);
-        if (resp.IsSuccessful) 
-            MudDialog.Close();
+        await frm.Validate();
+        if (frm.IsValid)
+        {
+            var resp = await api.SendMail(Model);
+            if (resp.IsSuccessful)
+                MudDialog.Close(resp.Content);
 
-        snackbar.AddError(resp.ErrorMessage);
+            snackbar.AddError(resp.ErrorMessage);
+        }
     }
 }

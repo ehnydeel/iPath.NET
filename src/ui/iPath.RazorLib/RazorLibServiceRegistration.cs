@@ -57,7 +57,6 @@ public static class RazorLibServiceRegistration
         services.AddScoped<GroupAdminViewModel>();
         services.AddScoped<UserAdminViewModel>();
         services.AddScoped<QuestionnaireAdminViewModel>();
-        services.AddScoped<MailBoxViewModel>();
 
         // users
         services.AddScoped<CommunityViewModel>();

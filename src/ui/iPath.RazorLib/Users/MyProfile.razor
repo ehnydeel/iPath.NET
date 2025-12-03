@@ -6,7 +6,7 @@
 
     <AuthorizeView>
         <Authorized>
-            <UserProfileForm Model="Model" />
+            <UserProfileForm Model="Model" RedirectUrl="/" />
         </Authorized>
         <NotAuthorized>
             <RedirectToLogin />
@@ -20,5 +20,4 @@
 @code {
     UserProfile Model = new();
     SessionUserDto sess;
-
 }

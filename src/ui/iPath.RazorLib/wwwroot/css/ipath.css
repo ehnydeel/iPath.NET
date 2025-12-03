@@ -143,22 +143,26 @@
 
 .ipath_node_title2 {
     grid-column-start: 1;
+    vertical-align: top;
 }
 
 
 .ipath_node_type2 {
     grid-column-start: 2;
     background-color: #ffc;
+    vertical-align: top;
 }
 
 .ipath_node_sender2 {
     grid-column-start: 3;
     background-color: #fcc;
+    vertical-align: top;
 }
 
 .ipath_node_date2 {
     grid-column-start: 4;
     background-color: #ccf;
+    vertical-align: top;
 }
 
 

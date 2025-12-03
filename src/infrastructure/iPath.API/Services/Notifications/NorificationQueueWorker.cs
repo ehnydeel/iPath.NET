@@ -1,26 +1,26 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using iPath.Application.Features.Notifications;
+using iPath.EF.Core.Database;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace iPath.API.Services.Email;
+namespace iPath.API.Services.Notifications;
 
-public class EmailQueueWorker(IEmailQueue queue,
-    ILogger<EmailQueueWorker> logger,
+public class NotificationQueueWorker(NotificationEventQueue queue,
+    ILogger<NotificationQueueWorker> logger,
     IServiceProvider services)
     : BackgroundService
 {
     private IServiceScope scope;
-    private IEmailSender srv;
     private IMediator mediator;
-    private IEmailRepository repo;
+    private iPathDbContext db;
 
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         scope = services.CreateScope();
-        srv = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+        db = scope.ServiceProvider.GetRequiredService<iPathDbContext>();
         mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        repo = scope.ServiceProvider.GetRequiredService<IEmailRepository>();
         await base.StartAsync(cancellationToken);
     }
 
@@ -33,7 +33,7 @@ public class EmailQueueWorker(IEmailQueue queue,
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("EmailQueueWorker Hosted Service is running.");
+        logger.LogInformation("NotificationQueueWorker Hosted Service is running.");
         await BackgroundProcessing(stoppingToken);
     }
 
@@ -41,20 +41,10 @@ public class EmailQueueWorker(IEmailQueue queue,
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var mail = await queue.DequeueAsync(stoppingToken);
-            var res = await srv.SendMailAsync(mail.Receiver, mail.Subject, mail.Body);
-
-            if (res.IsSuccess)
-            {
-                await repo.SetSent(mail.Id, stoppingToken);
-            }
-            else
-            {
-                await repo.SetError(mail.Id, res.ErrorMessage(), stoppingToken);
-            }
+            var evt = await queue.DequeueAsync(stoppingToken);
+            logger.LogTrace("processing event");
 
             await Task.Delay(500);
         }
     }
-
 }

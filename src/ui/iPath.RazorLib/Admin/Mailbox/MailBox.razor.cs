@@ -1,12 +1,6 @@
-﻿using iPath.Blazor.Componenents.Admin.Mailbox;
-using iPath.Blazor.ServiceLib.ApiClient;
-using iPath.Domain.Entities;
-using Microsoft.Extensions.Localization;
+namespace iPath.Blazor.Componenents.Admin.Mailbox;
 
-namespace iPath.Blazor.Componenents.Admin;
-
-public class MailBoxViewModel(IPathApi api, ISnackbar snackbar, IDialogService dlg, IStringLocalizer T)
-    : IViewModel
+public partial class MailBox(IPathApi api, ISnackbar snackbar, IDialogService dlg, IStringLocalizer T)
 {
     public MudDataGrid<EmailMessage> grid;
 
@@ -61,7 +55,6 @@ public class MailBoxViewModel(IPathApi api, ISnackbar snackbar, IDialogService d
                 snackbar.AddError(resp.ErrorMessage);
             }
         }
-        
     }
 
 
@@ -69,13 +62,15 @@ public class MailBoxViewModel(IPathApi api, ISnackbar snackbar, IDialogService d
     {
         var o = new DialogOptions { MaxWidth = MaxWidth.Small };
         var d = await dlg.ShowAsync<SendMailDialog>("", o);
-        await grid.ReloadServerData();
+        var r = await d.Result;
+        if (r is not null && r.Data is EmailMessage)
+            snackbar.Add(String.Format(T["email to {0} has been queued"], (r.Data as EmailMessage).Receiver));
     }
 }
 
 public static class EmailMessageViewExtensions
 {
-    extension (EmailMessage msg)
+    extension(EmailMessage msg)
     {
         public string ReadIcon => msg.IsRead ? Icons.Material.TwoTone.MarkEmailRead : Icons.Material.TwoTone.MarkAsUnread;
     }

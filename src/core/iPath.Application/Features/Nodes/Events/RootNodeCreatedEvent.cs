@@ -1,7 +1,11 @@
-﻿using iPath.Domain.Notificxations;
+﻿namespace iPath.Application.Features.Nodes;
 
-namespace iPath.Application.Features.Nodes;
+public class RootNodeCreatedEvent : NodeEvent, INotification
+{
+}
 
+
+/*
 public class RootNodeCreatedEvent : NodeEvent, INotification, IHasNodeNotification
 {
     public NodeNofitication ToNotification()
@@ -9,3 +13,4 @@ public class RootNodeCreatedEvent : NodeEvent, INotification, IHasNodeNotificati
         return this.ToNotif(eNodeEventType.NewNode, "new node");
     }
 }
+*/

@@ -3,7 +3,7 @@
 
 @inject GroupIndexViewModel vm
 
-@if (vm.Model is null)
+@if (Model is null)
 {
     <LoadingMessage />
 }
@@ -18,10 +18,13 @@ else
     [Parameter]
     public string groupId { get; set; }
 
+    [Parameter]
+    public GroupDto Model { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
         await vm.LoadGroup(Guid.Parse(groupId));
+        Model = vm.Model;
         StateHasChanged();
     }
 }

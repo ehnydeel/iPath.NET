@@ -1,25 +1,24 @@
 ﻿@page "/admin/mailbox"
 
-@inject MailBoxViewModel vm
 @inject IStringLocalizer T
 
 <IPathHeader Title=@T["Mailbox"]>
     <ActionContent>
         <MudFab StartIcon="@Icons.Material.TwoTone.Refresh"
                 Size="Size.Small" IconSize="Size.Small"
-                OnClick=@(() => vm.grid.ReloadServerData()) />
+                OnClick=@(() => grid.ReloadServerData()) />
         <MudFab StartIcon="@Icons.Material.TwoTone.DeleteForever"
                 Size="Size.Small" IconSize="Size.Small"
-                OnClick="vm.DeleteAll" />
+                OnClick="DeleteAll" />
         <MudFab StartIcon="@Icons.Material.TwoTone.Create"
                 Size="Size.Small" IconSize="Size.Small"
-                OnClick="vm.SendMail" />
+                OnClick="SendMail" />
     </ActionContent>
 </IPathHeader>
 
-<MudDataGrid T="EmailMessage" ServerData="vm.GetData" @ref="vm.grid"
+<MudDataGrid T="EmailMessage" ServerData="GetData" @ref="grid"
              Hover="true" Dense="true"
-             HierarchyVisibilityToggled="vm.OnDetailsOpened">
+             HierarchyVisibilityToggled="OnDetailsOpened">
     <ColGroup>
         <col style="width: 30px;" />
         <col style="width: 30%;" />
@@ -40,7 +39,7 @@
         <TemplateColumn>
             <CellTemplate>
                 <MudIconButton StartIcon="@Icons.Material.Filled.DeleteForever"
-                               Size="Size.Small" OnClick=@(() => vm.Delete(context.Item)) />
+                               Size="Size.Small" OnClick=@(() => Delete(context.Item)) />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -51,3 +50,5 @@
         <MudDataGridPager T="EmailMessage" />
     </PagerContent>
 </MudDataGrid>
+
+        

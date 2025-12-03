@@ -6,6 +6,8 @@ public class Address
     public string? PostalCode { get; set; }
     public string? City { get; set; }
     public string? Country { get; set; }
+
+    public Address Clone() => (Address)this.MemberwiseClone();
 }
 
 

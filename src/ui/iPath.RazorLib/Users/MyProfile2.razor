@@ -7,7 +7,7 @@
     {
         <AuthorizeView>
             <Authorized>
-                <UserProfileForm Model="Model" OnValidSubmit="OnSubmit"/>
+                <UserProfileForm Model="Model" OnValidSubmit="OnSubmit" RedirectUrl="/"/>
             </Authorized>
             <NotAuthorized>
                 <RedirectToLogin />
@@ -44,6 +44,7 @@
     async Task LoadProfile()
     {
         sess = await vm.GetCurrentSessionAsync();
+        vm.ClearProfileCache(sess.Id); // make sure we reload from DB
         var tmp = await vm.GetProfileAsync(sess.Id);
         Model = tmp.Clone();
     }

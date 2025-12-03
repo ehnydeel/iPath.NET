@@ -1,7 +1,6 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
 
 <MudTable T="NodeListDto" ServerData="vm.GetNodeListAsync" @ref="table"
-          OnRowClick=@((e) => vm.GotoNode(e.Item))
           HeaderClass="ipath_table_header"
           RowsPerPage="25" Bordered="false" Dense="true" Hover="true">
     <ToolBarContent>
@@ -29,7 +28,7 @@
         <MudTh Style="width: 10rem;"><MudTableSortLabel SortLabel="CreatedOn" T="NodeListDto" InitialDirection="SortDirection.Descending">Date</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Title" Class="ipath_node_title2">
+        <MudTd DataLabel="Title" Class="ipath_node_title2" onclick="@(() => vm.GotoNode(context))">
             <MudLink Href=@($"node/{context.Id}")>
                 <MudHighlighter Text="@context.Title" HighlightedText="@vm.SearchString" Style="font-weight: bold;" />
             </MudLink>

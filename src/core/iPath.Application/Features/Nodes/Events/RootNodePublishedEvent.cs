@@ -6,6 +6,6 @@ public class RootNodePublishedEvent : NodeEvent, INotification, IHasNodeNotifica
 {
     public NodeNofitication ToNotification()
     {
-        return this.ToNotif(eNodeEventType.NodePublished, "node published");
+        return this.ToNotif(eNodeEventType.NewNode, "new node published");
     }
 }

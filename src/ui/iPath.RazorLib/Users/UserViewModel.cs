@@ -68,6 +68,13 @@ public class UserViewModel(IPathApi api,
         return null;
     }
 
+    public void ClearProfileCache(Guid userId)
+    {
+        var cacheKey = $"User_{userId}";
+        cache.Remove(cacheKey);
+    }
+
+
     public async Task<UserDto?> GetUserAsync(Guid id)
     {
         var res = await api.GetUser(id);
@@ -88,6 +95,7 @@ public class UserViewModel(IPathApi api,
         var resp = await api.UpdateProfile(new UpdateUserProfileCommand(userId, profile));
         if (!resp.IsSuccessful)
         {
+            ClearProfileCache(userId);
             snackbar.AddWarning(resp.ErrorMessage);
         }
         else if (showSuccess) 

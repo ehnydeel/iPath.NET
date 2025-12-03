@@ -1,9 +1,11 @@
 ﻿using DispatchR.Extensions;
 using iPath.API.Services;
 using iPath.API.Services.Email;
+using iPath.API.Services.Notifications;
 using iPath.API.Services.Storage;
 using iPath.API.Services.Thumbnail;
 using iPath.API.Services.Uploads;
+using iPath.Application.Features.Notifications;
 using iPath.Application.Localization;
 using iPath.RazorLib.Localization;
 using Microsoft.Extensions.Configuration;
@@ -55,6 +57,10 @@ public static class APIServicesRegistration
             services.AddHostedService<EmailQueueWorker>();
         }
 
+
+        // Notification Handling
+        services.AddSingleton(ctx => new NotificationEventQueue(100));
+        services.AddHostedService<NotificationQueueWorker>();
 
 
         // Upload Handling

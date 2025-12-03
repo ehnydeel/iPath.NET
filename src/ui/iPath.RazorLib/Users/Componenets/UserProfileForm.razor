@@ -2,6 +2,7 @@
 @namespace iPath.Blazor.Componenents.Users
 
 @inject IStringLocalizer T
+@inject NavigationManager nm
 
 @if (Model != null)
 {
@@ -9,34 +10,34 @@
         <MudText Typo="Typo.h6" Class="section_header">@T["Personal Info"]</MudText>
         <MudGrid>
             <MudItem xs="12" sm="12" md="5">
-                <MudTextField Label=@T["FirstName"] For="@(() => Model.FirstName)" @bind-Value="Model.FirstName" />
+                <MudTextField Label=@T["FirstName"] For="(() => Model.FirstName)" @bind-Value="Model.FirstName" />
             </MudItem>
             <MudItem xs="12" sm="12" md="5">
-                <MudTextField Label=@T["FamilyName"] For="@(() => Model.FamilyName)" @bind-Value="Model.FamilyName" />
+                <MudTextField Label=@T["FamilyName"] For="(() => Model.FamilyName)" @bind-Value="Model.FamilyName" />
             </MudItem>
             <MudItem xs="12" sm="12" md="2">
-                <MudTextField Label=@T["Initials"] For="@(() => Model.Initials)" @bind-Value="Model.Initials" />
+                <MudTextField Label=@T["Initials"] For="(() => Model.Initials)" @bind-Value="Model.Initials" />
             </MudItem>
         </MudGrid>
 
-        <MudTextField Label=@T["Specialisation"] For="@(() => Model.Specialisation)" @bind-Value="Model.Specialisation" />
+        <MudTextField Label=@T["Specialisation"] For="(() => Model.Specialisation)" @bind-Value="Model.Specialisation" />
 
 
         <MudText Typo="Typo.h6" Class="section_header">@T["Address & Contact"]</MudText>
-        <MudTextField Label=@T["Organisation"] For="@(() => Model.ContactDetails.Organisation)" @bind-Value="Model.ContactDetails.Organisation" />
-        <MudTextField Label=@T["Street"] For="@(() => Model.ContactDetails.Address.Street)" @bind-Value="Model.ContactDetails.Address.Street" />
+        <MudTextField Label=@T["Organisation"] For="(() => Model.ContactDetails.Organisation)" @bind-Value="Model.ContactDetails.Organisation" />
+        <MudTextField Label=@T["Street"] For="(() => Model.ContactDetails.Address.Street)" @bind-Value="Model.ContactDetails.Address.Street" />
 
         <MudGrid>
             <MudItem xs="12" sm="4">
-                <MudTextField Label=@T["PostalCode"] For="@(() => Model.ContactDetails.Address.PostalCode)" @bind-Value="Model.ContactDetails.Address.PostalCode" />
+                <MudTextField Label=@T["PostalCode"] For="(() => Model.ContactDetails.Address.PostalCode)" @bind-Value="Model.ContactDetails.Address.PostalCode" />
             </MudItem>
             <MudItem xs="12" sm="8">
-                <MudTextField Label=@T["City"] For="@(() => Model.ContactDetails.Address.City)" @bind-Value="Model.ContactDetails.Address.City" />
+                <MudTextField Label=@T["City"] For="(() => Model.ContactDetails.Address.City)" @bind-Value="Model.ContactDetails.Address.City" />
             </MudItem>
         </MudGrid>
 
-        <MudAutocomplete T="string" Label=@T["Country"] @bind-Value="Model.ContactDetails.Address.Country" SearchFunc="@SearchCountry"
-                         ResetValueOnEmptyText="false" CoerceText="false" CoerceValue="true" SelectValueOnTab="true" />
+        <CountryLookup Label=@T["Country"] @bind-Value="Model.ContactDetails.Address.Country" Dense="true" MaxItems="null"
+                       ResetValueOnEmptyText="false" Clearable="true" Immediate="true" SelectValueOnTab="true" />
 
         <MudGrid>
             <MudItem xs="12" md="6">
@@ -47,7 +48,10 @@
             </MudItem>
         </MudGrid>
 
-        <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Primary" OnClick="OnSubmit" Class="mt-8 px-4">@T["Save"]</MudButton>
+        <MudStack Row Class="mt-8" Spacing="2">
+            <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Primary" OnClick="OnSubmit">@T["Save"]</MudButton>
+            <MudButton Variant="Variant.Filled" hidden="@HideSaveButton" Color="Color.Default" OnClick="OnCancel">@T["Cancel"]</MudButton>
+        </MudStack>
         <ValidationSummary />
     </MudForm>
 }
@@ -62,7 +66,20 @@
     [Parameter]
     public bool HideSaveButton { get; set; }
 
+    [Parameter]
+    public string? RedirectUrl { get; set; }
+
     private MudForm form;
+    public UserProfile OrigModel { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        if (Model != null && OrigModel == null)
+        {
+            OrigModel = Model.Clone();
+        }
+    }
 
     public async Task<bool> ValidateForm()
     {
@@ -70,14 +87,32 @@
         return form.IsValid;
     }
 
-    private async void OnSubmit()
+    private async Task OnSubmit()
     {
         if (form.IsValid)
         {
             await OnValidSubmit.InvokeAsync();
+            Redirect();
         }
     }
 
+    private void OnCancel()
+    {
+        if (OrigModel != null)
+        {
+            Model = OrigModel.Clone();
+            StateHasChanged();
+        }
+        Redirect();
+    }
+
+    private void Redirect()
+    {
+        if (!string.IsNullOrEmpty(RedirectUrl))
+        {
+            nm.NavigateTo(RedirectUrl);
+        }
+    }
 
     private async Task<IEnumerable<string>> SearchCountry(string value, CancellationToken ctk)
     {
