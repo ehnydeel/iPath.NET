@@ -1,0 +1,29 @@
+﻿@page "/admin/gmail"
+@using iPath.Application.Contracts
+
+<IPathHeader Title="Google Workspace" />
+
+<h3>Mailbox</h3>
+@foreach(var msg in messages)
+{
+    <div class="pa-2" style="border-bottom: 1px solid;">
+        @msg
+    </div>
+}
+
+
+
+@* @inject IMailBox srv *@
+
+@code {
+    IEnumerable<string> messages = new List<string>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // messages = srv.GetAllMails();
+            StateHasChanged();
+        }
+    }
+}

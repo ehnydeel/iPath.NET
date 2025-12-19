@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using iPath.Google;
 
 
 namespace iPath.API;
@@ -44,6 +45,10 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IGroupService, GroupService>();
+
+        // Google Workspace
+        services.AddGoogleServices(config);
+
 
         return services;
     }

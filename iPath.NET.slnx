@@ -8,10 +8,12 @@
   </Folder>
   <Folder Name="/Doc/">
     <File Path="README.md" />
+    <File Path="TODO.md" />
   </Folder>
   <Folder Name="/Infrastructure/">
     <Project Path="src/infrastructure/iPath.API/iPath.API.csproj" Id="a606b873-0cbc-4b84-b396-f04515874724" />
     <Project Path="src/infrastructure/iPath.Database.EFCore/iPath.Database.EFCore.csproj" />
+    <Project Path="src/infrastructure/iPath.Google/iPath.Google.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/Migrations/">
     <File Path="src/infrastructure/iPath.Database.Sqlite/README.md" />

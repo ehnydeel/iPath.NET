@@ -20,6 +20,7 @@
     <ProjectReference Include="..\iPath.Database.EFCore\iPath.Database.EFCore.csproj" />
     <ProjectReference Include="..\iPath.Database.Postgres\iPath.Database.Postgres.csproj" />
     <ProjectReference Include="..\iPath.Database.Sqlite\iPath.Database.Sqlite.csproj" />
+    <ProjectReference Include="..\iPath.Google\iPath.Google.csproj" />
   </ItemGroup>
 
   <ItemGroup>

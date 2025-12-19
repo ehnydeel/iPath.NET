@@ -12,9 +12,9 @@ public static class AdminEndpoints
 {
     public static IEndpointRouteBuilder MapAdminApi(this IEndpointRouteBuilder route)
     {
-        #region "-- Mailbox --"
+        #region "-- Internal Mailbox --"
         var mail = route.MapGroup("mail")
-            .WithTags("Mailbox");
+            .WithTags("Internal Mailbox");
 
         mail.MapGet("list", 
             ([DefaultValue(0)] int page, [DefaultValue(10)] int pagesize, IEmailRepository repo, CancellationToken ct)
@@ -80,6 +80,15 @@ public static class AdminEndpoints
             .Produces<TranslationData>()
             .WithTags("Localization");
 
+
+
+        var mailbox = route.MapGroup("mailbox")
+            .WithTags("External Mailbox");
+
+        mailbox.MapGet("all", (IMailBox srv) => srv.GetAllMails())
+            .RequireAuthorization("Admin");
+        mailbox.MapGet("unread", (IMailBox srv) => srv.GetUnreadMails())
+            .RequireAuthorization("Admin");
 
         return route;
     }
