@@ -9,7 +9,7 @@
     <DockerfileContext>..\..\..</DockerfileContext>
 	<DockerfileRunArguments>-v "C:\Daten\ipath_podman:/opt/ipath:rw"</DockerfileRunArguments>
 	<!-- Default image name and tag used by Visual Studio container targets -->
-	<DockerDefaultImageName>ipath\ipath_server</DockerDefaultImageName>
+	<DockerDefaultImageName>ipath_server</DockerDefaultImageName>
 	<DockerDefaultImageTag>latest</DockerDefaultImageTag>
   </PropertyGroup>
 
