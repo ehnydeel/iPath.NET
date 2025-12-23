@@ -38,6 +38,12 @@ public class CodingService(HttpClient http)
         return topoCS.Concept.Where(x => x.Display.ToLower().Contains(search)).OrderBy(x => x.Display).ToArray();
     }
 
+    public async Task<IEnumerable<CodedConcept>> FindTopoConcetps(string search, CancellationToken ct = default)
+    {
+        var codes = await FindTopoCodes(search, ct);
+        return codes.Select(c => c.ToConcept()).ToArray();
+    }
+
 
     public async Task<IEnumerable<CodeSystem.ConceptDefinitionComponent>> GetTopoGroups(CancellationToken ct = default)
     {
@@ -82,4 +88,22 @@ public class CodingService(HttpClient http)
         search = search.ToLower();
         return morphoCS.Concept.Where(x => x.Display.ToLower().Contains(search)).ToArray();
     }
+}
+
+
+
+
+
+
+
+
+public static class CodingExtensions
+{
+    public static CodedConcept ToConcept(this CodeSystem.ConceptDefinitionComponent code)
+    {
+        return new CodedConcept { Code = code.Code, Display = code.Display };
+    }
+
+    public static string ToAppend(this CodedConcept? concept)
+        => concept is null ? "" : $"- {concept.Display} [{concept.Code}]";
 }

@@ -39,22 +39,6 @@ public class Node : AuditableEntityWithEvents
 
 }
 
-
-
-public class NodeDescription
-{
-    public string? Subtitle { get; set; }
-    public string? CaseType { get; set; }
-    public string? AccessionNo { get; set; }
-    public string? Status { get; set; }
-
-    [Required, MinLength(3)]
-    public string? Title { get; set; } = string.Empty!;
-    public string? Text { get; set; } = string.Empty!;
-
-    public NodeDescription Clone() => (NodeDescription)MemberwiseClone();
-}
-
 public class NodeFile
 {
     public DateTime? LastStorageExportDate { get; set; }
