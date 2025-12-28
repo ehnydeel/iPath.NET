@@ -2,10 +2,11 @@
 
 public record NodeDto
 {
-    public Guid Id { get; init; }
     public string NodeType { get; init; } = default!;
-    public DateTime CreatedOn { get; set; }
     public int? SortNr { get; set; }
+
+    public Guid Id { get; init; }
+    public DateTime CreatedOn { get; set; }
 
     public Guid OwnerId { get; init; }
     public required OwnerDto Owner { get; init; }

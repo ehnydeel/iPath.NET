@@ -35,7 +35,10 @@
             <MudLink Href=@($"node/{context.Id}")>
                 <MudHighlighter Text="@context.Title" HighlightedText="@vm.SearchString" Style="font-weight: bold;" />
             </MudLink>
-            <span class="ml-1">(@context.Description.BodySite?.ToString())</span>
+            @if (@context.Description.BodySite is not null)
+            {
+                <span class="ml-1">(@context.Description.BodySite?.ToString())</span>
+            }
             <div><MudHighlighter Text="@context.SubTitle" HighlightedText="@vm.SearchString" /></div>
         </MudTd>
         <MudTd>

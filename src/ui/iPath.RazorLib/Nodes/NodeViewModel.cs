@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using iPath.Application;
 using iPath.Application.Contracts;
 using iPath.Blazor.Componenents.Nodes.Annotations;
 using iPath.Blazor.Componenents.Shared;
@@ -42,7 +43,13 @@ public class NodeViewModel(IPathApi api,
         }
     }
 
-    public async Task SelectChilNode(NodeDto? child)
+
+    public void SelectChilNode(Guid id)
+    {
+        SelectChilNode(RootNode?.ChildNodes?.FirstOrDefault(c => c.Id == id));
+    }
+
+    public void SelectChilNode(NodeDto? child)
     {
         if (child is null)
         {
@@ -82,27 +89,39 @@ public class NodeViewModel(IPathApi api,
 
     public async Task LoadNode(Guid id)
     {
-        OnLoadingStarted?.Invoke();
-        var respN = await api.GetNodeById(id);
-        if (respN.IsSuccessful)
+        // check if this is just the root or a child node and if so select it
+        if (RootNode is not null && RootNode.Id == id)
         {
-            RootNode = respN.Content;
-            // after loading a new root node (Case) => select the root node
-            await SelectChilNode(RootNode);
-
-            // load Group
-            if (RootNode.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != RootNode.GroupId))
-            {
-                var respG = await api.GetGroup(RootNode.GroupId.Value);
-                if (respG.IsSuccessful)
-                    ActiveGroup = respG.Content;
-            }
+            SelectChilNode(RootNode);
+        }
+        else if (RootNode is not null && RootNode.ContainsChildId(id))
+        {
+            SelectChilNode(id);
         }
         else
         {
-            snackbar.AddWarning(respN.ErrorMessage);
+            OnLoadingStarted?.Invoke();
+            var respN = await api.GetNodeById(id);
+            if (respN.IsSuccessful)
+            {
+                RootNode = respN.Content;
+                // after loading a new root node (Case) => select the root node
+                SelectChilNode(RootNode);
+
+                // load Group
+                if (RootNode.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != RootNode.GroupId))
+                {
+                    var respG = await api.GetGroup(RootNode.GroupId.Value);
+                    if (respG.IsSuccessful)
+                        ActiveGroup = respG.Content;
+                }
+            }
+            else
+            {
+                snackbar.AddWarning(respN.ErrorMessage);
+            }
+            OnLoadingFinished?.Invoke();
         }
-        OnLoadingFinished?.Invoke();
     }
 
     public async Task ReloadNode()
@@ -158,9 +177,8 @@ public class NodeViewModel(IPathApi api,
             {
                 IdList = new List<Guid>();
             }
-            return true;
         }
-        return false;
+        return !IdList.IsEmpty();
     }
 
     public async Task GoUp()
@@ -176,7 +194,7 @@ public class NodeViewModel(IPathApi api,
         {
             // go up to parent
             var tmp = RootNode.ChildNodes.FirstOrDefault(n => n.Id == SelectedNode.ParentNodeId.Value);
-            SelectedNode = tmp is null ? RootNode : tmp;
+            NavigateToChilNode(tmp is null ? RootNode : tmp);
         }
     }
 
@@ -206,10 +224,10 @@ public class NodeViewModel(IPathApi api,
             // find index of current child Node in parents child list
             var list = RootNode.ChildNodes.Where(n => n.ParentNodeId == SelectedNode.ParentNodeId).OrderBy(n => n.SortNr).ToList();
             var idx = list.IndexOf(SelectedNode);
-            if (IdList != null && idx < list.Count() - 1)
+            if (idx < list.Count() - 1)
             {
                 // there is one more in list => select
-                nm.NavigateTo($"node/{IdList[idx - 1]}");
+                NavigateToChilNode(list[idx + 1]);
             }
             else
             {
@@ -232,7 +250,9 @@ public class NodeViewModel(IPathApi api,
                 if (idx > 0)
                 {
                     // there is one more in list => select
-                    await LoadNode(IdList[idx - 1]);
+                    var prevId = IdList[idx - 1];
+                    ClearData();
+                    nm.NavigateTo($"node/{prevId}");
                     return;
                 }
             }
@@ -247,7 +267,7 @@ public class NodeViewModel(IPathApi api,
             if (idx > 0)
             {
                 // there is one more in list => select
-                SelectedNode = list[idx - 1];
+                NavigateToChilNode(list[idx - 1]);
             }
             else
             {
@@ -255,6 +275,11 @@ public class NodeViewModel(IPathApi api,
                 await GoUp();
             }
         }
+    }
+
+    public void NavigateToChilNode(NodeDto childNode)
+    {
+        nm.NavigateTo($"node/{childNode.Id}");
     }
     #endregion
 
@@ -287,7 +312,7 @@ public class NodeViewModel(IPathApi api,
         if (resp.IsSuccessful)
         {
             RootNode = resp.Content;
-            await SelectChilNode(RootNode);
+            SelectChilNode(RootNode);
             IsEditing = true;
         }
         else

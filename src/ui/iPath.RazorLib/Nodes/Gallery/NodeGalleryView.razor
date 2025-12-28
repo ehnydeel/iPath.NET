@@ -41,8 +41,8 @@
 }
 
 @code {
-	async Task OnChildClick(NodeDto child)
+	void OnChildClick(NodeDto child)
 	{
-		await vm.SelectChilNode(child);
+		vm.NavigateToChilNode(child);
 	}
 }

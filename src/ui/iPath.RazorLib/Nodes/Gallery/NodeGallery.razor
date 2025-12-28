@@ -15,13 +15,13 @@
     <div class="ipath_image">
         @if (vm.SelectedNode.IsImage)
         {
-            <img src=@vm.SelectedNode.FileUrl() @onclick="@vm.GoNext" />
+            <img src="@vm.SelectedNode.FileUrl" @onclick="@vm.GoNext" />
         }
         else
         {
-            <MudIcon Size="Size.Large" Icon=@vm.SelectedNode.FileIcon() />
+            <MudIcon Size="Size.Large" Icon="@vm.SelectedNode.FileIcon" />
         }
-        <div class="image_info">@vm.SelectedNode.GalleryCaption.ShortenTo(50)</div>
+        <div class="mt-2"><MudLink Target="_blank" Href="@vm.SelectedNode.FileUrl">@vm.SelectedNode.GalleryCaption.ShortenTo(50)</MudLink></div>
     </div>
 }
 else

@@ -35,7 +35,7 @@ public static class NodeExtensions
 
 
 
-    extension (NodeDto node)
+    extension(NodeDto node)
     {
         public string? Title => node?.Description?.Title;
         public string? SubTitle => node?.Description?.Subtitle;
@@ -62,47 +62,57 @@ public static class NodeExtensions
 
         public string? NodeTitle => node?.File is null ? node.Description?.Title : node.File.Filename;
 
+        public bool ContainsChildId(Guid Id) => node.ChildNodes.Any(c => c.Id == Id);
 
 
-        public string ThumbUrl() 
+        public string ThumbUrl
         {
-            if (!string.IsNullOrEmpty(node.File?.ThumbData))
+            get
             {
-                return $"data:image/jpeg;base64, {node.File.ThumbData}";
-            }
-            else if (node.ipath2_id.HasValue)
-            {
-                return $"https://www.ipath-network.com/ipath/image/src/{node.ipath2_id}";
-            }
+                if (!string.IsNullOrEmpty(node.File?.ThumbData))
+                {
+                    return $"data:image/jpeg;base64, {node.File.ThumbData}";
+                }
+                else if (node.ipath2_id.HasValue)
+                {
+                    return $"https://www.ipath-network.com/ipath/image/src/{node.ipath2_id}";
+                }
 
-            return "";
+                return "";
+            }
         }
 
-        public string FileUrl()
+        public string FileUrl
         {
-            if (!node.ipath2_id.HasValue)
+            get
             {
-                return $"/api/v1/nodes/file/{node.Id}";
-            }
-            else if (node.ipath2_id.HasValue)
-            {
-                return $"https://www.ipath-network.com/ipath/image/src/{node.ipath2_id}";
-            }
+                if (!node.ipath2_id.HasValue)
+                {
+                    return $"/api/v1/nodes/file/{node.Id}";
+                }
+                else if (node.ipath2_id.HasValue)
+                {
+                    return $"https://www.ipath-network.com/ipath/image/src/{node.ipath2_id}";
+                }
 
-            return "";
+                return "";
+            }
         }
 
         public bool IsImage => node.NodeType == "image";
 
-        public string FileIcon()
+        public string FileIcon
         {
-            if (node.File != null && node.File.MimeType.ToLower().EndsWith("pdf"))
-                return Icons.Custom.FileFormats.FilePdf;
+            get
+            {
+                if (node.File != null && node.File.MimeType.ToLower().EndsWith("pdf"))
+                    return Icons.Custom.FileFormats.FilePdf;
 
-            if (node.NodeType.ToLower() == "folder")
-                return Icons.Material.Filled.FolderOpen;
+                if (node.NodeType.ToLower() == "folder")
+                    return Icons.Material.Filled.FolderOpen;
 
-            return Icons.Custom.FileFormats.FileDocument;
+                return Icons.Custom.FileFormats.FileDocument;
+            }
         }
     }
 

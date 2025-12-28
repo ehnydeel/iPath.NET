@@ -13,7 +13,7 @@ public class FetchNodeFileHandler(iPathDbContext db,
     public async Task<FetchFileResponse> Handle(GetNodeFileQuery request, CancellationToken cancellationToken)
     {
         var node = await db.Nodes
-                   .Include(n => n.File)
+                   // .Include(n => n.File)
                    .Include(n => n.RootNode)
                    .AsNoTracking()
                    .FirstOrDefaultAsync(n => n.Id == request.nodeId);
@@ -22,8 +22,14 @@ public class FetchNodeFileHandler(iPathDbContext db,
             return new FetchFileResponse(NotFound: true);
 
         // TODO: implement authentication 
-        //if (!srvUser.CurrentUser.AllowedGroupIds().Contains(node.RootNode.GroupId.Value))
-        //    return new FetchFileResponse(AccessDenied: true);
+        try
+        {
+            sess.AssertInGroup(node.RootNode.GroupId.Value);
+        }
+        catch (NotAllowedException ex)
+        {
+            return new FetchFileResponse(AccessDenied: true);
+        }
 
         var fn = Path.Combine(opts.Value.TempDataPath, node.Id.ToString());
 

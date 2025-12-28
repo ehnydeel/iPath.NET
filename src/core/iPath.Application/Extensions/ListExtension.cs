@@ -11,7 +11,7 @@ public static class ListExtension
         return list is null || !list.Any();
     }
 
-    public static bool IsEmpty<T>(this IList<T>? list)
+    public static bool IsEmpty<T>(this List<T>? list)
     {
         return list is null || !list.Any();
     }

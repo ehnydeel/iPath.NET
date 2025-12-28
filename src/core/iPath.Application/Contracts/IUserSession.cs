@@ -16,6 +16,11 @@ public static class UserSessionExtensions
         public bool IsModerator => session.User.roles.Any(r => r.ToLower() == "moderator");
 
 
+        /// <summary>
+        /// Check if user has access to the GroupId and throw an NotAllowedException if not
+        /// </summary>
+        /// <param name="GroupId"></param>
+        /// <exception cref="NotAllowedException"></exception>
         public void AssertInGroup(Guid GroupId)
         {
             if (!session.IsAdmin)
