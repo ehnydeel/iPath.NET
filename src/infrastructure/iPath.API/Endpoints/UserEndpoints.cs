@@ -1,4 +1,5 @@
-﻿using iPath.Application.Features.Users;
+﻿using DispatchR;
+using iPath.Application.Features.Users;
 using Scalar.AspNetCore;
 
 namespace iPath.API;
@@ -44,6 +45,10 @@ public static class UserEndpoints
             => await mediator.Send(cmd, ct))
             .Produces<Guid>()
             .RequireAuthorization();
+
+        grp.MapDelete("{id}", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new DeleteUserCommand(Guid.Parse(id)), ct))
+            .RequireAuthorization("Admin");
 
 
         // communities

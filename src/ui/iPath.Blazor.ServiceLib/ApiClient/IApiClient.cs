@@ -49,6 +49,8 @@ public interface IPathApi
     [Post("/api/v1/users/create")]
     Task<IApiResponse<OwnerDto>> CreateUser(CreateUserCommand command);
 
+    [Delete("/api/v1/users/{id}")]
+    Task<IApiResponse> DeleteUser(Guid id);
 
     // communities
     [Put("/api/v1/users/assign/community")]

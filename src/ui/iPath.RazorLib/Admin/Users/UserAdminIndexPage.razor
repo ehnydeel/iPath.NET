@@ -53,6 +53,8 @@
                            Icon="@Icons.Material.Filled.Groups" />
             <MudIconButton Href=@($"admin/users/{context.Id}/notifications") Size="Size.Small"
                            Icon="@Icons.Material.Filled.Email" />
+            <MudIconButton OnClick="@(() => vm.Delete(context))" Size="Size.Small"
+                           Icon="@Icons.Material.Filled.DeleteForever" />
         </MudTd>
     </RowTemplate>
     <PagerContent>

@@ -234,11 +234,25 @@ public class UserAdminViewModel(IPathApi api,
 
 
     public bool DeleteDisable => true;
-    public async Task Delete()
+    public async Task Delete(UserListDto user)
     {
-        if (SelectedItem != null)
+        if (user != null)
         {
-            snackbar.AddWarning("not implemented yet");
+            var res = await dialog.ShowMessageBox("Warning",
+                $"Are you sure that you want to delete user {user.Username} completely?",
+                yesText: "Yes", cancelText: "Cancel");
+            if (res is not null)
+            {
+                var resp = await api.DeleteUser(user.Id);
+                if (resp.IsSuccessful)
+                {
+                    await table.ReloadServerData();
+                }
+                else
+                {
+                    snackbar.AddError(resp.ErrorMessage);
+                }
+            }
         }
     }
 
