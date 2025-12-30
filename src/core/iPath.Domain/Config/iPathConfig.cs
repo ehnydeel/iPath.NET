@@ -15,4 +15,6 @@ public class iPathConfig
     public int ThumbSize { get; set; } = 100;
 
     public string RenderMode { get; set; } = "Auto";
+
+    public string ReverseProxyAddresse { get; set; }
 }

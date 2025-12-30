@@ -5,10 +5,12 @@ using iPath.Blazor.Server.Components.Account;
 using iPath.Domain.Config;
 using iPath.RazorLib;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
+using System.Net;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,13 +66,28 @@ builder.Services.AddAntiforgery();
 
 builder.Services.AddTransient<baseAuthDelegationHandler, ForwardCookiesHandler>();
 
-
+// Configuration
 builder.Services.Configure<iPathConfig>(builder.Configuration.GetSection(iPathConfig.ConfigName));
+var cfg = new iPathConfig();
+builder.Configuration.GetSection(iPathConfig.ConfigName).Bind(cfg);
 
+// reverse Proxy
+if (!string.IsNullOrEmpty(cfg.ReverseProxyAddresse) && IPAddress.TryParse(cfg.ReverseProxyAddresse, out var proxyIP))
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(o => o.KnownProxies.Add(proxyIP));
+}
 
 
 var app = builder.Build();
 var opts = app.Services.GetRequiredService<IOptions<iPathConfig>>();
+
+
+// Header forwarding for Reverse Proxy Integration
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 
 app.MapDefaultEndpoints();
 
