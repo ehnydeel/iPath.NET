@@ -11,7 +11,7 @@ using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
 using iPath.Blazor.Server;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
+using MudBlazor.Translations;
 using Refit;
 using System.Data;
 using System.Text.Json;
@@ -22,6 +22,9 @@ public static class RazorLibServiceRegistration
 {
     public static IServiceCollection AddRazorLibServices(this IServiceCollection services, string baseAddress, bool WasmClient)
     {
+        services.AddMudTranslations();
+
+
         // Refit client with json serialization options => enums as int
         var jsonOptions = new JsonSerializerOptions
         {

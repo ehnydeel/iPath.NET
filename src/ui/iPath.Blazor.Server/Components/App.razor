@@ -56,9 +56,9 @@
 
     private IComponentRenderMode interactiveRenderMode => opts.Value.RenderMode.ToLower() switch
     {
-        "auto" => new InteractiveAutoRenderMode(prerender: false),
-        "server" => new InteractiveServerRenderMode(prerender: false),
-        _ => new InteractiveWebAssemblyRenderMode(prerender: false)
+        "auto" => new InteractiveAutoRenderMode(prerender: opts.Value.Prerender),
+        "server" => new InteractiveServerRenderMode(prerender: opts.Value.Prerender),
+        _ => new InteractiveWebAssemblyRenderMode(prerender: opts.Value.Prerender)
     };
 
     private IComponentRenderMode? PageRenderMode => HttpContext.AcceptsInteractiveRouting() ? interactiveRenderMode :  null;

@@ -44,6 +44,7 @@ public class ExceptionHandlerMiddleware
 
             case NotAllowedException notAllowed:
                 httpStatusCode = HttpStatusCode.Forbidden;
+                result = JsonSerializer.Serialize(notAllowed.Message);
                 break;
 
             case AggregateException:

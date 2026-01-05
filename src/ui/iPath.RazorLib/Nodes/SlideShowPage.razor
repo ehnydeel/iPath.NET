@@ -1,0 +1,61 @@
+﻿@page "/node/{id}/slideshow"
+
+@using iPath.Blazor.Componenents.Layouts
+@layout SlideshowLayout
+
+@inherits NodeViewComponentBase
+
+<MudPaper Elevation="0" Width="100%" Height="100%" @onclick="@(() => vm.SelectNextImage())" Style="background-color: black;" @onkeydown="OnKeyDown">
+
+    <MudPaper Width="100%" Class="d-flex justify-center flex-grow-1 gap-4 mb-10" Elevation="0" Style="background-color: black;">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowLeft" Size="Size.Small" OnClick="@(() => vm.SelectPreviousImage())" />
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowRight" Size="Size.Small" OnClick="@(() => vm.SelectNextImage())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="@(() => vm.GoUp())" />
+        <MudSpacer />
+    </MudPaper>
+
+
+    @if (vm.SelectedNode is not null)
+    {
+        <div class="ipath_image">
+            @if (vm.SelectedNode.IsImage)
+            {
+                <img src="@vm.SelectedNode.FileUrl" />
+            }
+            else
+            {
+                <MudIcon Size="Size.Large" Icon="@vm.SelectedNode.FileIcon" />
+            }
+            <div class="mt-2">@vm.SelectedNode.GalleryCaption.ShortenTo(50)</div>
+        </div>
+    }
+
+</MudPaper>
+
+@code
+{
+    [Parameter]
+    public string id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await vm.LoadNode(Guid.Parse(id));
+
+        // select first images
+        if (vm.HasImages)
+        {
+            vm.SelectChilNode(vm.RootNode.ChildNodes.FirstOrDefault(n => n.IsImage).Id);
+        }
+        else
+        {
+            await vm.GoUp();
+        }
+    }
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "space" )
+        {
+            await vm.SelectNextImage();
+        }
+    }
+}

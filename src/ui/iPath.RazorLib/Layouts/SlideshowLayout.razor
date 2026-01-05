@@ -1,0 +1,17 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="true" />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+<MudDialogProvider MaxWidth="MaxWidth.Medium"
+                   CloseButton="true"
+                   BackdropClick="false"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
+
+<MudLayout Style="background-color: black;">
+    <MudMainContent Style="background-color: black;">
+        @Body
+    </MudMainContent>
+</MudLayout>
+

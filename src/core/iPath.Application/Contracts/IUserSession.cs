@@ -27,7 +27,7 @@ public static class UserSessionExtensions
             {
                 if (!session.User.groups.ContainsKey(GroupId))
                 {
-                    throw new NotAllowedException();
+                    throw new NotAllowedException($"You are not allowed to access group {GroupId}");
                 }
             }
         }

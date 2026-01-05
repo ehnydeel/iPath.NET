@@ -281,6 +281,55 @@ public class NodeViewModel(IPathApi api,
     {
         nm.NavigateTo($"node/{childNode.Id}");
     }
+
+
+
+
+    public async Task SelectNextImage()
+    {
+        if (RootNode is null) return;
+
+        if (SelectedNode is not null)
+        {
+            // find index of current child Node
+            var list = RootNode.ChildNodes.Where(n => n.IsImage).OrderBy(n => n.SortNr).ToList();
+            if (list.IsEmpty()) await GoUp();
+            var idx = list.IndexOf(SelectedNode);
+            if (idx < list.Count() - 1)
+            {
+                // there is one more in list => select
+                SelectedNode = list[idx + 1];
+            }
+            else
+            {
+                // goto first
+                SelectedNode = list.First();
+            }
+        }
+    }
+
+    public async Task SelectPreviousImage()
+    {
+        if (RootNode is null) return;
+
+        if (SelectedNode is not null)
+        {
+            // find index of current child Node
+            var list = RootNode.ChildNodes.Where(n => n.IsImage).OrderBy(n => n.SortNr).ToList();
+            if (list.IsEmpty()) await GoUp();
+            var idx = list.IndexOf(SelectedNode);
+            if (idx > 0)
+            {
+                // there is one more in list => select
+                SelectedNode = list[idx - 1];
+            }
+            else
+            {
+                // goto last
+                SelectedNode = list.Last();
+            }
+        }
+    }
     #endregion
 
 
@@ -565,6 +614,16 @@ public class NodeViewModel(IPathApi api,
         snackbar.AddWarning("not implemented");
     }
 
+
+
+    public bool HasImages => RootNode is not null && RootNode.ChildNodes.Any(n => n.IsImage);
+    public void StartSlideshow()
+    {
+        if (RootNode is not null)
+        {
+            nm.NavigateTo($"node/{RootNode.Id}/slideshow");
+        }
+    }
 
     #endregion
 
