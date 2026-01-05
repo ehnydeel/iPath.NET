@@ -572,7 +572,7 @@ public class NodeViewModel(IPathApi api,
 
     public bool AnnotateDisabled => IsEditing;
 
-    public async Task Annotate()
+    public async Task Annotate(Guid? ChildNodeId = null)
     {
         if (AnnotateDisabled) return;
 
@@ -596,12 +596,16 @@ public class NodeViewModel(IPathApi api,
                 }
             }    
                         
-            var cmd = new CreateNodeAnnotationCommand(RootNode.Id, data.Text, data.Data, null);
+            var cmd = new CreateNodeAnnotationCommand(RootNode.Id, data.Text, data.Data, ChildNodeId, null);
 
             var resp = await api.CreateAnnotation(cmd);
             if (resp.IsSuccessful)
             {
                 await ReloadNode();
+            }
+            else
+            {
+                snackbar.AddError(resp.ErrorMessage);
             }
         }
     }

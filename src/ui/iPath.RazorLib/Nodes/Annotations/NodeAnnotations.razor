@@ -9,7 +9,7 @@
 		<div class="ipath_header_actions">
 			<MudTooltip Text="Add Annotation">
 				<MudIcon Size="Size.Small" Icon=@SortIcon @onclick="ToggleSort" />
-				<MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Add" @onclick="vm.Annotate" Disabled="vm.AnnotateDisabled" />
+				<MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Add" @onclick="@(() => vm.Annotate())" Disabled="vm.AnnotateDisabled" />
 			</MudTooltip>
 		</div>
 	</div>

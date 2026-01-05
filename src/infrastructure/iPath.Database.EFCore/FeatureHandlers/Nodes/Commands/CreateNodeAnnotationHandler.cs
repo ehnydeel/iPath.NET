@@ -11,6 +11,15 @@ public class CreateNodeAnnotationCommandHandler(iPathDbContext db, IMediator med
         var node = await db.Nodes.FindAsync(request.NodeId);
         Guard.Against.NotFound(request.NodeId, node);
 
+        if (request.ChildNodeId.HasValue)
+        {
+            var child = await db.Nodes.FindAsync(request.ChildNodeId.Value);
+            Guard.Against.NotFound(request.ChildNodeId.Value, child);
+
+            if (child.RootNodeId != node.Id)
+                throw new ArgumentException("Child doe nbot belong to RootNode");
+        }
+
         if (!sess.IsAdmin)
         {
             // TODO: check authorization. Who may add Annotations ???

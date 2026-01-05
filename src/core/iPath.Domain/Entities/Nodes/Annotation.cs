@@ -8,6 +8,10 @@ public class Annotation : AuditableEntity
     public Node? Node { get; set; }
 
 
+    public Guid? ChildNodeId { get; set; }
+    public Node? ChildNode { get; set; }
+
+
     public DateTime CreatedOn { get; set; }
 
     public Guid OwnerId { get; set; }
@@ -39,5 +43,5 @@ public class Annotation : AuditableEntity
 
 public class AnnotationData
 {
-    public CodedConcept Morphology { get; set; }
+    public CodedConcept? Morphology { get; set; }
 }

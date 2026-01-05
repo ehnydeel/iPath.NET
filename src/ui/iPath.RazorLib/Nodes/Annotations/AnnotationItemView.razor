@@ -26,7 +26,11 @@
 			</div>
 		</MudPopover>
 	</MudChatBubble>
-</MudChat>
+	@if (Item.ChildNodeId.HasValue)
+	{
+		<MudChatFooter Text=@($"Comment on image @Item.ChildNodeId") />
+	}
+	</MudChat>
 
 @code {
 	[Parameter]
