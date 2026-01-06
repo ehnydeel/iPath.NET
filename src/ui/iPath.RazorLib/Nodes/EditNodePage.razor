@@ -1,5 +1,4 @@
-﻿@page "/node/new/{groupId}"
-@page "/node/edit/{id}"
+﻿@page "/node/edit/{id}"
 
 @inherits NodeViewComponentBase
 
@@ -20,8 +19,6 @@
 }
 
 @code {
-    [Parameter]
-    public string groupId { get; set; }
 
     [Parameter]
     public string id { get; set; }
@@ -33,13 +30,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Guid.TryParse(groupId, out var GroupId))
-        {
-            await vm.CreateNewNode(GroupId);
-            SaveText = T["Publish"];
-            Title = T["New Case"];
-        }
-        else if (Guid.TryParse(id, out var nodeId))
+        if (Guid.TryParse(id, out var nodeId))
         {
             await vm.LoadNode(nodeId);
             SaveText = T["Save"];
