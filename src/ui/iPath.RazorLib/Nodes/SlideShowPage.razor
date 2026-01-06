@@ -23,13 +23,13 @@
             <div class="ipath_image">
                 @if (vm.SelectedNode.IsImage)
                 {
-                    <img src="@vm.SelectedNode.FileUrl" />
+                    <img src="@vm.SelectedNode.FileUrl" style="max-width: 95%; max-height: 90%;" />
                 }
                 else
                 {
                     <MudIcon Size="Size.Large" Icon="@vm.SelectedNode.FileIcon" /> 
                 }
-                <div class="mt-2">@vm.SelectedNode.GalleryCaption.ShortenTo(50)</div>
+                <div class="mt-2">@vm.SelectedNode.GalleryCaption.ShortenTo(80)</div>
             </div>
         }
         else

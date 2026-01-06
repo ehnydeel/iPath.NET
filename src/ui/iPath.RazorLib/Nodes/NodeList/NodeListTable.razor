@@ -52,7 +52,14 @@
             <i>@context.Description.BodySite?.Code</i>
         </MudTd>
         <MudTd DataLabel="Owner" Class="ipath_node_sender2">
-            <OwnerLink Owner="@context.Owner" />
+            @if (GroupId.HasValue)
+            {
+                <OwnerLink Owner="@context.Owner" />                
+            }
+            else
+            {
+                <GroupLink GroupId="@context.GroupId" />
+            }
         </MudTd>
         <MudTd DataLabel="CreatedOn" Class="ipath_node_date2">
             @context.CreatedOn.ToString("d")<br />

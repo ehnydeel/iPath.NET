@@ -23,11 +23,8 @@
                 <OwnerLink Owner="vm.RootNode.Owner" />
             </div>
             <div class="ipath_node_date">
+                <b><GroupLink GroupId="@vm.RootNode.GroupId" /></b>
                 <div>@vm.RootNode.CreatedOn.ToString("d")</div>
-                <div style="font-weight: bold;">@vm.RootNode.AccessionNo</div>
-                <div>
-                    @* <MudLink Href=@($"/group/{vm.SelectedNode.Group.Id}")>@vm.SelectedNode.Group.Name</MudLink> *@
-                </div>
             </div>
         </div>
         <div class="ipath_node_description">

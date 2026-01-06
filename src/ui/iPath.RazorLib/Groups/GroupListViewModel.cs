@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace iPath.Blazor.Componenents.Groups;
 
-public class GroupListViewModel(IPathApi api, ISnackbar snackbar, IDialogService dialog, NavigationManager nm) : IViewModel
+public class GroupListViewModel(IPathApi api, GroupCache cache, ISnackbar snackbar, IDialogService dialog, NavigationManager nm) : IViewModel
 {
     public CommunityListDto? SelectedCommunity {  get; set; }
     public string SearchString { get; set; }
@@ -36,12 +36,25 @@ public class GroupListViewModel(IPathApi api, ISnackbar snackbar, IDialogService
     }
 
 
+    public void GotoGroup(Guid groupId)
+    {
+        if (groupId != Guid.Empty)
+        {
+            nm.NavigateTo($"groups/{groupId}");
+        }
+    }
+
     public void GotoGroup(GroupListDto group)
     {
         if (group != null)
         {
-            nm.NavigateTo($"groups/{group.Id}");
+            GotoGroup(group.Id);
         }
+    }
+
+    public async Task<GroupDto> GetGroupDto(Guid groupId)
+    {
+        return await cache.GetGroupAsync(groupId);
     }
 
 

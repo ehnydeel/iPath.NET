@@ -1,0 +1,31 @@
+﻿@namespace iPath.Blazor.Componenents.Groups
+
+@inject GroupListViewModel vm
+
+<MudLink OnClick="GotoGroup">@GroupName</MudLink>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid? GroupId { get; set; } = null;
+
+    GroupDto group;
+    string GroupName => group is null ? "" : group.Name;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (GroupId.HasValue)
+        {
+            group = await vm.GetGroupDto(GroupId.Value);
+        }
+    }
+
+
+    async Task GotoGroup()
+    {
+        if (GroupId.HasValue)
+        {
+            vm.GotoGroup(GroupId.Value);
+        }
+    }
+}
