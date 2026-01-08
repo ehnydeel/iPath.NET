@@ -1,4 +1,5 @@
-﻿using iPath.Application.Features.Nodes;
+﻿using Humanizer;
+using iPath.Application.Features.Nodes;
 using Microsoft.AspNetCore.Components;
 using System.Text.RegularExpressions;
 
@@ -6,9 +7,38 @@ namespace iPath.Blazor.Componenents.Nodes;
 
 public static class NodeExtensions
 {
+    extension(NodeDescription? dto)
+    {
+        public string? FullTitle()
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(dto?.Title))
+                parts.Add(dto.Title);
+            if (!string.IsNullOrEmpty(dto?.AccessionNo))
+                parts.Add(dto.AccessionNo);
+            if (!parts.Any())
+                parts.Add("(No Title)");
+
+            return string.Join(", ", parts);
+        }
+    }
+
     extension(NodeListDto dto)
     {
-        public string? Title =>  string.IsNullOrEmpty(dto?.Description?.Title) ? "[Draft]" : dto?.Description?.Title;
+
+
+        public string? Title
+        {
+            get
+            {
+                var ret = dto.Description.FullTitle();
+                if (dto.IsDraft)
+                    ret += " (Draft)";
+                return ret;
+            }
+        }            
+            
+            
         public string? SubTitle => dto?.Description?.Subtitle;
         public string? AccessionNo => dto?.Description?.AccessionNo;
 
@@ -37,7 +67,14 @@ public static class NodeExtensions
 
     extension(NodeDto node)
     {
-        public string? Title => node?.Description?.Title;
+        public string? Title
+        {
+            get
+            {
+                return node.Description.FullTitle();
+            }
+        }
+
         public string? SubTitle => node?.Description?.Subtitle;
         public string? AccessionNo => node?.Description?.AccessionNo;
         public string? CaseType => node?.Description?.CaseType;
