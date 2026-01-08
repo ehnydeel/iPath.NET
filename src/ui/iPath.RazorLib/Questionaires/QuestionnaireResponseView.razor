@@ -1,0 +1,25 @@
+﻿@namespace iPath.Blazor.Componenents
+
+@inject NodeViewModel vm
+
+<iPath.LHCForms.LhcForm @ref="lhcForm" ReadOnly="true" />
+
+@code {
+    [Parameter, EditorRequired]
+    public QuestionnaireResponseData Data { get; set; } 
+
+
+    private iPath.LHCForms.LhcForm lhcForm;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Data is not null)
+        {
+            var q = await vm.GetQuesiotnnaire(Data.QuestionnaireId, Data.Version);
+            if (q is not null)
+            {
+                await lhcForm.LoadFormAsync(q, Data.Resource);
+            }
+        }
+    }
+}

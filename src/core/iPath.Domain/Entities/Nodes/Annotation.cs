@@ -43,9 +43,18 @@ public class Annotation : AuditableEntity
 
 public class AnnotationData
 {
+    public eAnnotationType Type { get; set; } = eAnnotationType.Comment;
+
     public CodedConcept? Morphology { get; set; }
 
-    public string? QuestionnaireId { get; set; }
-    public string? QuestionnaireResponse { get; set; }
+    public QuestionnaireResponseData? Questionnaire { get; set; }
 
+}
+
+public enum eAnnotationType
+{
+    None = 0,
+    Comment = 1,
+    FinalAssesment = 10,
+    FollowUp = 20
 }

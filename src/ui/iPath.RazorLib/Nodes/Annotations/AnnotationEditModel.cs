@@ -19,7 +19,7 @@ public class AnnotationEditModel
             Text ??= Data.Morphology.Display; // Morphology as default text if no text written
             return true;
         }
-        if (!string.IsNullOrEmpty(Data.QuestionnaireResponse)) return true;
+        if (Data.Questionnaire is not null) return true;
         return false;
     }
 }

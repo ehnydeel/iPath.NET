@@ -13,7 +13,7 @@ else
 {
     <NodeDescriptionView ExpandDescription="ShowDescription" />
     <NodeGallery OnShowingChildNode="@(e => ShowDescription = !e)" />
-    <NodeAnnotations />
+    <NodeAnnotations @ref="annotationView" />
 }
 
 
@@ -23,6 +23,9 @@ else
 
     bool ShowDescription = true;
     bool Loading;
+
+    NodeAnnotations annotationView;
+
 
     protected override void OnInitialized()
     {
@@ -54,5 +57,4 @@ else
 
         await vm.MarkAsVisited();
     }
-
 }

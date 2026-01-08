@@ -9,10 +9,10 @@ using Refit;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
-public class NodeViewModel(IPathApi api, 
+public class NodeViewModel(IPathApi api,
     AppState appState,
-    ISnackbar snackbar, 
-    IDialogService srvDialog, 
+    ISnackbar snackbar,
+    IDialogService srvDialog,
     IStringLocalizer T,
     NavigationManager nm,
     QuestionnaireCache qCache,
@@ -31,7 +31,7 @@ public class NodeViewModel(IPathApi api,
 
     public NodeDto RootNode { get; private set; }
     public NodeDto? SelectedNode { get; private set; }
-    public GroupDto? ActiveGroup {  get; private set; }
+    public GroupDto? ActiveGroup { get; private set; }
 
     public bool IsRootNodeSelected
     {
@@ -72,8 +72,8 @@ public class NodeViewModel(IPathApi api,
         {
             throw new Exception("child node is not child of the root node");
         }
-        else 
-        { 
+        else
+        {
             SelectedNode = child;
         }
         NotifyStateChanged();
@@ -372,7 +372,10 @@ public class NodeViewModel(IPathApi api,
         if (resp.IsSuccessful)
         {
             RootNode = resp.Content;
-            RootNode.Description.QuestionnaireId = QuestionaireId;
+            if (!string.IsNullOrEmpty(QuestionaireId))
+            {
+                RootNode.Description.Questionnaire = new QuestionnaireResponseData { QuestionnaireId = QuestionaireId };
+            }
             SelectChilNode(RootNode);
             IsEditing = true;
         }
@@ -396,7 +399,8 @@ public class NodeViewModel(IPathApi api,
         // Delete root node if none îs selected
         node ??= RootNode;
 
-        if (AskConfirmation) {
+        if (AskConfirmation)
+        {
             bool? result = await srvDialog.ShowMessageBox(
                 T["Warning"],
                 T["Are you sure that you want to delete !"],
@@ -447,7 +451,7 @@ public class NodeViewModel(IPathApi api,
 
 
         var errors = new List<string>();
-        foreach( var id in ids)
+        foreach (var id in ids)
         {
             var node = RootNode.ChildNodes.FirstOrDefault(n => n.Id == id);
             if (node != null)
@@ -459,7 +463,7 @@ public class NodeViewModel(IPathApi api,
                 }
                 else
                 {
-                    errors.Add(resp.ErrorMessage); 
+                    errors.Add(resp.ErrorMessage);
                 }
             }
         }
@@ -476,9 +480,10 @@ public class NodeViewModel(IPathApi api,
     }
 
 
-    public bool IsEditing { 
+    public bool IsEditing
+    {
         get;
-        set { field = value; OnChange(); } 
+        set { field = value; OnChange(); }
     }
 
     public bool EditDisabled => !appState.CanEditNode(SelectedNode);
@@ -496,7 +501,7 @@ public class NodeViewModel(IPathApi api,
 
     public async Task Save()
     {
-        if (RootNode !=null && !SaveDisabled && IsEditing)
+        if (RootNode != null && !SaveDisabled && IsEditing)
         {
             var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
             var resp = await api.UpdateNode(cmd);
@@ -599,25 +604,32 @@ public class NodeViewModel(IPathApi api,
         if (AnnotateDisabled) return;
 
         var model = CreateNewAnnotationInput(ChildNodeId);
-        var parameters = new DialogParameters<NodeAddAnnotationDialog> { { x => x.Model, model } };
-        var dialog = await srvDialog.ShowAsync<NodeAddAnnotationDialog>("New Annotation", parameters);
+        var parameters = new DialogParameters<AddPlaintextAnnotationDialog> { { x => x.Model, model } };
+        var dialog = await srvDialog.ShowAsync<AddPlaintextAnnotationDialog>("New Comment", parameters);
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is AnnotationEditModel data)
         {
             if (data.ValidateInput())
             {
-                await SubmitAnnotation(data);
+                await SubmitAnnotation();
             }
         }
     }
 
-    public AnnotationEditModel CreateNewAnnotationInput(Guid? ChildNodeId = null)
+    public AnnotationEditModel? NewAnnotation { get; set; }
+    public async Task StartAnnotation()
+    {
+        NewAnnotation = CreateNewAnnotationInput();
+        OnChange?.Invoke();
+    }
+
+    private AnnotationEditModel CreateNewAnnotationInput(Guid? ChildNodeId = null)
     {
         var model = new AnnotationEditModel();
         if (RootNode is not null)
         {
             model.RootNodeId = RootNode.Id;
-            model.ChildNodeId = ChildNodeId;
+            model.ChildNodeId = ChildNodeId ;
             if (ActiveGroup is not null)
             {
                 model.AskMorphology = ActiveGroup.Settings.AnnotationHasMoprhoogy;
@@ -626,19 +638,31 @@ public class NodeViewModel(IPathApi api,
         return model;
     }
 
-    public async Task SubmitAnnotation(AnnotationEditModel data)
-    {
-        var cmd = new CreateNodeAnnotationCommand(data.RootNodeId, data.Text, data.Data, data.ChildNodeId, null);
 
-        var resp = await api.CreateAnnotation(cmd);
-        if (resp.IsSuccessful)
+    public async Task CancelAnnotation()
+    {
+        NewAnnotation = null;
+        OnChange?.Invoke();
+    }
+
+    public async Task SubmitAnnotation()
+    {
+        if (NewAnnotation is not null)
         {
-            await ReloadNode();
+            var cmd = new CreateNodeAnnotationCommand(NewAnnotation.RootNodeId, NewAnnotation.Text, NewAnnotation.Data, NewAnnotation.ChildNodeId, null);
+
+            var resp = await api.CreateAnnotation(cmd);
+            if (resp.IsSuccessful)
+            {
+                NewAnnotation = null;
+                await ReloadNode();
+            }
+            else
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
         }
-        else
-        {
-            snackbar.AddError(resp.ErrorMessage);
-        }
+        OnChange?.Invoke();
     }
 
 
@@ -665,9 +689,9 @@ public class NodeViewModel(IPathApi api,
 
     public async Task<string?> GetQuesiotnnaire(NodeDescription model)
     {
-        if (!string.IsNullOrEmpty(model.QuestionnaireId))
+        if (model.Questionnaire != null)
         {
-            return await qCache.GetQuestionnaireResourceAsync(model.QuestionnaireId, model.QuestionnaireVersion);
+            return await qCache.GetQuestionnaireResourceAsync(model.Questionnaire.QuestionnaireId, model.Questionnaire.Version);
         }
         return null;
     }
@@ -676,5 +700,32 @@ public class NodeViewModel(IPathApi api,
     {
         return await qCache.GetQuestionnaireResourceAsync(questionnaireId, version);
     }
+
+
+
+    public IEnumerable<QuestionnaireForGroupDto> AvailableAnnotationQuestionnaires(eAnnotationType annotationTyp)
+    {
+        if (ActiveGroup is null) return new List<QuestionnaireForGroupDto>();
+
+        var qUsage = annotationTyp switch
+        {
+            eAnnotationType.Comment => eQuestionnaireUsage.Annotation,
+            eAnnotationType.FinalAssesment => eQuestionnaireUsage.FinalAssesment,
+            eAnnotationType.FollowUp => eQuestionnaireUsage.FollowUp,
+            _ => eQuestionnaireUsage.None,
+        };
+
+        var ret = ActiveGroup.Questionnaires
+            .Where(q => q.Usage == qUsage)
+            .OrderBy(q => q.QuestinnaireName)
+            .ToList();
+        if (ret.Any())
+        {
+            ret.Insert(0, PlainText);
+        }
+        return ret;
+    }
+
+    private QuestionnaireForGroupDto PlainText => new QuestionnaireForGroupDto(Guid.Empty, "", "Plain Text", eQuestionnaireUsage.Annotation);
 }
 

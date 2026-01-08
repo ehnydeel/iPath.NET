@@ -47,5 +47,5 @@ public enum eQuestionnaireUsage
     CaseDescription = 2,
     Annotation = 3,
     FollowUp = 4,
-    FinalDiagnosis = 5,
+    FinalAssesment = 5,
 }

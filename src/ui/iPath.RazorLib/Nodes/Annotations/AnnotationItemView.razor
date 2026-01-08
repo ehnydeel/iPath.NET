@@ -6,65 +6,74 @@
 @inject UserViewModel uvm
 
 <MudChat ChatPosition="ChatBubblePosition.Start">
-	<MudAvatar @onclick="@(() => uvm.ShowProfileAsync(Item.Owner.Id))">@Initials</MudAvatar>
-	<MudChatHeader Name=@Item.Owner.Username Time=@Item.CreatedOn.ToString("g") />
-	<MudChatBubble @onmouseenter="@(() => Hovering = true)"
-	@onmouseleave="@(() => Hovering = false)">
-		@((MarkupString)Item.Text)
-		@if (Item.Data?.Morphology is not null)
-		{
-			<div class="morphology_code">@Item.Data.Morphology.ToDisplay()</div>
-		}
-		<MudPopover Open="@Hovering" Class="hoverarea"
-		AnchorOrigin="Origin.CenterRight"
-		TransformOrigin="Origin.BottomRight"
-		@onmouseenter="@(() => Hovering = true)"
-		@onmouseleave="@(() => Hovering = false)">
-			<div class="d-flex" style="width: 100%;" @onclick:stopPropagation="true" @onclick:preventDefault="true">
-				<MudIcon Icon="@Icons.Material.Rounded.Delete" Size="Size.Small" @onclick="@Delete" Disabled="vm.DeleteAnnotationDisabled" />
-				<MudIcon Icon="@Icons.Material.Rounded.Reply" Size="Size.Small" @onclick="@Reply" Disabled="vm.AnnotateDisabled" />
-			</div>
-		</MudPopover>
-	</MudChatBubble>
-	@if (Item.ChildNodeId.HasValue)
-	{
-		<MudChatFooter Text=@($"Comment on image @Item.ChildNodeId") />
-	}
-	</MudChat>
+    <MudChatHeader Name=@Item.Owner.Username Time=@Item.CreatedOn.ToString("g") />
+    <MudAvatar @onclick="@(() => uvm.ShowProfileAsync(Item.Owner.Id))">@Initials</MudAvatar>
+
+    <MudChatBubble Style="min-width: 500px;"
+                   @onmouseenter="@(() => Hovering = true)"
+                   @onmouseleave="@(() => Hovering = false)">
+        @if (Item.Data?.Questionnaire is not null)
+        {
+            <QuestionnaireResponseView Data="Item.Data.Questionnaire" />
+        }
+
+        @((MarkupString)Item.Text)
+
+        @if (Item.Data?.Morphology is not null)
+        {
+            <div class="morphology_code"><b>Morphology:</b> @Item.Data.Morphology.ToDisplay()</div>
+        }
+
+        <MudPopover Open="@Hovering" Class="hoverarea"
+                    AnchorOrigin="Origin.TopRight"
+                    TransformOrigin="Origin.BottomRight"
+                    @onmouseenter="@(() => Hovering = true)"
+                    @onmouseleave="@(() => Hovering = false)">
+            <div class="d-flex" style="width: 100%;" @onclick:stopPropagation="true" @onclick:preventDefault="true">
+                <MudIcon Icon="@Icons.Material.Rounded.Delete" Size="Size.Small" @onclick="@Delete" Disabled="vm.DeleteAnnotationDisabled" />
+                <MudIcon Icon="@Icons.Material.Rounded.Reply" Size="Size.Small" @onclick="@Reply" Disabled="vm.AnnotateDisabled" />
+            </div>
+        </MudPopover>
+    </MudChatBubble>
+    @if (Item.ChildNodeId.HasValue)
+    {
+        <MudChatFooter Text=@($"Comment on image @Item.ChildNodeId") />
+    }
+</MudChat>
 
 @code {
-	[Parameter]
-	public AnnotationDto Item { get; set; }
+    [Parameter]
+    public AnnotationDto Item { get; set; }
 
-	[Parameter]
-	public EventCallback<AnnotationDto> OnDelete { get; set; }
+    [Parameter]
+    public EventCallback<AnnotationDto> OnDelete { get; set; }
 
-	[Parameter]
-	public EventCallback<AnnotationDto> OnReply { get; set; }
+    [Parameter]
+    public EventCallback<AnnotationDto> OnReply { get; set; }
 
-	private bool Hovering;
-	private string Initials;
+    private bool Hovering;
+    private string Initials;
 
-	protected override async Task OnParametersSetAsync()
-	{
-		if (Item != null)
-		{
-			Initials = (await uvm.GetProfileAsync(Item.OwnerId))?.Initials;
-		}
-	}
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Item != null)
+        {
+            Initials = (await uvm.GetProfileAsync(Item.OwnerId))?.Initials;
+        }
+    }
 
-	protected override void OnChangedHandler()
-	{
-		// no need to redraw here
-	}
+    protected override void OnChangedHandler()
+    {
+        // no need to redraw here
+    }
 
-	async Task Delete()
-	{
-		await OnDelete.InvokeAsync(Item);
-	}
+    async Task Delete()
+    {
+        await OnDelete.InvokeAsync(Item);
+    }
 
-	async Task Reply()
-	{
-		await OnReply.InvokeAsync(Item);
-	}
+    async Task Reply()
+    {
+        await OnReply.InvokeAsync(Item);
+    }
 }

@@ -1,0 +1,117 @@
+﻿@namespace iPath.Blazor.Componenents.Nodes
+
+@inject NodeViewModel vm
+
+
+@if (Model is not null)
+{
+    <MudGrid>
+        <MudItem xs="12" sm="3">
+            <MudText>Type of Annotation</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="9">
+            <MudToggleGroup T="eAnnotationType" Size="Size.Small" @bind-Value="Model.Data.Type" @bind-Value:after="OnTypeChanged">
+                @foreach (var t in vm.ActiveGroup.Settings.AllowedAnnotationTypes)
+                {
+                    <MudToggleItem Value="@t" />
+                }
+            </MudToggleGroup>
+        </MudItem>
+    </MudGrid>
+
+    @if (availableQuestionnaires.Any())
+    {
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudText>Questionnaire</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="9">
+                <MudToggleGroup T="QuestionnaireForGroupDto" Size="Size.Small" @bind-Value="SelectedQ" @bind-Value:after="OnQuestionnaireChanged">
+                    @foreach (var q in availableQuestionnaires)
+                    {
+                        <MudToggleItem Value="@q" />
+                    }
+                </MudToggleGroup>
+            </MudItem>
+        </MudGrid>
+    }
+
+
+    @if (useQuestionnaire)
+    {
+        <iPath.LHCForms.LhcForm @ref="lhcForm" ReadOnly="false" />
+
+        <MudTextField Label="Comment" @bind-Value="Model.Text" Immediate="true"
+                      AutoGrow="true" Lines="3" Variant="Variant.Outlined" Style="width: 100%;" />
+
+
+
+    }
+    else
+    {
+        <MudTextField Label="Annotation" @bind-Value="Model.Text" Immediate="true"
+                      AutoGrow="true" Lines="12" Variant="Variant.Outlined" Style="width: 100%;" />
+    }
+
+
+
+    @if (Model.AskMorphology)
+    {
+        <MorphoLookup Label="Morphology" @bind-Value="Model.Data.Morphology" Dense="true" ShrinkLabel="true" Variant="Variant.Outlined" />
+    }
+
+}
+
+@inject NodeViewModel vm
+
+@code {
+    [Parameter]
+    public AnnotationEditModel Model { get; set; } = new();
+
+    private bool useQuestionnaire = false;
+    iPath.LHCForms.LhcForm lhcForm;
+
+
+    public async Task Validate()
+    {
+        if (useQuestionnaire){
+            if (lhcForm is not null)
+            {
+                Model.Data.Questionnaire.Resource = await lhcForm.GetDataAsync();
+            }
+        }
+    }
+
+
+    private IEnumerable<QuestionnaireForGroupDto> availableQuestionnaires = [];
+
+
+    void OnTypeChanged()
+    {
+        availableQuestionnaires = vm.AvailableAnnotationQuestionnaires(Model.Data.Type);
+        if (SelectedQ is null && availableQuestionnaires.Any())
+        {
+            SelectedQ = availableQuestionnaires.FirstOrDefault();
+        }
+    }
+
+    private QuestionnaireForGroupDto SelectedQ;
+    async Task OnQuestionnaireChanged()
+    {
+        if (SelectedQ is not null && SelectedQ.qId != Guid.Empty)
+        {
+            useQuestionnaire = true;
+
+            var q = await vm.GetQuesiotnnaire(SelectedQ.QuestinnaireId);
+            if (q is not null)
+            {
+                Model.Data.Questionnaire = new QuestionnaireResponseData { QuestionnaireId = SelectedQ.QuestinnaireId };
+                await lhcForm.LoadFormAsync(q);
+            }
+        }
+        else
+        {
+            useQuestionnaire = false;
+        }
+    }
+}

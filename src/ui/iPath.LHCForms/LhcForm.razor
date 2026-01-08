@@ -5,7 +5,7 @@
 @inject IJSRuntime JS
 
 
-<div id="lhcform" class="form"><span>loading ...</span></div>
+<div id="@id" class="form"><span>loading ...</span></div>
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
@@ -16,6 +16,10 @@
 @code {
     [Parameter, EditorRequired]
     public bool ReadOnly { get; set; }
+
+
+    private string id = $"lhcform_{Guid.NewGuid().ToString("N")}";
+
 
     lhcformsJsInterop interop;
     string ErrorMessage;
@@ -34,7 +38,7 @@
     {
         try
         {
-            await interop.LoadDataAsync(questionnaire, questionnaireResponse, "lhcform", ReadOnly);
+            await interop.LoadDataAsync(questionnaire, questionnaireResponse, id, ReadOnly);
         }
         catch(Exception ex)
         {
@@ -46,7 +50,7 @@
     {
         try
         {
-            return await interop.GetDataAsync("lhcform");
+            return await interop.GetDataAsync(id);
         }
         catch (Exception ex)
         {

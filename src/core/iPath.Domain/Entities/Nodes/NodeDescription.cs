@@ -11,11 +11,7 @@ public class NodeDescription
     public string? Title { get; set; } = string.Empty!;
     public string? Text { get; set; } = string.Empty!;
 
-
-    public string? QuestionnaireId { get; set; }
-    public int? QuestionnaireVersion { get; set; }
-    public string QuestionnaireResponse { get; set; } = "";
-
+    public QuestionnaireResponseData? Questionnaire { get; set; }
 
     public CodedConcept? BodySite { get; set; }
 

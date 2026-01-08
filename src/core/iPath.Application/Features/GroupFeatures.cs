@@ -20,7 +20,10 @@ public record UserGroupMemberDto(Guid GroupId, string Groupname, eMemberRole Rol
 public record GroupMemberDto(Guid UserId, string Username, eMemberRole Role);
 
 
-public record QuestionnaireForGroupDto(Guid qId, string QuestinnaireId, string QuestinnaireName, eQuestionnaireUsage Usage, int? ExplicitVersion = null);
+public record QuestionnaireForGroupDto(Guid qId, string QuestinnaireId, string QuestinnaireName, eQuestionnaireUsage Usage, int? ExplicitVersion = null)
+{
+    public override string ToString() => QuestinnaireName;
+}
 
 #endregion
 

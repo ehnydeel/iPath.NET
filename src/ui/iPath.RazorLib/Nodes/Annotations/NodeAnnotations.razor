@@ -9,7 +9,7 @@
 		<div class="ipath_header_actions">
 			<MudTooltip Text="Add Annotation">
 				<MudIcon Size="Size.Small" Icon=@SortIcon @onclick="ToggleSort" />
-				<MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Add" @onclick="StartAnnotation" Disabled="vm.AnnotateDisabled" />
+				<MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Add" @onclick="vm.StartAnnotation" Disabled="vm.AnnotateDisabled" />
 			</MudTooltip>
 		</div>
 	</div>
@@ -23,21 +23,14 @@
 	}
 
 	<div class="ipath_annotations">
-		@if (NewAnnotation is not null)
+		@if (vm.NewAnnotation is not null)
 		{
 			<div class="mb-10">
-				<MudForm Model="NewAnnotation" @ref="AnnotationForm">
-				<MudTextField Label=@T["Annotation"] @bind-Value="NewAnnotation.Text" Immediate="true"
-							Lines="4" AutoGrow="true" Variant="Variant.Outlined"  />
-				@if (NewAnnotation.AskMorphology)
-				{
-					<MorphoLookup Label=@T["Morphology"] @bind-Value="NewAnnotation.Data.Morphology" Variant="Variant.Outlined" />
-				}
-			</MudForm>
-			<MudStack Row>
-				<MudButton OnClick="OnSubmit" Variant="Variant.Filled" Color="Color.Primary">@T["Submit"]</MudButton>
-				<MudButton OnClick="Reset" Variant="Variant.Filled">@T["Cancel"]</MudButton>
-			</MudStack>
+				<AnnotationForm Model="vm.NewAnnotation" @ref="annotationForm" />
+				<MudStack Row>
+					<MudButton OnClick="OnSubmit" Variant="Variant.Filled" Color="Color.Primary">@T["Submit"]</MudButton>
+					<MudButton OnClick="Reset" Variant="Variant.Filled">@T["Cancel"]</MudButton>
+				</MudStack>
 			</div>
 		}
 
@@ -88,31 +81,23 @@
 	}
 
 
+	AnnotationForm annotationForm;
 
-
-	MudForm? AnnotationForm;
-	AnnotationEditModel? NewAnnotation = null;
-
-	void StartAnnotation()
-	{
-		NewAnnotation = vm.CreateNewAnnotationInput();
-	}
 
 	async Task OnSubmit()
 	{
-		if (NewAnnotation != null && AnnotationForm != null)
+		if (annotationForm != null)
 		{
-			await AnnotationForm.Validate();
-			if (NewAnnotation.ValidateInput())
+			await annotationForm.Validate();
+			if (vm.NewAnnotation.ValidateInput())
 			{
-				await vm.SubmitAnnotation(NewAnnotation);				
+				await vm.SubmitAnnotation();				
 			}
-			NewAnnotation = null;
 		}
 	}
 
-	void Reset()
+	async Task Reset()
 	{
-		NewAnnotation = null;
+		await vm.CancelAnnotation();
 	}
 }

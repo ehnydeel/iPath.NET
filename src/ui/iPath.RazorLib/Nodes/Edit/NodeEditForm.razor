@@ -65,7 +65,7 @@
 
     private iPath.LHCForms.LhcForm lhcForm;
 
-    bool useQuestionnaire => !string.IsNullOrEmpty(Model?.QuestionnaireId);
+    bool useQuestionnaire => Model?.Questionnaire != null;
     bool useHtmlEditor = true;
 
     private MudForm frm;
@@ -74,14 +74,10 @@
     {
         if (firstRender && useQuestionnaire)
         {
-            var q = vm.GetQuesiotnnaire(Model);
-            if (q is not null)
+            var qResource = await vm.GetQuesiotnnaire(Model);
+            if (!string.IsNullOrEmpty(qResource))
             {
-                var qResource = await vm.GetQuesiotnnaire(Model);
-                if (!string.IsNullOrEmpty(qResource))
-                {
-                    await lhcForm.LoadFormAsync(qResource, Model.QuestionnaireResponse);
-                }
+                await lhcForm.LoadFormAsync(qResource, Model.Questionnaire.Resource);
             }
         }
     }
@@ -91,11 +87,11 @@
     {
         if (useQuestionnaire)
         {
-            Model.QuestionnaireResponse = await lhcForm.GetDataAsync() ?? "";
+            Model.Questionnaire.Resource = await lhcForm.GetDataAsync() ?? "";
         }
         else
         {
-            Model.QuestionnaireResponse = "";
+            Model.Questionnaire.Resource = "";
         }
 
         await frm.Validate();

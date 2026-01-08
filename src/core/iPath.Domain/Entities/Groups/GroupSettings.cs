@@ -16,6 +16,8 @@ public class GroupSettings
 
 
     public ICollection<string> CaseTypes { get; set; } = [];
+    public ICollection<eAnnotationType> AllowedAnnotationTypes { get; set; } = [ eAnnotationType.Comment, eAnnotationType.FinalAssesment, eAnnotationType.FollowUp ];
+
 
     public GroupSettings Clone() => (GroupSettings)MemberwiseClone();
 }

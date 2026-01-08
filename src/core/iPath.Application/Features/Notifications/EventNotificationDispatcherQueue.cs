@@ -1,4 +1,5 @@
 ﻿using iPath.Application.Contracts;
+using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
 namespace iPath.Application.Features.Notifications;

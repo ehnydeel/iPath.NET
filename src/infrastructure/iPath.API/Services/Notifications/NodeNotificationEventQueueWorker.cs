@@ -43,7 +43,6 @@ public class EventNotificationDispatcher(IEventNotificationDispatcherQueue queue
         while (!stoppingToken.IsCancellationRequested)
         {
             var evt = await queue.DequeueAsync(stoppingToken);
-
             logger.LogTrace("processing event type {0}", evt.GetType().Name);
 
             var processor = scope.ServiceProvider.GetService<INodeEventProcessor>();
