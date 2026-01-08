@@ -8,7 +8,7 @@
     }
     else
     {
-        <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Value="Model.BodySite" />
+        <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Value="Model.BodySite" Margin="@Margin" />
     }
 }
 
@@ -18,6 +18,9 @@
 
     [Parameter, EditorRequired]
     public NodeDescription Model { get; set; }
+
+    [Parameter]
+    public Margin Margin { get; set; } = Margin.Dense;
 
     protected override void OnParametersSet()
     {

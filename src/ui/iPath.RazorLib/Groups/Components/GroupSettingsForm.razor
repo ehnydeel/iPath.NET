@@ -17,7 +17,12 @@
     <MudTextField Label=@T["Template for case description"] @bind-Value="Model.DescriptionTemplate"
                   Variant="@Variant" Lines="3" />
 
-    <MudSwitch Label=@T["Body Site input active"] @bind-Value="Model.DescriptionWithBodySite" Color="Color.Info" />
+    <MudSwitch Label=@T["Case title active"] @bind-Value="Model.UseCaseTitleField" Color="Color.Info" Class="mt-4" />
+    <MudSwitch Label=@T["Case sub-title active"] @bind-Value="Model.UseCaseSubTitleField" Color="Color.Info" />
+    <MudSwitch Label=@T["Case type active"] @bind-Value="Model.UseCaseTypeField" Color="Color.Info" />
+
+
+    <MudSwitch Label=@T["Body Site input active"] @bind-Value="Model.DescriptionWithBodySite" Color="Color.Info" Class="mt-4" />
     <MudSwitch Label=@T["Use grouped Body Site input"] @bind-Value="Model.DescriptionGroupedBodySiteInput" Color="Color.Info" />
 
     <MudTextField Label=@T["Case types"] @bind-Value="CaseTypeList" @bind-Value:after="ReadCaseTypes" Lines="8" Variant="@Variant" />

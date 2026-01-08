@@ -14,6 +14,10 @@ public class GroupSettings
     public bool AnnotationsHide { get; set; } = false;
     public bool AnnotationHasMoprhoogy { get; set; } = true;
 
+    public bool UseCaseTitleField { get; set; } = true;
+    public bool UseCaseSubTitleField { get; set; } = true;
+    public bool UseCaseTypeField { get; set; } = true;
+
 
     public ICollection<string> CaseTypes { get; set; } = [];
     public ICollection<eAnnotationType> AllowedAnnotationTypes { get; set; } = [ eAnnotationType.Comment, eAnnotationType.FinalAssesment, eAnnotationType.FollowUp ];

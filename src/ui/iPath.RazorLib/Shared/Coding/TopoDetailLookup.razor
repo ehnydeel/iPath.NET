@@ -1,7 +1,7 @@
 ﻿@inject CodingService srv
 
 <MudStack Row="@Row">
-    <MudSelect T="CodedConcept"
+    <MudSelect T="CodedConcept" Margin="@Margin"
                ToStringFunc=@(x => x.ToDisplay())
                Variant="@Variant" Label="Organ System"
                Dense="true" ShrinkLabel="true" Clearable="true"
@@ -13,7 +13,7 @@
             </MudSelectItem>
         }
     </MudSelect>
-    <MudSelect T="CodedConcept"
+    <MudSelect T="CodedConcept" Margin="@Margin"
                ToStringFunc=@(x => x.ToDisplay())
                Variant="@Variant" Label="@Label"
                Dense="true" ShrinkLabel="true" Clearable="true"
@@ -37,6 +37,9 @@
 
     [Parameter]
     public CodedConcept Code { get; set; }
+
+    [Parameter]
+    public Margin Margin { get; set; } = Margin.Dense;
 
     private CodedConcept _code;
 

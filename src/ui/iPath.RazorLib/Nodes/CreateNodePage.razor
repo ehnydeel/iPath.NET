@@ -94,6 +94,7 @@ else
 
     async Task OnSave()
     {
+        await frm.Validate();
         if (frm.IsValid)
         {
             await vm.Save();
