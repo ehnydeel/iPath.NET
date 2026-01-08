@@ -6,7 +6,7 @@ namespace iPath.Blazor.Componenents.Pages;
 
 public partial class Home(AppState appState, UserViewModel uvm, AuthenticationStateProvider asp, IStringLocalizer T)
 {
-    private UserProfile MyProfile = null;
+    private UserProfile? MyProfile = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -17,7 +17,7 @@ public partial class Home(AppState appState, UserViewModel uvm, AuthenticationSt
         }
     }
 
-    private async Task<UserProfile> GetMyProfile()
+    private async Task<UserProfile?> GetMyProfile()
     {
         if (appState.User is null)
         {

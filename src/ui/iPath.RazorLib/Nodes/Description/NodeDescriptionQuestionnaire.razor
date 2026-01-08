@@ -1,7 +1,27 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
+@inject NodeViewModel vm
 
-<h2>Questionnaire View</h2>
+<iPath.LHCForms.LhcForm @ref="lhcForm" ReadOnly="true" />
 
 @code {
+    [Parameter]
+    public NodeDescription Model { get; set; }
 
+    private iPath.LHCForms.LhcForm lhcForm;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var q = vm.GetQuesiotnnaire(Model);
+            if (q is not null)
+            {
+                var qResource = await vm.GetQuesiotnnaire(Model);
+                if (!string.IsNullOrEmpty(qResource))
+                {
+                    await lhcForm.LoadFormAsync(qResource, Model.QuestionnaireResponse);
+                }
+            }
+        }
+    }
 }

@@ -18,10 +18,16 @@ public class lhcformsJsInterop : IAsyncDisposable
         return await module.InvokeAsync<string>("getData", componentId, options);
     }
 
-    public async ValueTask LoadDataAsync(string questionnaireJson, string responseJson, string componentId)
+    public async ValueTask<bool> CheckValidity(string componentId)
     {
         var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("loadData", questionnaireJson, responseJson, componentId, options);
+        return await module.InvokeAsync<bool>("checkValidity", componentId);
+    }
+
+    public async ValueTask LoadDataAsync(string questionnaireJson, string responseJson, string componentId, bool asReadonly)
+    {
+        var module = await moduleTask.Value;
+        await module.InvokeVoidAsync("loadData", questionnaireJson, responseJson, componentId, asReadonly);
     }
 
     public async ValueTask DisposeAsync()

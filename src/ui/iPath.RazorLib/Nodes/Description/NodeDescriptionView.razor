@@ -27,9 +27,16 @@
                 <div>@vm.RootNode.CreatedOn.ToString("d")</div>
             </div>
         </div>
-        <div class="ipath_node_description">
-            <MudHighlighter Text="@vm.RootNode.DescriptionHtml" Markup="true" HighlightedText="@vm.SearchString" />
-        </div>
+        @if (string.IsNullOrEmpty(vm.RootNode.Description.QuestionnaireId))
+        {
+            <div class="ipath_node_description">
+                <MudHighlighter Text="@vm.RootNode.DescriptionHtml" Markup="true" HighlightedText="@vm.SearchString" />
+            </div>
+        }
+        else
+        {
+            <NodeDescriptionQuestionnaire Model="@vm.RootNode.Description" />
+        }
     }
     else
     {

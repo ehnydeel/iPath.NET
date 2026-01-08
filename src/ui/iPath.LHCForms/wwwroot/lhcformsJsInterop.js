@@ -11,8 +11,8 @@ export function getData(componentId, options) {
 }
 
 // load form and data
-export function loadData(questionnaireJson, responseJson, componentId, options) {
+export function loadData(questionnaireJson, responseJson, componentId, asReadonly) {
     const qData = JSON.parse(questionnaireJson);
     const qrData = responseJson ? JSON.parse(responseJson) : null;
-    LForms.Util.addFormToPage(qData, componentId, { questionnaireResponse: qrData });
+    LForms.Util.addFormToPage(qData, componentId, { questionnaireResponse: qrData, readonlyMode: asReadonly });
 }

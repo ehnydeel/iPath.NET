@@ -13,7 +13,8 @@ public class NodeDescription
 
 
     public string? QuestionnaireId { get; set; }
-    public int? QuestionnaireVersion { get; set; } = null;
+    public int? QuestionnaireVersion { get; set; }
+    public string QuestionnaireResponse { get; set; } = "";
 
 
     public CodedConcept? BodySite { get; set; }
