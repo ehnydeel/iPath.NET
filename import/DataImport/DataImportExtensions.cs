@@ -178,13 +178,15 @@ public static class DataImportExtensions
         n.OwnerId = nn.Value; 
         n.NodeId = NewNodeId(a.object_id);
 
+        n.Data ??= new AnnotationData();
+
         try
         {
             var xml = LoadDataDocument(a.data);
 
             if (xml.SelectSingleNode("/data/text") != null)
             {
-                n.Text = xml.SelectSingleNode("/data/text").InnerText;
+                n.Data.Text = xml.SelectSingleNode("/data/text").InnerText;
             }
         }
         catch (Exception ex)

@@ -71,8 +71,15 @@ public class StringLocalizerService(ILocalizationDataProvider data, ILogger<Stri
                 }
                 else if (AddMissingtTranslations)
                 {
-                    data.Words.Add(key, "");
-                    IsModified = true;
+                    try
+                    {
+                        data.Words.Add(key, "");
+                        IsModified = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.Message, ex);
+                    }
                 }
             }
             else

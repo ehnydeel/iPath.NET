@@ -6,7 +6,7 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-<MudText Typo="Typo.h5">@T["Edit User:"] @Username</MudText>
+<MudText Typo="Typo.h5">@T["Edit User:"] @vm.SelectedUser?.Username</MudText>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="mt-2"
          PanelClass="pa-6" Color="Color.Info" IconColor="Color.Surface"
@@ -26,6 +26,8 @@
 </MudTabs>
 
 
+@inject NavigationManager nm
+
 @code {
     [Parameter]
     public string id { get; set; }
@@ -34,10 +36,21 @@
     public string panel { get; set; } = "";
 
     int panelIndex = 0;
-    string Username = "";
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Guid.TryParse(id, out var userid))
+        {
+            await vm.LoadUser(userid);
+            if (vm.SelectedUser is null)
+            {
+                nm.NavigateTo("admin/users");
+                return;
+            };
+            StateHasChanged();
+        }
+
+
         panelIndex = panel switch
         {
             "communities" => 1,
@@ -45,11 +58,5 @@
             "notifications" => 3,
             _ => 0
         };
-
-        if (Guid.TryParse(id, out var userid))
-        {
-            await vm.LoadUser(userid);
-            Username = vm.SelectedUser.Username;
-        }
     }
 }

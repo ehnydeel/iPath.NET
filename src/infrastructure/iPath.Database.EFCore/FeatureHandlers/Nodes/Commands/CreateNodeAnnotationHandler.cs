@@ -6,7 +6,10 @@ public class CreateNodeAnnotationCommandHandler(iPathDbContext db, IMediator med
 {
     public async Task<AnnotationDto> Handle(CreateNodeAnnotationCommand request, CancellationToken ct)
     {
-        Guard.Against.NullOrEmpty(request.Text + request.QuestionnaireResponse);
+        if (!request.Data.ValidateInput())
+        {
+            throw new ArgumentException("Invalid Annotation Data");
+        }
 
         var node = await db.Nodes.FindAsync(request.NodeId);
         Guard.Against.NotFound(request.NodeId, node);

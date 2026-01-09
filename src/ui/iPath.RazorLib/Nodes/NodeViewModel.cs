@@ -609,7 +609,7 @@ public class NodeViewModel(IPathApi api,
         var result = await dialog.Result;
         if (!result.Canceled && result.Data is AnnotationEditModel data)
         {
-            if (data.ValidateInput())
+            if (data.Data.ValidateInput())
             {
                 await SubmitAnnotation();
             }
@@ -649,7 +649,7 @@ public class NodeViewModel(IPathApi api,
     {
         if (NewAnnotation is not null)
         {
-            var cmd = new CreateNodeAnnotationCommand(NewAnnotation.RootNodeId, NewAnnotation.Text, NewAnnotation.Data, NewAnnotation.ChildNodeId, null);
+            var cmd = new CreateNodeAnnotationCommand(NewAnnotation.RootNodeId, NewAnnotation.Data, NewAnnotation.ChildNodeId);
 
             var resp = await api.CreateAnnotation(cmd);
             if (resp.IsSuccessful)

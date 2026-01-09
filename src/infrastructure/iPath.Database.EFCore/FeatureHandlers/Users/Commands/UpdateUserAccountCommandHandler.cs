@@ -11,6 +11,25 @@ public class UpdateUserAccountCommandHandler(UserManager<User> um, RoleManager<R
         var user = await um.FindByIdAsync(request.UserId.ToString());
         Guard.Against.NotFound(request.UserId, user);
 
+        if (request.Username is not null)
+        {
+           var res = await um.SetUserNameAsync(user, request.Username);
+            if (!res.Succeeded)
+            {
+                logger.LogError("Failed to update username for user {UserId}: {Errors}", request.UserId, string.Join(", ", res.Errors.Select(e => e.Description)));
+                throw new Exception($"Failed to update username: {string.Join(", ", res.Errors.Select(e => e.Description))}");
+            }
+        }
+
+        if (request.Email is not null)
+        {
+            var res = await um.SetEmailAsync(user, request.Email);
+            if (!res.Succeeded)
+            {
+                logger.LogError("Failed to update email for user {UserId}: {Errors}", request.UserId, string.Join(", ", res.Errors.Select(e => e.Description)));
+                throw new Exception($"Failed to update email: {string.Join(", ", res.Errors.Select(e => e.Description))}");
+            }
+        }
 
         if ( request.IsActive.HasValue)
         {
@@ -20,12 +39,6 @@ public class UpdateUserAccountCommandHandler(UserManager<User> um, RoleManager<R
         if (request.Profile != null)
         {
             user.UpdateProfile(request.Profile);
-        }
-
-        if (request.Username != null)
-        {
-            // not implemented yet
-            throw new NotImplementedException();
         }
 
         await um.UpdateAsync(user);

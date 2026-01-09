@@ -6,5 +6,6 @@ public class UpdateUserAccountCommand : IRequest<UpdateUserAccountCommand, Task>
     public bool? IsActive { get; set; } = null;
     public UserProfile? Profile { get; set; } = null;
     public string? Username { get; set; } = null;
+    public string? Email { get; set; } = null;
     public IEnumerable<Guid>? Roles { get; set; } = null;
 }

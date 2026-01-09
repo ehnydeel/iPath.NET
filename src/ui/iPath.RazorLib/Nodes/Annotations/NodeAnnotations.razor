@@ -89,7 +89,7 @@
 		if (annotationForm != null)
 		{
 			await annotationForm.Validate();
-			if (vm.NewAnnotation.ValidateInput())
+			if (vm.NewAnnotation.Data.ValidateInput())
 			{
 				await vm.SubmitAnnotation();				
 			}

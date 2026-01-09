@@ -1,4 +1,9 @@
-﻿namespace iPath.Application.Features.Nodes;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace iPath.Application.Features.Nodes;
 
 public static class AnnotationExtensions
 {
@@ -10,10 +15,24 @@ public static class AnnotationExtensions
             CreatedOn = item.CreatedOn,
             OwnerId = item.OwnerId,
             Owner = item.Owner.ToOwnerDto(),
-            Text = item.Text,
             Data = item.Data,
-            ChildNodeId = item.ChildNodeId,
-            QuestionnaireResponses = item.QuestionnaireResponses
+            ChildNodeId = item.ChildNodeId
         };
+    }
+
+    extension (AnnotationData Data)
+    {
+
+        public bool ValidateInput()
+        {
+            if (!string.IsNullOrWhiteSpace(Data.Text)) return true;
+            if (Data.Morphology is not null)
+            {
+                Data.Text ??= Data.Morphology.Display; // Morphology as default text if no text written
+                return true;
+            }
+            if (Data.Questionnaire is not null) return true;
+            return false;
+        }
     }
 }

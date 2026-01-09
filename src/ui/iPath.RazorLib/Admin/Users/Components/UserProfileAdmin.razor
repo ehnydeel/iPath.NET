@@ -1,18 +1,31 @@
 ﻿@namespace iPath.Blazor.Componenents.Admin.Users
+@using System.ComponentModel.DataAnnotations
 
 @inject UserAdminViewModel vm
 @inject IStringLocalizer T
 @inject ISnackbar snackbar
 
-@if (User != null)
+@if (Model is null)
 {
-    <MudForm Model="User">
+    <LoadingMessage />
+}
+else
+{
+    <MudContainer MaxWidth="MaxWidth.Medium">
         <MudGrid>
             <MudItem xs="12" sm="8">
-                <MudTextField Label="Username" Value="User.Username" ReadOnly="true" />
-                <MudTextField Label="Username" Value="User.Email" ReadOnly="true" />
-                <MudStack Row Spacing="4">
-                    <MudCheckBox Label="active" @bind-Value="IsActive" />
+                <MudStack Row Spacing="0">
+                    <MudTextField Label="Username" @bind-Value="Model.Username" Variant="Variant.Outlined" Disabled="@UsernameEditDisabled" />
+                    <MudIconButton Icon="@UsernameEditButtonIcon" OnClick="ToggleUsernameEdit" Color="Color.Primary" Size="Size.Small" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="CancelUsernameEdit" Color="Color.Surface" Disabled="@UsernameEditDisabled" Size="Size.Small" />
+                </MudStack>
+                <MudStack Row Spacing="0">
+                    <MudTextField Label="Username" @bind-Value="Model.Email" Variant="Variant.Outlined" Disabled="true" />
+                    <MudIconButton Icon="@EmailEditButtonIcon" OnClick="ToggleEmailEdit" Color="Color.Primary" Size="Size.Small" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="CancelEmailEdit" Color="Color.Surface" Disabled="@EmailEditDiabled" Size="Size.Small" />
+                </MudStack>
+                <MudStack Row Spacing="4" Class="mt-2">
+                    <MudCheckBox Label="active" @bind-Value="Model.IsActive" />
                     <MudButton StartIcon="@Icons.Material.Filled.Password" Variant="Variant.Outlined" OnClick="vm.ResetPassword">@T["Password"]</MudButton>
                 </MudStack>
             </MudItem>
@@ -25,15 +38,15 @@
                     }
                 </MudToggleGroup>
             </MudItem>
-            </MudGrid>
-             
+        </MudGrid>
+
         <UserProfileForm Model="Profile" HideSaveButton="true" @ref="frm" />
 
         <MudStack Row Class="mt-8">
             <ProgressButton ProcessingText=@T["saving ..."] OnClick="Save" Text=@T["Save"] />
             <MudButton Variant="Variant.Filled" Href="admin/users">Back</MudButton>
         </MudStack>
-    </MudForm>
+    </MudContainer>
 }
 
 @code {
@@ -45,7 +58,19 @@
     private IEnumerable<RoleDto> allRoles = [];
     private IEnumerable<RoleDto> selectedRoles = [];
     private UserProfile Profile;
-    private bool IsActive { get; set; }
+
+
+    private UserEditModel? Model { get; set; } = null;
+
+    private class UserEditModel
+    {
+        [Required, MinLength(2)]
+        public string Username { get; set; } = "";
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+        public bool IsActive { get; set; }
+    }
+
 
 
     protected override async Task OnParametersSetAsync()
@@ -55,7 +80,13 @@
             allRoles = await vm.GetRoles();
             selectedRoles = User.Roles.ToList();
             Profile = User.Profile.Clone();
-            IsActive = User.IsActive;
+            Model = new UserEditModel
+            {
+                Username = User.Username,
+                Email = User.Email,
+                IsActive = User.IsActive
+            };
+            StateHasChanged();
         }
     }
 
@@ -64,8 +95,14 @@
         await frm.ValidateForm();
 
         var cmd = new UpdateUserAccountCommand { UserId = User.Id };
-        if (IsActive != User.IsActive)
-            cmd.IsActive = IsActive;
+        if (Model.IsActive != User.IsActive)
+            cmd.IsActive = Model.IsActive;
+
+        if (Model.Username != User.Username)
+            cmd.Username = Model.Username;
+
+        if (Model.Email != User.Email)
+            cmd.Email = Model.Email;
 
         if (!Profile.Equals(User.Profile))
             cmd.Profile = Profile;
@@ -74,6 +111,56 @@
         if (await vm.SaveUserAccount(cmd))
         {
             snackbar.Add("User Profile saved", Severity.Success);
+            CancelUsernameEdit();
+            CancelEmailEdit();
         }
     }
+
+
+
+
+    private UserEditModel model = new UserEditModel();
+
+    private bool UsernameEditDisabled = true;
+    private string UsernameEditButtonIcon => !UsernameEditDisabled ? Icons.Material.Filled.Save : Icons.Material.Filled.Edit;
+    private async Task ToggleUsernameEdit()
+    {
+        if (!UsernameEditDisabled)
+        {
+            var cmd = new UpdateUserAccountCommand { UserId = User.Id, Username = Model.Username };
+            var success = await vm.SaveUserAccount(cmd);
+            UsernameEditDisabled = success;
+        }
+        else
+        {
+            UsernameEditDisabled = false;
+        }
+    }
+    private void CancelUsernameEdit()
+    {
+        UsernameEditDisabled = true;
+        Model.Username = User.Username;
+    }
+
+    private bool EmailEditDiabled = true;
+    private string EmailEditButtonIcon => !EmailEditDiabled ? Icons.Material.Filled.Save : Icons.Material.Filled.Edit;
+    private async Task ToggleEmailEdit()
+    {
+        if (!EmailEditDiabled)
+        {
+            var cmd = new UpdateUserAccountCommand { UserId = User.Id, Email = Model.Email };
+            var success = await vm.SaveUserAccount(cmd);
+            EmailEditDiabled = success;
+        }
+        else
+        {
+            EmailEditDiabled = false;
+        }
+    }
+    private void CancelEmailEdit()
+    {
+        EmailEditDiabled = true;
+        Model.Email = User.Email;
+    }
+
 }

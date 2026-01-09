@@ -16,14 +16,13 @@ public class Annotation : AuditableEntity
 
     public Guid OwnerId { get; set; }
     public User Owner { get; set; } = null!;
-    public string? Text { get; set; }
 
     public AnnotationData? Data { get; set; }
 
     public ICollection<QuestionnaireResponse> QuestionnaireResponses { get; set; } = [];
 
 
-    public static Annotation Create(Node node, Guid ownerId, string text, AnnotationData data)
+    public static Annotation Create(Node node, Guid ownerId, AnnotationData data)
     {
         var ret = new Annotation
         {
@@ -31,7 +30,6 @@ public class Annotation : AuditableEntity
             CreatedOn = DateTime.UtcNow,
             NodeId = node.Id,
             OwnerId = ownerId,
-            Text = text,
             Data = data
         };
 
@@ -44,6 +42,8 @@ public class Annotation : AuditableEntity
 public class AnnotationData
 {
     public eAnnotationType Type { get; set; } = eAnnotationType.Comment;
+
+    public string? Text { get; set; }
 
     public CodedConcept? Morphology { get; set; }
 

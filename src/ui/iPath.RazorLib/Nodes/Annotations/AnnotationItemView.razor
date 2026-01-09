@@ -6,7 +6,7 @@
 @inject UserViewModel uvm
 
 <MudChat ChatPosition="ChatBubblePosition.Start">
-    <MudChatHeader Name=@Item.Owner.Username Time=@Item.CreatedOn.ToString("g") />
+    <MudChatHeader Name=@FullTitle() Time=@Item.CreatedOn.ToString("g") />
     <MudAvatar @onclick="@(() => uvm.ShowProfileAsync(Item.Owner.Id))">@Initials</MudAvatar>
 
     <MudChatBubble Style="min-width: 500px;"
@@ -17,7 +17,7 @@
             <QuestionnaireResponseView Data="Item.Data.Questionnaire" />
         }
 
-        @((MarkupString)Item.Text)
+        @((MarkupString)Item.Data.Text)
 
         @if (Item.Data?.Morphology is not null)
         {
@@ -41,7 +41,7 @@
     }
 </MudChat>
 
-@code {
+    @code {
     [Parameter]
     public AnnotationDto Item { get; set; }
 
@@ -60,6 +60,13 @@
         {
             Initials = (await uvm.GetProfileAsync(Item.OwnerId))?.Initials;
         }
+    }
+
+    string FullTitle()
+    {
+        if (Item is null) return "";
+        var cType =  T[Item.Data.Type.ToString()];
+        return string.Format(T["{0} by {1}"], cType, Item.Owner.Username);
     }
 
     protected override void OnChangedHandler()

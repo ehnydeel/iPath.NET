@@ -6,12 +6,12 @@ using System.Runtime.CompilerServices;
 
 namespace iPath.Blazor.Componenents.Admin.Users;
 
-public class UserAdminViewModel(IPathApi api, 
-    ISnackbar snackbar, 
-    IDialogService dialog, 
-    IStringLocalizer T, 
+public class UserAdminViewModel(IPathApi api,
+    ISnackbar snackbar,
+    IDialogService dialog,
+    IStringLocalizer T,
     IMemoryCache cache,
-    ILogger<UserAdminViewModel> logger) 
+    ILogger<UserAdminViewModel> logger)
     : IViewModel
 {
 
@@ -64,7 +64,7 @@ public class UserAdminViewModel(IPathApi api,
 
     public string SelectedRowStyle(UserListDto item, int rowIndex)
     {
-        if (item is not null && SelectedItem is not null && item.Id == SelectedItem.Id )
+        if (item is not null && SelectedItem is not null && item.Id == SelectedItem.Id)
             return "background-color: var(--mud-palette-background-gray)";
 
         return "";
@@ -183,16 +183,23 @@ public class UserAdminViewModel(IPathApi api,
 
     public async Task<bool> SaveUserAccount(UpdateUserAccountCommand cmd)
     {
-        if (SelectedUser != null)
+        try
         {
             var res = await api.UpdateUserAccount(cmd);
             if (res.IsSuccessful)
             {
-                snackbar.AddError(res.ErrorMessage);
-                return false;
+                if (SelectedUser is not null) await LoadUser(SelectedUser.Id);
+                return true;
             }
+
+            snackbar.AddError(res.ErrorMessage);
         }
-        return true;
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+            snackbar.AddError(ex.Message);
+        }
+        return false;
     }
 
     public async Task ResetPassword()
