@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace iPath.EF.Core.Database;
 
@@ -93,6 +94,7 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
         });
 
 
+
         // EventStore
         //---------------------------------------------------------------------------
         // ignore the Events Property
@@ -128,6 +130,16 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
     {
         _savesChangesTracker.Push(new object());
 
+        // soft delete
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry is not { State: EntityState.Deleted, Entity: ISoftDelete delete }) continue;
+            entry.State = EntityState.Modified;
+            delete.DeletedOn = DateTime.UtcNow;
+        }
+
+
+        // doamin events
         var entitiesWithEvents = ChangeTracker
             .Entries<IHasDomainEvents>()
             .Where(e => e.Entity.Events.Any())

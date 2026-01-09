@@ -119,6 +119,7 @@ public class NodeViewModel(IPathApi api,
             else
             {
                 snackbar.AddWarning(respN.ErrorMessage);
+                nm.NavigateTo("/");
             }
             OnLoadingFinished?.Invoke();
         }
@@ -535,16 +536,11 @@ public class NodeViewModel(IPathApi api,
             {
                 IApiResponse resp;
                 // if title is empty => delete draft
-                if (string.IsNullOrEmpty(RootNode.Description.Title))
-                {
-                    resp = await api.DeleteNode(RootNode.Id);
-                }
-                else
-                {
-                    // when cancelling a draft, save current state ...
-                    var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
-                    resp = await api.UpdateNode(cmd);
-                }
+                // TODO: check if there is any input, if not => delte draft
+
+                // when cancelling a draft, save current state ...
+                var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
+                resp = await api.UpdateNode(cmd);
 
                 // and go up
                 await GoUp();

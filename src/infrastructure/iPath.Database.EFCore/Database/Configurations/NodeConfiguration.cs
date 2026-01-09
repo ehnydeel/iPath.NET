@@ -1,4 +1,6 @@
-﻿namespace iPath_EFCore.Database.Configurations;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace iPath_EFCore.Database.Configurations;
 
 internal class NodeConfiguration : IEntityTypeConfiguration<Node>
 {
@@ -26,5 +28,7 @@ internal class NodeConfiguration : IEntityTypeConfiguration<Node>
 
         b.ComplexProperty(x => x.Description, pb => pb.ToJson("description"));
         b.ComplexProperty(x => x.File, pb => pb.ToJson("file"));
+
+        b.HasQueryFilter(x => !x.DeletedOn.HasValue);
     }
 }

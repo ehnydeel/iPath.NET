@@ -22,8 +22,13 @@ public class AuditableEntity : BaseEntity
 }
 
 
+public interface ISoftDelete
+{
+    DateTime? DeletedOn { get; set; }
+}
 
-public class AuditableEntityWithEvents : AuditableEntity, IHasDomainEvents
+
+public class AuditableEntityWithEvents : AuditableEntity, IHasDomainEvents, ISoftDelete
 {
     public DateTime? DeletedOn { get; set; }
     public DateTime? LastModifiedOn { get; set; }
