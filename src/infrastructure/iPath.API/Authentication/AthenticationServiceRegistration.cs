@@ -14,12 +14,14 @@ public static class AthenticationServiceRegistration
         var opts = new AuthOptions();
         config.GetSection(nameof(AuthOptions)).Bind(opts);
 
-        services.AddAuthentication(options =>
+
+        var authBuilder = services.AddAuthentication(options =>
         {
             options.DefaultScheme = IdentityConstants.ApplicationScheme;
             options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-        })
-            .AddIdentityCookies();
+        });
+
+        authBuilder.AddIdentityCookies();
 
         // Identity Services
         services.AddIdentityCore<User>(options => {
@@ -31,6 +33,27 @@ public static class AthenticationServiceRegistration
             .AddEntityFrameworkStores<iPathDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+
+
+        // external logins
+        if (opts.Google.IsActive)
+        {
+            authBuilder.AddGoogle("Google", options =>
+            {
+                options.ClientId = opts.Google.ClientId;
+                options.ClientSecret = opts.Google.ClientSecret;
+                options.SaveTokens = true;
+            });
+        }
+        if (opts.Microsoft.IsActive)
+        {
+            authBuilder.AddMicrosoftAccount("Microsoft", options =>
+            {
+                options.ClientId = opts.Microsoft.ClientId;
+                options.ClientSecret = opts.Microsoft.ClientSecret;
+                options.SaveTokens = true;
+            });
+        }
 
 
         return services;
