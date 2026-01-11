@@ -200,7 +200,7 @@ public class CommunityEditModel
     [Required]
     public string Name { get; set; } = "";
 
-    public CommunitySettings Settings { get; set; }
+    public CommunitySettings Settings { get; set; } = new();
 
     public OwnerDto? Owner { get; set; }
 }
