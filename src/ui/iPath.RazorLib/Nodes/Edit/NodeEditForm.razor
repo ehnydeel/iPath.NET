@@ -76,7 +76,7 @@
     private iPath.LHCForms.LhcForm lhcForm;
 
     bool useQuestionnaire => Model?.Questionnaire != null;
-    bool useHtmlEditor = true;
+    bool useHtmlEditor => vm.ActiveGroup.Settings.DescriptionAllowHtml;
 
     private MudForm frm;
 
