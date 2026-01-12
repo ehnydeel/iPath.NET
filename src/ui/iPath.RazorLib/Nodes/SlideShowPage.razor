@@ -7,9 +7,10 @@
 @inherits NodeViewComponentBase
 
 <MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
-    <div style="height: 100%; width: 100%; background-color: black;"
-         @onkeydown="@((args) => OnKeyDown(args))" 
-         @onclick="@(() => vm.SelectNextImage())">
+    <MudSwipeArea Style="height: 100%; width: 100%; background-color: black;"
+                  OnSwipeEnd="OnSwipeHandler"
+                  @onkeydown="@((args) => OnKeyDown(args))"
+                  @onclick="@(() => vm.SelectNextImage())">
 
         @if (vm.SelectedNode is not null)
         {
@@ -27,7 +28,7 @@
                 }
                 else
                 {
-                    <MudIcon Size="Size.Large" Icon="@vm.SelectedNode.FileIcon" /> 
+                    <MudIcon Size="Size.Large" Icon="@vm.SelectedNode.FileIcon" />
                 }
                 <div class="mt-2">@vm.SelectedNode.GalleryCaption.ShortenTo(80)</div>
             </div>
@@ -36,14 +37,13 @@
         {
             vm.GoUp();
         }
-    </div>
+    </MudSwipeArea>
 </MudFocusTrap>
 
 @code
 {
     [Parameter]
     public string id { get; set; }
-
 
 
     protected override async Task OnParametersSetAsync()
@@ -61,6 +61,18 @@
         }
     }
 
+
+    async Task OnSwipeHandler(SwipeEventArgs args)
+    {
+        if (args.SwipeDirection == SwipeDirection.RightToLeft)
+        {
+            await vm.SelectNextImage();
+        }
+        else if (args.SwipeDirection == SwipeDirection.LeftToRight)
+        {
+            await vm.SelectPreviousImage();
+        }
+    }
 
 
     private async Task OnKeyDown(KeyboardEventArgs args)
