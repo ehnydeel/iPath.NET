@@ -87,10 +87,9 @@
 .ipath_header_actions {
     grid-column-start: 2;
     grid-row-start: 1;
-    align-self: end;
     text-align: right;
+    align-content: end;
     padding-right: 4px;
-    width: 90px;
     min-width: 90px;
 }
 

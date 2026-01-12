@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace iPath.Application.Features.Nodes;
+﻿namespace iPath.Application.Features.Nodes;
 
 public static class AnnotationExtensions
 {

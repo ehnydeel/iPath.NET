@@ -1,22 +1,21 @@
-﻿using iPath.Blazor.ServiceLib.ApiClient;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Refit;
 
 namespace iPath.Blazor.Componenents.Nodes;
 
 public class UploadTask(IPathApi api)
 {
-    public bool uploading;
-    public NodeDto? result;
-    public string? Error;
-    public string Filename = "";
+    public bool uploading { get; private set; }
+    public NodeDto? Result { get; private set; }
+    public string? Error { get; private set; }
+    public bool IsSuccessful {  get; private set; }
+    public string Filename { get; private set; } = "";
 
     public Action OnChange;
 
-
     public void FromNode(NodeDto node)
     {
-        result = node;
+        Result = node;
     }
 
 
@@ -30,7 +29,8 @@ public class UploadTask(IPathApi api)
             var resp = await api.UploadNodeFile(s, parentId);
             if (resp.IsSuccessful)
             {
-                result = resp.Content;
+                IsSuccessful = true;
+                Result = resp.Content;
             }
             else 
             { 
@@ -47,6 +47,6 @@ public class UploadTask(IPathApi api)
     }
 
     public string ThumbUrl
-        => $"data:image/jpeg;base64, {result.File.ThumbData}";
+        => $"data:image/jpeg;base64, {Result.File.ThumbData}";
 
 }

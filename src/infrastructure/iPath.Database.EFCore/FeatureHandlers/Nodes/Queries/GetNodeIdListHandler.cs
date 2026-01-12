@@ -1,4 +1,6 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes;
+﻿using iPath.EF.Core.FeatureHandlers.Nodes.Queries;
+
+namespace iPath.EF.Core.FeatureHandlers.Nodes;
 
 
 public class GetNodeIdListHandler(iPathDbContext db, IUserSession sess)
@@ -20,6 +22,10 @@ public class GetNodeIdListHandler(iPathDbContext db, IUserSession sess)
         {
             q = q.Where(n => n.OwnerId == request.OwnerId.Value);
         }
+
+        // Filter out drafts & private cases
+        q = q.VisibilityFilter(sess);
+
 
         // filter & sort
         q = q.ApplyQuery(request);

@@ -37,6 +37,9 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
             }
         }
 
+        // Filter out drafts & private cases
+        q = q.VisibilityFilter(sess);
+
 
         // filter & sort
         q = q.ApplyQuery(request);
@@ -50,6 +53,7 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
                 Id = n.Id,
                 NodeType = n.NodeType,
                 CreatedOn = n.CreatedOn,
+                IsDraft = n.IsDraft,
                 OwnerId = n.OwnerId,
                 Owner = new OwnerDto(n.OwnerId, n.Owner.UserName, n.Owner.Email),
                 GroupId = n.GroupId,
@@ -63,6 +67,7 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
                 Id = n.Id,
                 NodeType = n.NodeType,
                 CreatedOn = n.CreatedOn,
+                IsDraft = n.IsDraft,
                 OwnerId = n.OwnerId,
                 Owner = new OwnerDto(n.OwnerId, n.Owner.UserName, n.Owner.Email),
                 GroupId = n.GroupId,

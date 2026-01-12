@@ -25,13 +25,15 @@ public class NodeViewModel(IPathApi api,
 
     public event Action OnLoadingStarted;
     public event Action OnLoadingFinished;
-
+    public event Action<UploadTask> OnUploadStarted;
+    public event Action<UploadTask> OnUploadFinished;
 
     public string SearchString { get; set; }
 
     public NodeDto RootNode { get; private set; }
     public NodeDto? SelectedNode { get; private set; }
     public GroupDto? ActiveGroup { get; private set; }
+
 
     public bool IsRootNodeSelected
     {
@@ -506,7 +508,7 @@ public class NodeViewModel(IPathApi api,
     public async Task Save()
     {
         if (OnBeforeSaveEvent is not null)
-            await OnBeforeSaveEvent.Invoke(this);  
+            await OnBeforeSaveEvent.Invoke(this);
 
         if (RootNode != null && !SaveDisabled && IsEditing)
         {
@@ -535,15 +537,28 @@ public class NodeViewModel(IPathApi api,
             if (RootNode.IsDraft)
             {
                 IApiResponse resp;
-                // if title is empty => delete draft
-                // TODO: check if there is any input, if not => delte draft
 
-                // when cancelling a draft, save current state ...
-                var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
-                resp = await api.UpdateNode(cmd);
+                // check if there is no valid input and no child nodes => delete
+                if (RootNode.ChildNodes.IsEmpty() && !RootNode.Description.ValidateInput())
+                {
+                    resp = await api.DeleteNode(RootNode.Id);
+                }
+                else
+                {
+                    // when cancelling a draft, save current state ...
+                    var cmd = new UpdateNodeCommand(NodeId: RootNode.Id, Description: RootNode.Description, IsDraft: true);
+                    resp = await api.UpdateNode(cmd);
+                }
 
-                // and go up
-                await GoUp();
+                if (resp.IsSuccessful)
+                {
+                    // and go up
+                    await GoUp();
+                }
+                else
+                {
+                    snackbar.AddError(resp.ErrorMessage);
+                }
             }
             else
             {
@@ -554,10 +569,9 @@ public class NodeViewModel(IPathApi api,
 
 
 
-
-
     public bool AttachFileDisabled => EditDisabled;
 
+    public UploadTask CreateUploadTask() => new UploadTask(api);
 
     public async Task UploadFile(IBrowserFile f)
     {
@@ -575,18 +589,26 @@ public class NodeViewModel(IPathApi api,
             {
                 logger.LogInformation("starting file upload: " + f.Name);
 
-                var stream = new StreamPart(f.OpenReadStream(maxAllowedSize: IPathApi.MaxFileSize), f.Name, f.ContentType);
-                var resp = await api.UploadNodeFile(stream, SelectedNode.Id);
-                if (resp.IsSuccessful)
+                var t = CreateUploadTask();
+                OnUploadStarted?.Invoke(t);
+
+                await t.Upload(f, SelectedNode.Id);
+
+                //var stream = new StreamPart(f.OpenReadStream(maxAllowedSize: IPathApi.MaxFileSize), f.Name, f.ContentType);
+                //var resp = await api.UploadNodeFile(stream, SelectedNode.Id);
+                if (t.IsSuccessful)
                 {
                     // append to child nodes
-                    RootNode.ChildNodes.Add(resp.Content);
+                    RootNode.ChildNodes.Add(t.Result);
                     OnChange();
                 }
                 else
                 {
-                    snackbar.AddWarning(resp.ErrorMessage);
+                    snackbar.AddWarning(t.Error);
                 }
+
+                OnUploadFinished?.Invoke(t);
+                OnChange?.Invoke();
             }
         }
         catch (Exception ex)
@@ -631,7 +653,7 @@ public class NodeViewModel(IPathApi api,
         if (RootNode is not null)
         {
             model.RootNodeId = RootNode.Id;
-            model.ChildNodeId = ChildNodeId ;
+            model.ChildNodeId = ChildNodeId;
             if (ActiveGroup is not null)
             {
                 model.AskMorphology = ActiveGroup.Settings.AnnotationHasMoprhoogy;

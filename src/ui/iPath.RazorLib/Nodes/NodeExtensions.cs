@@ -42,6 +42,7 @@ public static class NodeExtensions
         public string? SubTitle => dto?.Description?.Subtitle;
         public string? AccessionNo => dto?.Description?.AccessionNo;
 
+
         public bool IsNew => dto.LastVisit is null;
         public string IsNewIcon => dto.IsNew ? Icons.Material.TwoTone.NewReleases : string.Empty;
 

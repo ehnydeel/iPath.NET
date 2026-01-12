@@ -1,6 +1,8 @@
 ﻿@page "/groups"
 @page "/user/groups"
 
+@attribute [Authorize]
+
 @inject GroupListViewModel vm
 @inject IStringLocalizer T
 

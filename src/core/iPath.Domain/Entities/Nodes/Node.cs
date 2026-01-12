@@ -31,6 +31,8 @@ public class Node : AuditableEntityWithEvents
 
     public string NodeType { get; set; } = default!;
 
+    public eNodeVisibility Visibility { get; set; } = eNodeVisibility.GroupMembers;
+
     public NodeDescription? Description { get; set; } = new();
 
     public NodeFile? File { get; set; } = null!;
@@ -39,14 +41,10 @@ public class Node : AuditableEntityWithEvents
 
 }
 
-public class NodeFile
-{
-    public DateTime? LastStorageExportDate { get; set; }
-    public string? Filename { get; set; }
-    public string? MimeType { get; set; }
-    public string? ThumbData { get; set; }
-    public int? ImageWidth { get; set; }
-    public int? ImageHeight { get; set; }
 
-    public NodeFile Clone() => (NodeFile)MemberwiseClone();
+public enum eNodeVisibility
+{
+    GroupMembers = 0,
+    Private = 1,
+    Public = 2
 }

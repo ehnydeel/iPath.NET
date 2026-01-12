@@ -1,4 +1,5 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
+@inject IStringLocalizer T
 
 <MudTable T="NodeListDto" ServerData="vm.GetNodeListAsync" @ref="table"
           HeaderClass="ipath_table_header"
@@ -28,7 +29,7 @@
         <MudTh Style="min-width: 50px;"></MudTh>
         <MudTh Style="width: 8rem;"><MudTableSortLabel SortLabel="Description.CaseType" T="NodeListDto">Type</MudTableSortLabel></MudTh>
         <MudTh Style="width: 8rem;"><MudTableSortLabel SortLabel="Owner" T="NodeListDto">Sender</MudTableSortLabel></MudTh>
-        <MudTh Style="width: 10rem;"><MudTableSortLabel SortLabel="CreatedOn" T="NodeListDto" InitialDirection="SortDirection.Descending">Date</MudTableSortLabel></MudTh>
+        <MudTh Style="width: 12rem;"><MudTableSortLabel SortLabel="CreatedOn" T="NodeListDto" InitialDirection="SortDirection.Descending">Date</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Title" Class="ipath_node_title2" onclick="@(() => vm.GotoNode(context))">
@@ -43,7 +44,14 @@
         </MudTd>
         <MudTd>
             <div class="d-flex justify-end flex-grow-1">
-                <MudIcon Icon=@context.IsNewIcon />
+                @if (context.IsDraft)
+                {
+                    <MudTooltip Text=@T["Draft"]><MudIcon Icon=@Icons.Material.TwoTone.HourglassEmpty" /></MudTooltip>
+                }
+                else
+                {
+                    <MudIcon Icon=@context.IsNewIcon />
+                }
                 <MudIcon Icon=@context.HasNewAnnotationIcon />
             </div>
         </MudTd>

@@ -59,7 +59,7 @@
         {
             if (vm.RootNode is null)
                 return T["loading ..."];
-            else if (string.IsNullOrEmpty(vm.RootNode.Title))
+            else if (vm.RootNode.IsDraft)
                 return T["New Case"];
             else
                 return vm.RootNode.Title;

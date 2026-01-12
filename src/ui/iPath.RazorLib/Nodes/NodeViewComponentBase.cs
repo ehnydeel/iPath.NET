@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Localization;
-
-namespace iPath.Blazor.Componenents.Nodes;
+﻿namespace iPath.Blazor.Componenents.Nodes;
 
 public abstract class NodeViewComponentBase : ComponentBase, IDisposable
 {
