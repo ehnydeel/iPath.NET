@@ -512,7 +512,7 @@ public class NodeViewModel(IPathApi api,
 
         if (RootNode != null && !SaveDisabled && IsEditing)
         {
-            var cmd = new UpdateNodeCommand(RootNode.Id, RootNode.Description, false);
+            var cmd = new UpdateNodeCommand(NodeId: RootNode.Id, Description: RootNode.Description, IsDraft: false);
             var resp = await api.UpdateNode(cmd);
             if (!resp.IsSuccessful)
             {

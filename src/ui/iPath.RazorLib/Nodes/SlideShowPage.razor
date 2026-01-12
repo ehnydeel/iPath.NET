@@ -21,10 +21,10 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="@(() => vm.GoUp())" />
             </div>
 
-            <div class="ipath_image">
+            <div class="ipath_image slideshow">
                 @if (vm.SelectedNode.IsImage)
                 {
-                    <img src="@vm.SelectedNode.FileUrl" style="max-width: 95%; max-height: 90%;" />
+                    <img src="@vm.SelectedNode.FileUrl" class="ipath_image_slideshow"/>
                 }
                 else
                 {

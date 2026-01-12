@@ -37,7 +37,6 @@
 
     protected override void OnDisposed()
     {
-        if (vm.IsEditing) vm.CancelEdit();
         vm.OnBeforeSaveEvent -= OnBeforeSaveEventHandler;    
     }
 
