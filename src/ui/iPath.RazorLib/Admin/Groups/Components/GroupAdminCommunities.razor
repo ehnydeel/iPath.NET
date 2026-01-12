@@ -10,11 +10,13 @@
 }
 else
 {
-    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="mt-4 ipath_table">
+    <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="ipath_table"
+                 FixedHeader="true" Height="400px" Virtualize="true">
         <ToolBarContent>
             <MudText Typo="Typo.h6">@T["Communities"]</MudText>
             <MudSpacer />
-            <CommunityLookup Label=@T["add to community"] Variant="Variant.Outlined" Dense="true" @bind-Value="communityToAdd" />
+            <CommunityLookup Label=@T["add to community"] @bind-Value="communityToAdd" 
+                             Variant="Variant.Outlined" ShrinkLabel="true" Dense="true" Margin="Margin.Dense" />
             <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddCommunity" />
         </ToolBarContent>
         <Columns>

@@ -13,14 +13,15 @@
 else
 {
     <MudTable T="GroupMemberModel" Items="@Items" @ref="table"
+              FixedHeader="true" Height="400px" Breakpoint="Breakpoint.Sm" Virtualize="true"
               Dense="true" Striped="true" Hover="true"
-              FixedHeader="true" Height="400px" Elevation="0">
+              Elevation="1">
         <ToolBarContent>
             <MudText Typo="Typo.h6">@T["Filter"]</MudText>
             <MudSpacer />
-            <OwnerLookup Label=@T["Search user"] Dense="true" Clearable="true"
+            <OwnerLookup Label=@T["Search user"] Clearable="true"
                          @bind-Value="selectedUser" @bind-Value:after="OnUserSelected"
-                         Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                         Variant="Variant.Outlined" ShrinkLabel="true" Dense="true" Margin="Margin.Dense" />
         </ToolBarContent>
         <HeaderContent>
             <MudTh>@T["Username"]</MudTh>
