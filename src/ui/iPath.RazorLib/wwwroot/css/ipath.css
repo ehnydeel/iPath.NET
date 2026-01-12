@@ -90,6 +90,8 @@
     align-self: end;
     text-align: right;
     padding-right: 4px;
+    width: 90px;
+    min-width: 90px;
 }
 
 .ipath_header_toolbar {
