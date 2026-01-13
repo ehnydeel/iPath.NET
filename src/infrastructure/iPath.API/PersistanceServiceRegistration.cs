@@ -28,7 +28,8 @@ public static class PersistanceServiceRegistration
                     x => x.MigrationsAssembly(DBProvider.Postgres.Assembly)
                 );
             }
-            else if (provider == DBProvider.SqlServer.Name)
+            /*
+            if (provider == DBProvider.SqlServer.Name)
             {
                 var cs = config.GetConnectionString(DBProvider.SqlServer.Name);
                 cfg.UseSqlServer(
@@ -36,7 +37,8 @@ public static class PersistanceServiceRegistration
                     x => x.MigrationsAssembly(DBProvider.SqlServer.Assembly)
                 );
             }
-            else if (provider == DBProvider.Sqlite.Name)
+            */
+            if (provider == DBProvider.Sqlite.Name)
             {
                 var cs = config.GetConnectionString(DBProvider.Sqlite.Name);
                 cfg.UseSqlite(
@@ -78,6 +80,7 @@ public static class PersistanceServiceRegistration
                     x => x.MigrationsAssembly(DBProvider.Postgres.Assembly)
                 );
             }
+            /*
             if (provider == DBProvider.SqlServer.Name)
             {
                 var cs = config.GetConnectionString(DBProvider.SqlServer.Name);
@@ -86,6 +89,7 @@ public static class PersistanceServiceRegistration
                     x => x.MigrationsAssembly(DBProvider.SqlServer.Assembly)
                 );
             }
+            */
             if (provider == DBProvider.Sqlite.Name)
             {
                 cfg.UseSqlite(
@@ -112,5 +116,5 @@ public record DBProvider(string Name, string Assembly)
 {
     public static DBProvider Sqlite = new(nameof(Sqlite), typeof(iPath.EF.Sqlite.Marker).Assembly.GetName().Name!);
     public static DBProvider Postgres = new(nameof(Postgres), typeof(iPath.EF.Postgres.Marker).Assembly.GetName().Name!);
-    public static DBProvider SqlServer = new(nameof(SqlServer), typeof(iPath.EF.SqlServer.Marker).Assembly.GetName().Name!);
+    // public static DBProvider SqlServer = new(nameof(SqlServer), typeof(iPath.EF.SqlServer.Marker).Assembly.GetName().Name!);
 }

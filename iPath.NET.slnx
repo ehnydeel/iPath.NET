@@ -20,7 +20,6 @@
   <Folder Name="/Infrastructure/Migrations/">
     <Project Path="src/infrastructure/iPath.Database.Postgres/iPath.Database.Postgres.csproj" />
     <Project Path="src/infrastructure/iPath.Database.Sqlite/iPath.Database.Sqlite.csproj" />
-    <Project Path="src/infrastructure/iPath.Database.Sqlserver/iPath.Database.SqlServer.csproj" Id="9bac62b4-7a4f-4ce7-a492-efbe727530e9" />
   </Folder>
   <Folder Name="/UI/">
     <Project Path="src/ui/iPath.Blazor.Client/iPath.Blazor.Client.csproj" />
