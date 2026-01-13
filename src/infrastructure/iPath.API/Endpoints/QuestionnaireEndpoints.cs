@@ -21,7 +21,7 @@ public static class QuesionnaireEndpoints
                 return await mediator.Send(new GetQuestionnaireQuery(id, Version), ct);
             }
         })
-            .Produces<Questionnaire>();
+            .Produces<QuestionnaireEntity>();
 
 
         qr.MapPost("list", async (GetQuestionnaireListQuery query, [FromServices] IMediator mediator, CancellationToken ct)

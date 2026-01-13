@@ -13,7 +13,7 @@ public class QuestionnaireCache(IMemoryCache cache, IPathApi api, ILogger<Questi
 
         var chachekey = $"qr_{Id}" + (Version.HasValue ? $"_{Version}" : "");
 
-        if( !cache.TryGetValue(cache, out Questionnaire? q))
+        if( !cache.TryGetValue(cache, out QuestionnaireEntity? q))
         {
             logger.LogInformation("loading questionnaire {0}", Id);
 

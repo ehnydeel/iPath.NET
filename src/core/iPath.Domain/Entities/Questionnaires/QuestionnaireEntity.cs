@@ -3,7 +3,7 @@
 namespace iPath.Domain.Entities;
 
 [DebuggerDisplay("Quesionnaire {QuestionnaireId}, Version {Version}, active={IsActive}")]
-public class Questionnaire : AuditableEntity
+public class QuestionnaireEntity : AuditableEntity
 {
     [Required]
     public required string QuestionnaireId { get; set; }
@@ -30,7 +30,7 @@ public class QuestionnaireForGroup
     public Guid Id { get; set; }
 
     public Guid QuestionnaireId { get; set; }
-    public Questionnaire Questionnaire { get; set; }
+    public QuestionnaireEntity Questionnaire { get; set; }
 
     public Guid GroupId { get; set; }
     public Group Group { get; set; }

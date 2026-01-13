@@ -2,9 +2,9 @@
 namespace iPath.EF.Core.FeatureHandlers.Questionnaires;
 
 public class GetQuestionnaireHandler(iPathDbContext db)
-     : IRequestHandler<GetQuestionnaireQuery, Task<Questionnaire>>
+     : IRequestHandler<GetQuestionnaireQuery, Task<QuestionnaireEntity>>
 {
-    public async Task<Questionnaire> Handle(GetQuestionnaireQuery request, CancellationToken cancellationToken)
+    public async Task<QuestionnaireEntity> Handle(GetQuestionnaireQuery request, CancellationToken cancellationToken)
     {
         var q = db.Questionnaires.AsNoTracking()
             .Where(q => q.QuestionnaireId == request.QuestionnaireId);

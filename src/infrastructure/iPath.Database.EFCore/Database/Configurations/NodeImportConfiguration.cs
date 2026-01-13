@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace iPath_EFCore.Database.Configurations;
+﻿namespace iPath_EFCore.Database.Configurations;
 
 internal class NodeImportConfiguration : IEntityTypeConfiguration<NodeImport>
 {

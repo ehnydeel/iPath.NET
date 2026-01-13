@@ -9,7 +9,8 @@ internal class CommunityMemberConfiguration : IEntityTypeConfiguration<Community
         b.Property(x => x.Id).HasColumnName("id");
 
         b.Property(x => x.UserId).HasColumnName("user_id");
-        b.HasOne(x => x.User).WithMany(u => u.CommunityMembership).HasForeignKey(x => x.UserId).IsRequired();
+        b.HasOne(x => x.User).WithMany(u => u.CommunityMembership).HasForeignKey(x => x.UserId).IsRequired()
+            .OnDelete(DeleteBehavior.NoAction); ;
 
         b.Property(x => x.CommunityId).HasColumnName("community_id");
         b.HasOne(x => x.Community).WithMany(c => c.Members).HasForeignKey(x => x.CommunityId).IsRequired();

@@ -1,5 +1,9 @@
 # Migrations
 
+preparations: set the dbprovider to "Postgres" in
+ - in appsettings (iPath-Blazor.Server)
+ - user secrets
+
 ## Creating the Initial Migration
 ` dotnet ef migrations add Initial --startup-project ..\..\ui\iPath.Blazor.Server`
 

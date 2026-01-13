@@ -1,3 +1,5 @@
+using Ardalis.GuardClauses;
+
 namespace iPath.Domain.Entities;
 
 public class Community : AuditableEntity
@@ -18,6 +20,23 @@ public class Community : AuditableEntity
 
     
     public int? ipath2_id { get; set; }
+
+    private Community()
+    {   
+    }
+
+    public static Community Create(string Name, User Owner)
+    {
+        Guard.Against.NullOrEmpty(Name);
+        Guard.Against.Null(Owner);
+        return new Community
+        {
+            Id = Guid.CreateVersion7(),
+            CreatedOn = DateTime.UtcNow,
+            Name = Name,
+            Owner = Owner,  
+        };
+    }
 }
 
 

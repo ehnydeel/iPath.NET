@@ -5,14 +5,14 @@ public record QuestionnaireListDto (Guid Id, string QuestionnaireId, string Name
 
 
 public record GetQuestionnaireByIdQuery(Guid Id)
-    : IRequest<GetQuestionnaireByIdQuery, Task<Questionnaire>>;
+    : IRequest<GetQuestionnaireByIdQuery, Task<QuestionnaireEntity>>;
 
 
 public record GetQuestionnaireQuery(string QuestionnaireId, int? Version)
-    : IRequest<GetQuestionnaireQuery, Task<Questionnaire>>;
+    : IRequest<GetQuestionnaireQuery, Task<QuestionnaireEntity>>;
 
 
-public class GetQuestionnaireListQuery : PagedQuery<Questionnaire>
+public class GetQuestionnaireListQuery : PagedQuery<QuestionnaireEntity>
     , IRequest<GetQuestionnaireListQuery, Task<PagedResultList<QuestionnaireListDto>>>
 { 
     public bool AllVersions { get; set; } 

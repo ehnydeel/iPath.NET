@@ -37,7 +37,7 @@ public class Node : AuditableEntityWithEvents
 
     public NodeFile? File { get; set; } = null!;
 
-    public ICollection<QuestionnaireResponse> QuestionnaireResponses { get; set; } = [];
+    public ICollection<QuestionnaireResponseEntity> QuestionnaireResponses { get; set; } = [];
 
 }
 

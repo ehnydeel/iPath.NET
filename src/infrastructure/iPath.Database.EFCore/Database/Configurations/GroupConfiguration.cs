@@ -10,7 +10,8 @@ internal class GroupConfiguration : IEntityTypeConfiguration<Group>
 
         b.Property(x => x.Name).HasMaxLength(200);
 
-        b.HasOne(g => g.Owner).WithMany().HasForeignKey(g => g.OwnerId).IsRequired(false);
+        b.HasOne(g => g.Owner).WithMany().HasForeignKey(g => g.OwnerId).IsRequired(false)
+            .OnDelete(DeleteBehavior.NoAction); 
 
         b.HasMany(x => x.Communities).WithOne(x => x.Group).IsRequired(true);
 

@@ -8,6 +8,7 @@ internal class NotificationConfiguration : IEntityTypeConfiguration<Notification
         builder.HasKey(n => n.Id);
         builder.Property(x => x.Id).HasColumnName("id");
 
-        builder.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId).IsRequired();
+        builder.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId).IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

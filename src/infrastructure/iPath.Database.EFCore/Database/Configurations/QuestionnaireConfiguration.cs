@@ -1,8 +1,8 @@
 ﻿namespace iPath_EFCore.Database.Configurations;
 
-internal class QuestionnaireConfiguration : IEntityTypeConfiguration<Questionnaire>
+internal class QuestionnaireConfiguration : IEntityTypeConfiguration<QuestionnaireEntity>
 {
-    public void Configure(EntityTypeBuilder<Questionnaire> b)
+    public void Configure(EntityTypeBuilder<QuestionnaireEntity> b)
     {
         b.ToTable("questionnaires");
         b.HasKey(q => q.Id);
@@ -17,6 +17,7 @@ internal class QuestionnaireConfiguration : IEntityTypeConfiguration<Questionnai
         b.HasMany(q => q.Groups)
             .WithOne(qg => qg.Questionnaire)
             .HasForeignKey(qg => qg.QuestionnaireId)
-            .IsRequired(true);
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

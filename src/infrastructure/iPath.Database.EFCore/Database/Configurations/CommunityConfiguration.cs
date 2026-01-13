@@ -14,7 +14,8 @@ internal class CommunityConfiguration : IEntityTypeConfiguration<Community>
 
         b.ComplexProperty(x => x.Settings, pb => pb.ToJson());
 
-        b.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).IsRequired();
+        b.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
 
         b.HasMany(x => x.Groups).WithOne(g => g.Community).HasForeignKey(g => g.CommunityId);
         b.HasMany(x => x.Members).WithOne(m => m.Community).HasForeignKey(m => m.CommunityId).OnDelete(DeleteBehavior.NoAction);

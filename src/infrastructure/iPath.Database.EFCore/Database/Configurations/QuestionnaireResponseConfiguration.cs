@@ -1,8 +1,8 @@
 ﻿namespace iPath_EFCore.Database.Configurations;
 
-internal class QuestionnaireResponseConfiguration : IEntityTypeConfiguration<QuestionnaireResponse>
+internal class QuestionnaireResponseConfiguration : IEntityTypeConfiguration<QuestionnaireResponseEntity>
 {
-    public void Configure(EntityTypeBuilder<QuestionnaireResponse> b)
+    public void Configure(EntityTypeBuilder<QuestionnaireResponseEntity> b)
     {
         b.ToTable("questionnaire_responses");
         b.HasKey(r => r.Id);
@@ -15,7 +15,8 @@ internal class QuestionnaireResponseConfiguration : IEntityTypeConfiguration<Que
 
         b.HasOne(q => q.Owner)
             .WithMany()
-            .IsRequired(true);
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.NoAction);
 
         b.HasOne(r => r.Node)
             .WithMany(n => n.QuestionnaireResponses)
@@ -26,7 +27,7 @@ internal class QuestionnaireResponseConfiguration : IEntityTypeConfiguration<Que
             .WithMany(a => a.QuestionnaireResponses)
             .HasForeignKey(r => r.AnnotationId)
             .IsRequired(false);
-
-        b.Property(r => r.Resource).HasColumnType("jsonb");
+        
+        // b.Property(r => r.Resource).HasColumnType("jsonb");
     }
 }

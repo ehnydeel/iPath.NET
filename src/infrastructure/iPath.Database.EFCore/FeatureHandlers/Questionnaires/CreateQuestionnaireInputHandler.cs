@@ -26,7 +26,7 @@ public class CreateQuestionnaireInputHandler(iPathDbContext db, IUserSession ses
                 .MaxAsync(q => (int?)q.Version, ct) ?? 0;
 
             // create new entry in DB
-            var newItem = new Questionnaire
+            var newItem = new QuestionnaireEntity
             {
                 Id = Guid.CreateVersion7(),
                 OwnerId = sess.User.Id,

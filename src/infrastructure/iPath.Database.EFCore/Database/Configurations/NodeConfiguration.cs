@@ -14,7 +14,9 @@ internal class NodeConfiguration : IEntityTypeConfiguration<Node>
         b.Property(b => b.GroupId).HasColumnName("group_id");
         b.HasIndex(b => b.GroupId);
 
-        b.HasOne(x => x.Owner).WithMany(u => u.OwnedNodes).HasForeignKey(x => x.OwnerId).IsRequired();
+        b.HasOne(x => x.Owner).WithMany(u => u.OwnedNodes).HasForeignKey(x => x.OwnerId).IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+
         b.HasOne(x => x.Group).WithMany(g => g.Nodes).HasForeignKey(x => x.GroupId).IsRequired(false);
 
         b.HasMany(x => x.ChildNodes).WithOne(c => c.RootNode).HasForeignKey(c => c.RootNodeId).OnDelete(DeleteBehavior.Cascade);

@@ -18,24 +18,35 @@ public static class PersistanceServiceRegistration
     {
         services.AddDbContext<iPathDbContext>(cfg =>
         {
-            var provider = config.GetSection("DbProvider").Value ?? DBProvider.Postgres.Name;
-            // Console.WriteLine(provider);
+            var provider = config.GetSection("DbProvider").Value ?? DBProvider.Sqlite.Name; // read from appsettings and default to sqlite
+            Console.WriteLine("DbProvider = " + provider);
 
             if (provider == DBProvider.Postgres.Name)
             {
-                throw new NotImplementedException();
-                //cfg.UseNpgsql(
-                //    config.GetConnectionString(DBProvider.Postgres.Name),
-                //    x => x.MigrationsAssembly(Postgres.Assembly)
-                //);
+                cfg.UseNpgsql(
+                    config.GetConnectionString(DBProvider.Postgres.Name),
+                    x => x.MigrationsAssembly(DBProvider.Postgres.Assembly)
+                );
             }
-            if (provider == DBProvider.Sqlite.Name)
+            else if (provider == DBProvider.SqlServer.Name)
+            {
+                var cs = config.GetConnectionString(DBProvider.SqlServer.Name);
+                cfg.UseSqlServer(
+                    config.GetConnectionString(DBProvider.SqlServer.Name),
+                    x => x.MigrationsAssembly(DBProvider.SqlServer.Assembly)
+                );
+            }
+            else if (provider == DBProvider.Sqlite.Name)
             {
                 var cs = config.GetConnectionString(DBProvider.Sqlite.Name);
                 cfg.UseSqlite(
-                    config.GetConnectionString(DBProvider.Sqlite.Name),
+                    config.GetConnectionString(DBProvider.Sqlite.Name) ?? "ipath.db", // default to ipath.db
                     x => x.MigrationsAssembly(DBProvider.Sqlite.Assembly)
                 );
+            }
+            else
+            {
+                throw new Exception("no db provider configuration found");
             }
         });
 
@@ -62,20 +73,25 @@ public static class PersistanceServiceRegistration
 
             if (provider == DBProvider.Postgres.Name)
             {
-                throw new NotImplementedException();
-                //cfg.UseNpgsql(
-                //    config.GetConnectionString(DBProvider.Postgres.Name),
-                //    x => x.MigrationsAssembly(DBProvider.Postgres.Assembly)
-                //)
-                // .UseSnakeCaseNamingConvention();
+                cfg.UseNpgsql(
+                    config.GetConnectionString(DBProvider.Postgres.Name),
+                    x => x.MigrationsAssembly(DBProvider.Postgres.Assembly)
+                );
+            }
+            if (provider == DBProvider.SqlServer.Name)
+            {
+                var cs = config.GetConnectionString(DBProvider.SqlServer.Name);
+                cfg.UseSqlServer(
+                    config.GetConnectionString(DBProvider.SqlServer.Name),
+                    x => x.MigrationsAssembly(DBProvider.SqlServer.Assembly)
+                );
             }
             if (provider == DBProvider.Sqlite.Name)
             {
                 cfg.UseSqlite(
                     config.GetConnectionString(DBProvider.Sqlite.Name),
                     x => x.MigrationsAssembly(DBProvider.Sqlite.Assembly)
-                )
-                .UseSnakeCaseNamingConvention();
+                );
             }
         });
 
@@ -96,4 +112,5 @@ public record DBProvider(string Name, string Assembly)
 {
     public static DBProvider Sqlite = new(nameof(Sqlite), typeof(iPath.EF.Sqlite.Marker).Assembly.GetName().Name!);
     public static DBProvider Postgres = new(nameof(Postgres), typeof(iPath.EF.Postgres.Marker).Assembly.GetName().Name!);
+    public static DBProvider SqlServer = new(nameof(SqlServer), typeof(iPath.EF.SqlServer.Marker).Assembly.GetName().Name!);
 }

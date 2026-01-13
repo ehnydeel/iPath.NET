@@ -208,10 +208,10 @@ public interface IPathApi
 
     #region "-- Questionnaires --"
     [Get("/api/v1/questionnaires/{id}")]
-    Task<IApiResponse<Questionnaire>> GetQuestionnaireById(Guid id);
+    Task<IApiResponse<QuestionnaireEntity>> GetQuestionnaireById(Guid id);
 
     [Get("/api/v1/questionnaires/{id}")]
-    Task<IApiResponse<Questionnaire>> GetQuestionnaire(string id, int? Version = null);
+    Task<IApiResponse<QuestionnaireEntity>> GetQuestionnaire(string id, int? Version = null);
 
     [Post("/api/v1/questionnaires/list")]
     Task<IApiResponse<PagedResultList<QuestionnaireListDto>>> GetQuestionnnaires(GetQuestionnaireListQuery query);

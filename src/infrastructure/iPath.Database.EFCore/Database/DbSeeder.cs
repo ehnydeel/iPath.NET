@@ -1,4 +1,5 @@
 ﻿using iPath.Domain.Config;
+using iPath.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,7 +40,11 @@ public class DbSeeder(iPathDbContext db,
 
     public async Task SeedData()
     {
-        if (!db.Roles.Any())
+        if (db.Roles.Any())
+        {
+            return;
+        }
+        else
         {
             await roleManager.CreateAsync(new Role { Name = "Admin" });
             await roleManager.CreateAsync(new Role { Name = "Moderator" });
@@ -63,14 +68,16 @@ public class DbSeeder(iPathDbContext db,
         }
 
 
+        Community? community = null;
         if (!db.Communities.Any() && admin != null)
         {
-            await db.Communities.AddAsync(new Community { Name = "Test Community", OwnerId = admin.Id });
+            community = Community.Create(Name: "Test Community", Owner: admin);
+            await db.Communities.AddAsync(community);
         }
 
         if (!db.Groups.Any() && admin != null)
         {
-            await db.Groups.AddAsync(new Group { Name = "Test Group", OwnerId = admin.Id });
+            await db.Groups.AddAsync(Group.Create(Name: "Test Group", Owner: admin, DefaultCommunity: community));
         }
 
         await db.SaveChangesAsync();

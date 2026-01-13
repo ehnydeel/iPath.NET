@@ -140,11 +140,7 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
             var exists = group.Communities.Any(x => x.CommunityId == request.CommunityId);
             if (!exists)
             {
-                group.Communities.Add(new CommunityGroup()
-                {
-                    Group = group,
-                    Community = community
-                });
+                group.AssignToCommunity(community);
             }
         }
 
@@ -182,15 +178,13 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
         Guard.Against.NullOrEmpty(cmd.Name);
         await AssertNameNotExists(cmd.Name, null, ct);
 
-        var group = new Group
-        {
-            Id = Guid.CreateVersion7(),
-            Name = cmd.Name,
-            Settings = cmd.Settings,
-            OwnerId = cmd.OwnerId,
-            Visibility = cmd.Visibility ?? eGroupVisibility.MembersOnly,
-            CreatedOn = DateTime.UtcNow
-        };
+        var owner = await db.Users.FindAsync(cmd.OwnerId);
+        Guard.Against.NotFound(cmd.OwnerId, owner);
+
+        var group = Group.Create(Name: cmd.Name, Owner: owner);
+        group.Settings = cmd.Settings;
+        group.Visibility = cmd.Visibility ?? eGroupVisibility.MembersOnly;
+
         await db.Groups.AddAsync(group, ct);
         await db.SaveChangesAsync(ct);
 

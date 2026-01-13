@@ -19,7 +19,7 @@ public class Annotation : AuditableEntity
 
     public AnnotationData? Data { get; set; }
 
-    public ICollection<QuestionnaireResponse> QuestionnaireResponses { get; set; } = [];
+    public ICollection<QuestionnaireResponseEntity> QuestionnaireResponses { get; set; } = [];
 
 
     public static Annotation Create(Node node, Guid ownerId, AnnotationData data)

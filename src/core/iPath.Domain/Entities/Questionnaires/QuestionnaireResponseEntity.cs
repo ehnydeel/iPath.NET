@@ -1,9 +1,9 @@
 ﻿namespace iPath.Domain.Entities;
 
-public class QuestionnaireResponse : AuditableEntity
+public class QuestionnaireResponseEntity : AuditableEntity
 {
     public Guid QuestionnaireId { get; set; }
-    public required Questionnaire Questionnaire { get; set; }
+    public required QuestionnaireEntity Questionnaire { get; set; }
 
     public Guid? OwnerId { get; set; }
     public User? Owner { get; set; }

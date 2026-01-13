@@ -1,18 +1,30 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace iPath.EF.Core.Database;
 
 public class iPathDbContext : IdentityDbContext<User, Role, Guid>
 {
-    public iPathDbContext(DbContextOptions<iPathDbContext> options, IMediator mediator) : base(options)
+    public iPathDbContext(DbContextOptions<iPathDbContext> options, IMediator mediator, IConfiguration config) : base(options)
     {
         _mediator = mediator;
+
+        _collation = config["DbCollation"];
+        if (string.IsNullOrEmpty(_collation))
+        {
+            _collation = config["DbProvider"].ToLower() switch
+            {
+                "sqlite" => "NOCASE",
+                "sqlserver" => "SQL_Latin1_General_CP1_CI_AS",
+                _ => ""
+            };
+        }
     }
 
     private readonly IMediator _mediator;
-
+    private readonly string _collation;
 
     public DbSet<Community> Communities { get; set; }
     public DbSet<Group> Groups { get; set; }
@@ -22,7 +34,7 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<NodeImport> NodeImports { get; set; }
     public DbSet<NodeLastVisit> NodeLastVisits { get; set; }
 
-    public DbSet<Questionnaire> Questionnaires { get; set; }
+    public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
 
     public DbSet<Notification> NotificationQueue { get; set; }
     public DbSet<EmailMessage> EmailStore { get; set; }
@@ -39,8 +51,8 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // builder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
-        builder.UseCollation("NOCASE");
+        if (!string.IsNullOrEmpty(_collation))
+            builder.UseCollation(_collation);
 
         builder.ApplyConfigurationsFromAssembly(typeof(iPathDbContext).Assembly);
 
@@ -50,16 +62,6 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
         {
             b.ToTable("users");
             b.ComplexProperty(u => u.Profile, b => b.ToJson("profile"));
-            /*
-            b.OwnsOne(x => x.Profile, pb =>
-            {
-                pb.ToJson(); //.HasColumnType("jsonb");
-                pb.OwnsOne(x => x.ContactDetails, cdb =>
-                {
-                    cdb.OwnsOne(cd => cd.Address);
-                });
-            });
-            */
             b.HasMany(e => e.Roles).WithMany().UsingEntity<IdentityUserRole<Guid>>();
         });
 

@@ -10,24 +10,19 @@ public class CreateCommunityHandler(iPathDbContext db, IUserSession sess)
     {
         Guard.Against.NullOrEmpty(request.Name, "A name must be specified");
 
-        var user = await db.Users.FindAsync(request.OwnerId, ct);
-        Guard.Against.NotFound(request.OwnerId, user);
+        var owner = await db.Users.FindAsync(request.OwnerId, ct);
+        Guard.Against.NotFound(request.OwnerId, owner);
 
         var existing = await db.Communities.AsNoTracking().IgnoreQueryFilters().AnyAsync(x => x.Name == request.Name, ct);
         if (existing) throw new CommunityNameExistsException(request.Name);
 
         await using var transaction = await db.Database.BeginTransactionAsync(ct);
 
-        var newEntity = new Community()
+        var newEntity = Community.Create(Name: request.Name, Owner: owner);
+        newEntity.Settings = new CommunitySettings
         {
-            Id = Guid.CreateVersion7(),
-            Name = request.Name,
-            OwnerId = user.Id,
-            Settings = new CommunitySettings
-            {
-                Description = request.Description,
-                BaseUrl = request.BaseUrl
-            }
+            Description = request.Description,
+            BaseUrl = request.BaseUrl
         };
 
         await db.Communities.AddAsync(newEntity, ct);

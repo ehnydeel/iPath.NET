@@ -12,11 +12,19 @@ using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using Serilog;
 using System.Net;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Configuration
+if (builder.Environment.IsDevelopment())
+{
+    Console.WriteLine("Reading Application Configuration");
+    Console.WriteLine("-------------------------------------------------");
+    Console.WriteLine("CONFIG_PATH = " + builder.Configuration["CONFIG_PATH"]);
+}
 if (!string.IsNullOrEmpty(builder.Configuration["CONFIG_PATH"]))
 {
     var cfgFile = System.IO.Path.Combine(builder.Configuration["CONFIG_PATH"]!, "appsettings.json");
@@ -25,6 +33,19 @@ if (!string.IsNullOrEmpty(builder.Configuration["CONFIG_PATH"]))
     {
         builder.Configuration.AddJsonFile(cfgFile);
     }
+}
+
+if (builder.Environment.IsDevelopment())
+{
+    foreach (var s in builder.Configuration.Sources)
+    {
+        Console.WriteLine("config source: " + s);
+        if (s is Microsoft.Extensions.Configuration.Json.JsonConfigurationSource source)
+        {
+            Console.WriteLine(" - " + source.Path);
+        }
+    }
+    Console.WriteLine("-------------------------------------------------");
 }
 
 

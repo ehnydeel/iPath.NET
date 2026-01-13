@@ -1,3 +1,5 @@
+using Ardalis.GuardClauses;
+
 namespace iPath.Domain.Entities;
 
 public class Group : AuditableEntity
@@ -23,6 +25,47 @@ public class Group : AuditableEntity
     public GroupSettings Settings { get; set; } = new();
     
     public int? ipath2_id { get; set; }
+
+
+    private Group()
+    {   
+    }
+
+    public static Group Create(string Name, User Owner, Community? DefaultCommunity = null)
+    {
+        Guard.Against.NullOrEmpty(Name);
+        Guard.Against.Null(Owner);
+        var grp = new Group
+        {
+            Id = Guid.CreateVersion7(),
+            CreatedOn = DateTime.UtcNow,
+            Name = Name,
+            Owner = Owner,
+        };
+
+        if (DefaultCommunity is not null)
+        {
+            grp.AssignToCommunity(DefaultCommunity);
+        }
+
+        return grp;
+    }
+
+
+
+    public Group AssignToCommunity(Community community)
+    {
+        if (community != null && !this.Communities.Any(x => x.CommunityId == community.Id))
+        {
+            this.Communities.Add(new CommunityGroup()
+            {
+                Group = this,
+                Community = community
+            });
+        }
+
+        return this;
+    }
 }
 
 
