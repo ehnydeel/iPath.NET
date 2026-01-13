@@ -18,7 +18,7 @@ public interface IPathApi
     Task<IApiResponse<TranslationData>> GetTranslations(string lang);
 
     [Get("/api/v1/session")]
-    Task<IApiResponse<SessionUserDto>> GetSession();
+    Task<IApiResponse<SessionUserDto?>> GetSession();
 
     [Post("/api/v1/test/notify")]
     Task SendTestNodeEvent(TestEvent e);

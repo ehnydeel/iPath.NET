@@ -6,18 +6,39 @@ using System.Text.Unicode;
 
 namespace iPath.Application.Localization;
 
-public class LocalizationFileService(IOptions<LocalizationSettings> opts, ILogger<LocalizationFileService> logger)
+public class LocalizationFileService
 {
+    private readonly IOptions<LocalizationSettings> _opts;
+    private readonly ILogger<LocalizationFileService> _logger;
+
+    public LocalizationFileService(IOptions<LocalizationSettings> opts, ILogger<LocalizationFileService> logger)
+    {
+        _logger = logger;
+        _opts = opts;
+        if (!string.IsNullOrEmpty(_opts.Value.LocalesRoot) && !System.IO.Directory.Exists(_opts.Value.LocalesRoot))
+        {
+            try
+            {
+                System.IO.Directory.CreateDirectory(_opts.Value.LocalesRoot);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "LocalesRoot folder could not be created");
+            }
+        }
+    }
+
+
     public TranslationData GetTranslationData(string locale)
     {
         TranslationData data;
 
-        if (!opts.Value.SupportedCultures.Contains(locale))
+        if (!_opts.Value.SupportedCultures.Contains(locale))
         {
             throw new InvalidOperationException($"Culture {locale} is not supported");
         }
 
-        string fileName = Path.Combine(opts.Value.LocalesRoot, $"{locale}.json");
+        string fileName = Path.Combine(_opts.Value.LocalesRoot, $"{locale}.json");
         if (!File.Exists(fileName))
         {
             data = new();
@@ -26,7 +47,7 @@ public class LocalizationFileService(IOptions<LocalizationSettings> opts, ILogge
             data.Words = new();
             data.Words["Test"] = "Test";
             data.Words["Test2"] = "Test2";
-            if (opts.Value.AutoSave) SaveTranslation(data);
+            if (_opts.Value.AutoSave) SaveTranslation(data);
         }
         else
         {
@@ -47,13 +68,13 @@ public class LocalizationFileService(IOptions<LocalizationSettings> opts, ILogge
                 WriteIndented = true
             };
             string json = JsonSerializer.Serialize(data, options);
-            string fileName = Path.Combine(opts.Value.LocalesRoot, $"{data.locale}.json");
+            string fileName = Path.Combine(_opts.Value.LocalesRoot, $"{data.locale}.json");
             File.WriteAllText(fileName, json, System.Text.Encoding.UTF8);
             return true;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error while saving translation {0}", data.locale);
+            _logger.LogError(ex, "Error while saving translation {0}", data.locale);
         }
         return false;
     }

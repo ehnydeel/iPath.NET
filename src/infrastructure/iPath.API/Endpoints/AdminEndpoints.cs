@@ -1,9 +1,14 @@
-﻿using Scalar.AspNetCore;
-using System.ComponentModel;
-using System.Linq.Dynamic.Core;
+﻿using iPath.Application;
+using iPath.Application.Features.Admin;
+using iPath.Application.Features.Notifications;
 using iPath.Application.Features.Users;
 using iPath.Application.Localization;
-using iPath.Application.Features.Notifications;
+using iPath.EF.Core.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using System.ComponentModel;
+using System.Linq.Dynamic.Core;
 
 namespace iPath.API;
 
@@ -68,10 +73,15 @@ public static class AdminEndpoints
             .RequireAuthorization("Admin");
 
 
-        route.MapGet("session", ([FromServices] IUserSession sess) => sess.User)
+        route.MapGet("session", ([FromServices] IUserSession? sess) => {
+            if (sess is not null)
+            {
+                return sess.User;
+            }
+            return null;
+        })
             .Produces<SessionUserDto>()
-            .WithTags("Session")
-            .RequireAuthorization();
+            .WithTags("Session");
 
 
         route.MapGet("translations/{lang}", (string lang, [FromServices] LocalizationFileService srv)
@@ -80,7 +90,7 @@ public static class AdminEndpoints
             .WithTags("Localization");
 
 
-
+        #region "-- imap --"
         var mailbox = route.MapGroup("mailbox")
             .WithTags("External Mailbox");
 
@@ -88,6 +98,7 @@ public static class AdminEndpoints
             .RequireAuthorization("Admin");
         mailbox.MapGet("unread", ([FromServices] IMailBox srv) => srv.GetUnreadMails())
             .RequireAuthorization("Admin");
+        #endregion
 
         return route;
     }

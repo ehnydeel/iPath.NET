@@ -11,24 +11,27 @@
 <MudPaper Width="100%" Elevation="0">
     @if (RendererInfo.IsInteractive)
     {
-        @if (MyProfile is not null)
+        @if (ShowLoginButtons)
         {
-            @if (!MyProfile.IsComplete())
-            {
+            <MudButton StartIcon="@Icons.Material.Filled.Login" Href="Account/Login" Variant="Variant.Filled" Color="Color.Primary">@T["Login"]</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Person" Href="Account/Register" Variant="Variant.Filled" Color="Color.Primary">@T["Sign Up"]</MudButton>
+        }
+
+        @if (ShowProfileCompletion)
+        {
                 <MudAlert Severity="Severity.Warning" Class="my-8 pa-2">
                     <MudText Typo="Typo.body1">
                         @T["You have not yet completed your Profile. Please fill in your data"]
                     </MudText>
                     <MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Person" Href="user/profile" Variant="Variant.Filled" Color="Color.Secondary">@T["My Profile"]</MudButton>
                 </MudAlert>
-            }
+        }
+
+        @if (ShowUserLinks)
+        {
             <div class="mt-10">more to follow here ...</div>
         }
-        else
-        {
-            <MudButton StartIcon="@Icons.Material.Filled.Login" Href="Account/Login" Variant="Variant.Filled" Color="Color.Primary">@T["Login"]</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Person" Href="Account/Register" Variant="Variant.Filled" Color="Color.Primary">@T["Sign Up"]</MudButton>
-        }
+        
 
     }
     else

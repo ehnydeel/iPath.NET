@@ -7,6 +7,7 @@ public class iPathConfig
     public bool DbSeedingAvtice { get; set; }
     public bool DbAutoMigrate { get; set; }
 
+    public string DataRoot { get; set; } = string.Empty;
     public string TempDataPath { get; set; } = string.Empty;
     public string LocalDataPath { get; set; } = string.Empty;
 

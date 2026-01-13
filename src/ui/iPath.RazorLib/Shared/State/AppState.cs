@@ -1,8 +1,9 @@
 ﻿using iPath.Application.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace iPath.Blazor.Componenents.Shared;
 
-public class AppState(IPathApi api) : IUserSession
+public class AppState(IPathApi api, ILogger<AppState> logger) : IUserSession
 {
     private SessionUserDto _user;
 
@@ -13,10 +14,17 @@ public class AppState(IPathApi api) : IUserSession
     public async Task ReloadSession()
     {
         _user = SessionUserDto.Anonymous;
-        var resp = await api.GetSession();
-        if (resp.IsSuccessful)
+        try
         {
-            _user = resp.Content;
+            var resp = await api.GetSession();
+            if (resp.IsSuccessful)
+            {
+                _user = resp.Content;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "error calling /api/v1/session");
         }
     }
 

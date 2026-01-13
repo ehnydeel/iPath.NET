@@ -19,6 +19,15 @@ public static class APIServicesRegistration
 {
     public static IServiceCollection AddIPathAPI(this IServiceCollection services, IConfiguration config)
     {
+        // app config
+        services.Configure<iPathConfig>(config.GetSection(iPathConfig.ConfigName));
+        var cfg = new iPathConfig();
+        config.GetSection(iPathConfig.ConfigName).Bind(cfg);
+
+        // create root folder if requested
+        CreateDataRoot(cfg);
+        
+
         // configure Mediator
         services.AddDispatchR(cfg =>
         {
@@ -36,11 +45,6 @@ public static class APIServicesRegistration
             .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
             .AddPolicy("Developer", policy => policy.RequireRole("Developer"));
 
-
-        // app config
-        services.Configure<iPathConfig>(config.GetSection(iPathConfig.ConfigName));
-        //var cfg = new iPathConfig();
-        //config.GetSection(iPathConfig.ConfigName).Bind(cfg);
 
         // Email handling
         var smtp = new SmtpConfig();
@@ -119,5 +123,30 @@ public static class APIServicesRegistration
         services.AddOpenApi();
 
         return services;
+    }
+
+
+    private static void CreateDataRoot(iPathConfig cfg)
+    {
+        if (!string.IsNullOrEmpty(cfg.DataRoot) && !System.IO.Directory.Exists(cfg.DataRoot))
+        {
+            try
+            {
+                var root = new System.IO.DirectoryInfo(cfg.DataRoot);
+                root.Create();
+
+                var data = new System.IO.DirectoryInfo(cfg.LocalDataPath);
+                if (root.FullName == data.Parent.FullName)
+                    data.Create();
+
+                var temp = new System.IO.DirectoryInfo(cfg.TempDataPath);
+                if (root.FullName == temp.Parent.FullName)
+                    temp.Create();
+            }
+            catch(Exception ex) 
+            {
+                throw new Exception("Cannot create initial data folder structure", ex);
+            }
+        }
     }
 }

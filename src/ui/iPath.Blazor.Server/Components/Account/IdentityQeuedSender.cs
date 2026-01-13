@@ -1,10 +1,11 @@
 using iPath.Application.Features;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
 
 namespace iPath.Blazor.Server.Components.Account
 {
-    internal sealed class IdentityQueuedSender(IEmailRepository repo) : IEmailSender<User>
+    internal sealed class IdentityQueuedSender(IEmailRepository repo, NavigationManager nm) : IEmailSender<User>
     {
 
         private async Task Enqueue(string address, string subject, string body)
@@ -17,7 +18,9 @@ namespace iPath.Blazor.Server.Components.Account
 
         public Task SendPasswordResetLinkAsync(User user, string email, string resetLink)
         {
-            if (resetLink.Contains("email="))
+            string baseAddress = nm.ToAbsoluteUri("").AbsoluteUri;
+
+            if (resetLink.Contains("migrate="))
             {
                 // migration confirmation
                 return Enqueue(email, "iPath Account Migration",
@@ -26,7 +29,13 @@ namespace iPath.Blazor.Server.Components.Account
             else
             {
                 return Enqueue(email, "Reset your iPath password",
-                    $"Please reset your password by <a href='{resetLink}'>clicking here</a>.");
+                    $"""
+                    <p>A request to reset your password has been received on <a href='{baseAddress}'>iPath-Server</a>.</p>
+                    <p>If you have asked for resetting your password, please follow this link and set a new password</p>
+                    <ul>
+                        <li><a href='{resetLink}'>reset password</a></li>
+                    </ul>
+                    """);
             }
         }
 

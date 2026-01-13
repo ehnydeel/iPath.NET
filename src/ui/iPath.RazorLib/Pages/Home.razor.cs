@@ -8,12 +8,33 @@ public partial class Home(AppState appState, UserViewModel uvm, AuthenticationSt
 {
     private UserProfile? MyProfile = null;
 
-    protected override async Task OnInitializedAsync()
+
+    private bool ShowLoginButtons = false;
+    private bool ShowProfileCompletion = false;
+    private bool ShowUserLinks = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var state = await asp.GetAuthenticationStateAsync();
-        if (state.User.Identity.IsAuthenticated)
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
         {
-            MyProfile = await GetMyProfile();
+            var state = await asp.GetAuthenticationStateAsync();
+            if (state.User.Identity.IsAuthenticated)
+            {
+                MyProfile = await GetMyProfile();
+                if (MyProfile is not null && MyProfile.IsComplete())
+                {
+                    ShowProfileCompletion = true;
+                }
+
+                ShowUserLinks = true;
+            }
+            else
+            {
+                ShowLoginButtons = true;
+            }
+            StateHasChanged();
         }
     }
 

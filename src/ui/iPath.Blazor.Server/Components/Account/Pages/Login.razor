@@ -32,20 +32,32 @@
 
             <MudText GutterBottom="true" Typo="Typo.body1">log in with your iPath account.</MudText>
 
-            <MudGrid>
+            <MudGrid Spacing="2">
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Username)" @bind-Value="Input.Username"
                                         Label="Username or Email" Placeholder="name@example.com"
+                                        Margin="Margin.Dense" Variant="Variant.Outlined" ShrinkLabel="true"
                                         UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
                                         Label="Password" InputType="InputType.Password" Placeholder="password"
+                                        Margin="Margin.Dense" Variant="Variant.Outlined" ShrinkLabel="true"
                                         UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } })" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticCheckBox For="@(() => Input.RememberMe)" @bind-Value="Input.RememberMe">Remember me</MudStaticCheckBox>
                 </MudItem>
+
+                @if (!string.IsNullOrEmpty(InitialAdminPassword))
+                {
+                    <MudAlert Severity="Severity.Info" Class="ma-4">
+                        <strong>This is a new Database.</strong><br /> 
+                        You may login with username 'Admin' and the following password: 
+                        <pre style="border: 1px: solid; padding: 4px; background-color: lightgrey;">@InitialAdminPassword</pre>
+                    </MudAlert>
+                }
+
                 <MudItem md="12">
                     <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Log in</MudStaticButton>
                 </MudItem>
@@ -61,8 +73,9 @@
         </MudGrid>
     </MudItem>
     <MudItem md="6">
-        <MudText GutterBottom="true" Typo="Typo.body1">Use another service to log in.</MudText>
-
+        <!--
+            <MudText GutterBottom="true" Typo="Typo.body1">Use another service to log in.</MudText>
+        -->
         <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
@@ -86,7 +99,32 @@
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
+
+
+        // Check for fresh database
+        await CheckInitialDb();
     }
+
+
+    string InitialAdminPassword = string.Empty;
+    async Task CheckInitialDb()
+    {
+        // check if admin user has been created but never logged in
+        if (DbSeeder.InitialAdminPassword != null)
+        {
+            var admin = await um.FindByNameAsync("Admin");
+            if (admin != null)
+            {
+                var logins = await um.GetLoginsAsync(admin);
+                if (logins is null || !logins.Any())
+                {
+                    InitialAdminPassword = DbSeeder.InitialAdminPassword;
+                }
+            }
+        }
+    }
+
+
 
     public async Task LoginUser()
     {
@@ -113,6 +151,7 @@
         var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
         if (result.Succeeded)
         {
+            DbSeeder.InitialAdminPassword = null;
             Logger.LogInformation("User logged in.");
             RedirectManager.RedirectTo(ReturnUrl);
         }
@@ -146,7 +185,7 @@
 
                         var callbackUrl = NavigationManager.GetUriWithQueryParameters(
                             NavigationManager.ToAbsoluteUri("Account/ConfirmMigration").AbsoluteUri,
-                            new Dictionary<string, object?> { ["code"] = code, ["email"] = mailB64 });
+                            new Dictionary<string, object?> { ["code"] = code, ["email"] = mailB64, ["migrate"] = "true" });
 
                         await EmailSender.SendPasswordResetLinkAsync(user, user.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
