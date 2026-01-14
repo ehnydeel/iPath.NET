@@ -120,6 +120,8 @@ public static class NodeExtensions
             }
         }
 
+        public string BinarayDataUrl => $"/files/{node.Id}";
+
         public string FileUrl
         {
             get

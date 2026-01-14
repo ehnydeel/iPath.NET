@@ -7,7 +7,9 @@ using iPath.RazorLib;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using Serilog;
@@ -102,7 +104,6 @@ if (!string.IsNullOrEmpty(cfg.ReverseProxyAddresse) && IPAddress.TryParse(cfg.Re
     builder.Services.Configure<ForwardedHeadersOptions>(o => o.KnownProxies.Add(proxyIP));
 }
 
-
 var app = builder.Build();
 var opts = app.Services.GetRequiredService<IOptions<iPathConfig>>();
 
@@ -148,6 +149,53 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 
+
+// Serve files from external storage folder at request path /files
+// - Uses configured LocalDataPath from iPathConfig (used elsewhere by LocalStorageService).
+// - Falls back to no-op and logs a warning if folder is not configured or missing.
+var externalFilesPath = opts.Value?.TempDataPath;
+if (!string.IsNullOrWhiteSpace(externalFilesPath))
+{
+    try
+    {
+        if (Directory.Exists(externalFilesPath))
+        {
+            var provider = new PhysicalFileProvider(Path.GetFullPath(externalFilesPath));
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+            // Optionally: add unknown mappings or overrides here, e.g. contentTypeProvider.Mappings[".bin"] = "application/octet-stream";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = provider,
+                RequestPath = "/files",
+                ContentTypeProvider = contentTypeProvider,
+                ServeUnknownFileTypes = true, // allow binary files with unknown extensions
+                OnPrepareResponse = ctx =>
+                {
+                    // reuse same caching policy as other static files (adjust as desired)
+                    ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+                    ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+                    ctx.Context.Response.Headers.Append("Expires", "0");
+                }
+            });
+        }
+        else
+        {
+            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+            logger.LogWarning("Configured LocalDataPath '{path}' does not exist; /files will not be available.", externalFilesPath);
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "Failed to configure static file serving for '{path}'", externalFilesPath);
+    }
+}
+else
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogWarning("LocalDataPath is not configured; /files will not be available.");
+}
 
 
 // app.UseHttpsRedirection();
