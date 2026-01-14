@@ -20,4 +20,6 @@ public class iPathConfig
     public bool ShowPageInfo { get; set; } = false;
 
     public string ReverseProxyAddresse { get; set; }
+
+    public bool WsiViewerActive { get; set; }
 }

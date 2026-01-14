@@ -1,5 +1,6 @@
 ﻿@namespace iPath.Blazor.Componenents.Nodes
 @using System.Threading.Tasks
+@using iPath.Domain.Config
 
 @inherits NodeViewComponentBase
 
@@ -7,7 +8,7 @@
 @inject ISnackbar snackbar
 @inject IJSRuntime JS
 @inject IHttpClientFactory httpFactory
-
+@inject IOptions<iPathConfig> opts
 
 @if (!vm.IsRootNodeSelected && vm.SelectedNode is not null && !vm.SelectedNode.ChildNodes.Any())
 {
@@ -17,7 +18,7 @@
         {
             <img src="@vm.SelectedNode.FileUrl" @onclick="@vm.GoNext" />
         }
-        else if (vm.SelectedNode.FileExtension == ".svs")
+        else if (opts.Value.WsiViewerActive && vm.SelectedNode.FileExtension == ".svs")
         {
             <iPath.OpenSeadragon.OsdViewer Style="width: 90%; max-height: 70vh; height: 70vh; background-color: black;" ImagePath="@vm.SelectedNode.BinarayDataUrl" />
         }
