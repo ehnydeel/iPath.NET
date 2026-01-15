@@ -56,11 +56,11 @@ public partial class UserCommunityMembershipGrid(CommunityAdminViewModel cvm, Us
                 var m = uvm.SelectedUser.CommunityMembership.FirstOrDefault(m => m.CommunityId == item.Id);
                 if (m != null)
                 {
-                    tmp.Add(new CommunityMemberModel(m, item.Name, uvm.SelectedUser.Id));
+                    tmp.Add(new CommunityMemberModel(m, item.Name, uvm.SelectedUser.Id, uvm.SelectedUser.Username));
                 }
                 else
                 {
-                    tmp.Add(new CommunityMemberModel(item.Id, item.Name, uvm.SelectedUser.Id));
+                    tmp.Add(new CommunityMemberModel(item.Id, item.Name, uvm.SelectedUser.Id, uvm.SelectedUser.Username));
                 }
             }
             allMemberShips = tmp;

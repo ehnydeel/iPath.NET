@@ -1,0 +1,18 @@
+﻿@page "/admin"
+
+@attribute [Authorize(Roles = "Admin")]
+@inject IStringLocalizer T
+
+<MudBreadcrumbs Items="_items" Class="mt-0 pt-0"></MudBreadcrumbs>
+
+<MudText Typo="Typo.h6" GutterBottom="true">@T["Administration"]</MudText>
+
+<AdminNavMenu />
+
+@code {
+    private List<BreadcrumbItem> _items =
+    [
+        new("Home", href: "#"),
+        new("Administration", href: null, disabled: true)
+    ];
+}

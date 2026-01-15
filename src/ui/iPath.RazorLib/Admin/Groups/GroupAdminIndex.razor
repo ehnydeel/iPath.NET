@@ -4,6 +4,9 @@
 @inject GroupAdminViewModel vm
 @inject IStringLocalizer T
 
+<MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
+
+
 <IPathHeader Typo="Typo.h5" Title="Group Administration">
     <ActionContent>
         <MudTooltip Text=@T["create a new group"]>
@@ -45,4 +48,10 @@
 
 @code {
     int[] pageOpts => new[] { 25, 50, 100 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await vm.LoadGroup(null);
+    }
 }

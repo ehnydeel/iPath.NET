@@ -8,10 +8,12 @@ namespace iPath.Application.Features;
 public record GroupListDto(Guid Id, string Name, eGroupVisibility Visibility,
     int? TotalNodes = null, int? NewNodes = null, int? NewAnnotation = null);
 
-public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, OwnerDto Owner, 
-    GroupSettings Settings, 
-    GroupMemberDto[]? Members, 
-    CommunityListDto[]? Communities,
+public record GroupDto(Guid Id, string Name, eGroupVisibility Visibility, 
+    OwnerDto Owner,
+    CommunityListDto? Community,
+    GroupSettings Settings,    
+    GroupMemberDto[]? Members,
+    CommunityListDto[]? ExtraCommunities,
     QuestionnaireForGroupDto[]? Questionnaires);
 
 
@@ -105,7 +107,7 @@ public class CreateGroupCommand : IRequest<CreateGroupCommand, Task<GroupListDto
     public eGroupVisibility? Visibility { get; set; }
 
     public Guid OwnerId { get; set; }
-    public Guid? CommunityId { get; set; } = null;
+    public Guid CommunityId { get; set; }
 
     [JsonIgnore]
     public string ObjectName => nameof(Group);
@@ -125,6 +127,8 @@ public class UpdateGroupCommand
     public GroupSettings? Settings { get; set; } = null;
 
     public Guid? OwnerId { get; set; }
+    public Guid? CommunityId { get; set; }
+
     public eGroupVisibility? Visibility { get; set; }
 
     public string ObjectName => nameof(Group);
@@ -136,9 +140,12 @@ public static class GroupExtensions
 {
     public static GroupDto ToDto(this Group group)
     {
-        return new GroupDto(Id: group.Id, Name: group.Name, Visibility: group.Visibility, Owner: group.Owner.ToOwnerDto(), Settings: group.Settings,
+        return new GroupDto(Id: group.Id, Name: group.Name, Visibility: group.Visibility, 
+            Owner: group.Owner.ToOwnerDto(),
+            Community: group.Community.ToListDto(),
+            Settings: group.Settings,
             Members: group.Members?.Select(m => new GroupMemberDto(UserId: m.UserId, Role: m.Role, Username: m.User?.UserName)).ToArray(),
-            Communities: group.Communities.Select(c => new CommunityListDto(Id: c.Community.Id, Name: c.Community.Name)).ToArray(),
+            ExtraCommunities: group.ExtraCommunities.Select(c => new CommunityListDto(Id: c.Community.Id, Name: c.Community.Name)).ToArray(),
             Questionnaires: group.Quesionnaires.Select(q => new QuestionnaireForGroupDto(qId: q.QuestionnaireId, QuestinnaireId: q.Questionnaire.QuestionnaireId, QuestinnaireName: q.Questionnaire.Name, Usage: q.Usage, ExplicitVersion: q.ExplicitVersion)).ToArray());
     }
     

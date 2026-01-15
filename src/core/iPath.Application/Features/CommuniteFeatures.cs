@@ -6,7 +6,11 @@ namespace iPath.Application.Features;
 #region "-- Queries --"
 
 public record CommunityListDto(Guid Id, string Name, CommunitySettings? Settings = null);
-public record CommunityDto(Guid Id, string Name, CommunitySettings Settings, eCommunityVisibility Visibility, GroupListDto[] Groups, OwnerDto? Owner);
+
+public record CommunityDto(Guid Id, string Name, CommunitySettings Settings, eCommunityVisibility Visibility,
+    OwnerDto? Owner, 
+    GroupListDto[] Groups,
+    GroupListDto[]? ExtraGroups);
 
 
 public class GetCommunityListQuery : PagedQuery<CommunityListDto>
@@ -65,6 +69,9 @@ public record DeleteCommunityCommand(Guid Id)
 
 public static class CommunityExtensions
 {
-    public static CommunityListDto ToListDto(this Community entity)
-        => new CommunityListDto(Id: entity.Id, Name: entity.Name);
+    public static CommunityListDto? ToListDto(this Community? entity)
+        => entity is null ? null : new CommunityListDto(Id: entity.Id, Name: entity.Name);
+
+    public static CommunityListDto? ToListDto(this CommunityDto? entity)
+        => entity is null ? null : new CommunityListDto(Id: entity.Id, Name: entity.Name);
 }

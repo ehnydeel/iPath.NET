@@ -19,5 +19,11 @@ internal class QuestionnaireConfiguration : IEntityTypeConfiguration<Questionnai
             .HasForeignKey(qg => qg.QuestionnaireId)
             .IsRequired(true)
             .OnDelete(DeleteBehavior.NoAction);
+
+        b.HasMany(q => q.Communities)
+            .WithOne(qg => qg.Questionnaire)
+            .HasForeignKey(qg => qg.QuestionnaireId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

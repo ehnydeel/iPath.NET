@@ -84,7 +84,7 @@ public class DbSeeder(iPathDbContext db,
 
         if (!db.Groups.Any() && admin != null)
         {
-            await db.Groups.AddAsync(Group.Create(Name: "Test Group", Owner: admin, DefaultCommunity: community));
+            await db.Groups.AddAsync(Group.Create(Name: "Test Group", Owner: admin, Community: community));
         }
 
         await db.SaveChangesAsync();

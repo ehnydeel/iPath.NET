@@ -15,7 +15,7 @@ public partial class GroupAdminDetailView(GroupAdminViewModel vm, IStringLocaliz
     {       
         if (Model != null)
         {
-            Communities = Model.Communities;
+            Communities = Model.ExtraCommunities;
             if (memberGrid != null)
             {
                 await memberGrid.ReloadServerData();

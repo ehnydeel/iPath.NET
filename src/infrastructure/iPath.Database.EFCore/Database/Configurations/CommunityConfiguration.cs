@@ -18,6 +18,9 @@ internal class CommunityConfiguration : IEntityTypeConfiguration<Community>
             .OnDelete(DeleteBehavior.NoAction);
 
         b.HasMany(x => x.Groups).WithOne(g => g.Community).HasForeignKey(g => g.CommunityId);
+        b.HasMany(x => x.ExtraGroups).WithOne(g => g.Community).HasForeignKey(g => g.CommunityId);
         b.HasMany(x => x.Members).WithOne(m => m.Community).HasForeignKey(m => m.CommunityId).OnDelete(DeleteBehavior.NoAction);
+
+        b.HasMany(g => g.Quesionnaires).WithOne(g => g.Community).HasForeignKey(g => g.CommunityId).IsRequired(true);
     }
 }

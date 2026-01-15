@@ -1,4 +1,5 @@
 ﻿using iPath.Blazor.Componenents.Admin.Groups;
+using iPath.Blazor.Componenents.Admin.Users;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,9 +9,31 @@ public class CommunityAdminViewModel(IPathApi api,
     ISnackbar snackbar, 
     IDialogService dialog,
     IStringLocalizer T,
+    NavigationManager nm,
     ILogger<CommunityAdminViewModel> logger)
     : IViewModel
 {
+    public Action OnChange { get; set; }
+
+
+    public List<BreadcrumbItem> BreadCrumbs {
+        get
+        {
+            var ret = new List<BreadcrumbItem> { new("Administration", href: "admin") };
+            if (SelectedCommunity is null)
+            {
+                ret.Add(new("Communities", href: null, disabled: true));
+            }
+            else
+            {
+                ret.Add(new("Communities", href: "admin/communities"));
+                ret.Add(new(SelectedCommunity.Name, href: null, disabled: true));
+            }
+            return ret;
+        }
+    }
+
+
     public MudDataGrid<CommunityListDto> grid;
 
     public async Task<GridData<CommunityListDto>> GetListAsync(GridState<CommunityListDto> state)
@@ -55,7 +78,7 @@ public class CommunityAdminViewModel(IPathApi api,
 
 
     public CommunityDto SelectedCommunity { get; private set; }
-    private async Task LoadCommunity(Guid? id)
+    public async Task<CommunityDto> LoadCommunity(Guid? id)
     {
         if (!id.HasValue)
         {
@@ -70,7 +93,71 @@ public class CommunityAdminViewModel(IPathApi api,
             }
             snackbar.AddError(resp.ErrorMessage);
         }
+        return SelectedCommunity;
     }
+
+    public void GoToCommunity(CommunityListDto dto)
+    {
+        nm.NavigateTo($"admin/communities/{dto.Id}");
+    }
+
+
+
+
+
+    public async Task<List<CommunityMemberModel>> GetMembersAsync(CancellationToken ct = default)
+    {
+        if (SelectedCommunity is not null)
+        {
+            try
+            {
+                var resp = await api.GetCommunityMembers(SelectedCommunity.Id);
+
+                if (resp.IsSuccessful)
+                {
+                    return resp.Content.Items.Select(m => new CommunityMemberModel(dto: m, SelectedCommunity.Name, m.UserId, m.Username)).ToList();
+                }
+                snackbar.AddWarning(resp.ErrorMessage);
+            }
+            catch(Exception ex)
+            {
+                snackbar.AddError(ex.Message);
+            }
+        }
+        return new List<CommunityMemberModel>();
+    }
+
+    public async Task UpdateMember(CommunityMemberModel m)
+    {
+        if (m.Role == eMemberRole.None)
+        {
+            await RemoveGroupMember(m);
+        }
+        else
+        {
+            var cmd = new AssignUserToCommunityCommand(communityId: m.CommunityId, userId: m.UserId, role: m.Role);
+
+            var resp = await api.AssignUserToCommunity(cmd);
+            if (!resp.IsSuccessful)
+                snackbar.AddError(resp.ErrorMessage);
+        }
+        OnChange?.Invoke();
+    }
+
+    public async Task RemoveGroupMember(CommunityMemberModel member)
+    {
+        if (SelectedCommunity is not null)
+        {
+            UserGroupMemberDto[] list = {
+                new UserGroupMemberDto(GroupId: SelectedCommunity.Id, Groupname: "", Role: eMemberRole.None)
+            };
+            var cmd = new UpdateGroupMembershipCommand(member.UserId, list);
+            var resp = await api.UpdateGroupMemberships(cmd);
+            if (!resp.IsSuccessful)
+                snackbar.AddError(resp.ErrorMessage);
+        }
+    }
+
 
 
 
@@ -111,19 +198,29 @@ public class CommunityAdminViewModel(IPathApi api,
             DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
             var dlg = await dialog.ShowAsync<EditCommunityDialog>(T["Edit communiy"], options: opts, parameters: p);
             var res = await dlg.Result;
-            var r = res?.Data as CommunityEditModel;
-            if (r != null && r.Id.HasValue)
-            {
-                var cmd = new UpdateCommunityCommand(Id: r.Id.Value, Name: r.Name, OwnerId: r.Owner.Id, Settings: r.Settings);
-                var resp = await api.UpdateCommunity(cmd);
-                if (!resp.IsSuccessful)
-                {
-                    snackbar.AddWarning(resp.ErrorMessage);
-                }
-                await grid.ReloadServerData();
-            }
+            await UpdateCommunity(res?.Data as CommunityEditModel);           
         }
     }
+
+    public async Task<bool> UpdateCommunity(CommunityEditModel r)
+    {
+        if (r != null && r.Id.HasValue)
+        {
+            var cmd = new UpdateCommunityCommand(Id: r.Id.Value, Name: r.Name, OwnerId: r.Owner.Id, Settings: r.Settings);
+            var resp = await api.UpdateCommunity(cmd);
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddWarning(resp.ErrorMessage);
+            }
+            if (grid is not null)
+            {
+                await grid.ReloadServerData();
+            }
+            return true;
+        }
+        return false;
+    }
+
 
     public async Task Delete()
     {
@@ -134,7 +231,10 @@ public class CommunityAdminViewModel(IPathApi api,
     {
         if (SelectedCommunity != null)
         {
-            var p = new DialogParameters<CreateGroupDialog> { { d => d.Model, new CreateGroupCommandModel { Community = this.SelectedItem } } };
+            var p = new DialogParameters<CreateGroupDialog> {
+                { d => d.Model, new CreateGroupCommandModel { Community = SelectedCommunity.ToListDto() } },
+                { d => d.DisableCommunityInput, true }
+            };
             DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
             var dlg = await dialog.ShowAsync<CreateGroupDialog>(T["Create a new group"], options: opts, parameters: p);
             var res = await dlg.Result;
@@ -148,7 +248,7 @@ public class CommunityAdminViewModel(IPathApi api,
                 }
                 else
                 {
-                    await LoadCommunity(SelectedItem.Id);
+                    await LoadCommunity(SelectedCommunity.Id);
                 }
             }
         }

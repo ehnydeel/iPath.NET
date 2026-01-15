@@ -12,9 +12,12 @@
     <DialogContent>
         <MudForm Model="@Model" @ref="frm" Spacing="4">
             <MudTextField @bind-Value="@Model.Name" Label=@T["Name"] Required="true" Variant="Variant.Outlined" />
-            <MudTextField @bind-Value="@Model.Settings.Purpose" Label=@T["Purpose"] Variant="Variant.Outlined" Lines="5" AutoGrow="true" />
-            <OwnerLookup Label=@T["Group Owner"] Class="mt-4" @bind-Value="Model.Owner" />
-            <CommunityLookup Label=@T["Community"] @bind-Value="@Model.Community" />
+            <MudTextField @bind-Value="@Model.Settings.Purpose" Label=@T["Purpose"] Variant="Variant.Outlined"
+                          Lines="5" AutoGrow="true" />
+            <OwnerLookup Label=@T["Group Owner"] Class="mt-4" @bind-Value="Model.Owner" Clearable="true"
+                         Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" Dense="true" />
+            <CommunityLookup Label=@T["Community"] @bind-Value="@Model.Community" Disabled="DisableCommunityInput" Clearable="true"
+                             Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" Dense="true" />
         </MudForm>
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -34,7 +37,10 @@
     private IMudDialogInstance MudDialog { get; set; }
 
     [Parameter]
-    public CreateGroupCommandModel Model { get; set;  } = new();
+    public CreateGroupCommandModel Model { get; set; } = new();
+
+    [Parameter]
+    public bool DisableCommunityInput { get; set; }
 
     MudForm frm;
     string ErrorMessage = string.Empty;

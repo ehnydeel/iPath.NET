@@ -1,83 +1,53 @@
-﻿@page "/admin/communities"
+﻿@page "/admin/communities/{id}"
+@using iPath.Blazor.Componenents.Admin.Community
 
 @inject CommunityAdminViewModel vm
 @inject IStringLocalizer T
 
+@attribute [Authorize(Roles = "Admin")]
 
-<MudGrid Spacing="2">
-    <MudItem xs="12" sm="8" md="7">
-        <IPathHeader Title=@T["Community Administration"]>
-            <ActionContent>
-                <MudTooltip Text=@T["Create a new community"]>
-                    <MudFab StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="vm.Create" />
-                </MudTooltip>
-            </ActionContent>
-        </IPathHeader>
-        <MudDataGrid T="CommunityListDto" ServerData="vm.GetListAsync" @ref="vm.grid"
-                     RowClick="@(async args => await vm.SetSelectedItem(args.Item))"
-                     RowStyleFunc="vm.SelectedRowStyle"
-                     Dense>
-            <Columns>
-                <PropertyColumn Property="x => x.Name" />
-            </Columns>
-            <PagerContent>
-                <MudDataGridPager T="CommunityListDto" />
-            </PagerContent>
-        </MudDataGrid>
-    </MudItem>
-    <MudItem xs="12" sm="4" md="5">
-        <IPathHeader Title="@vm.SelectedCommunity?.Name">
-            <ActionContent>
-                <MudTooltip Text=@T["edit this community"]>
-                    <MudFab StartIcon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="vm.Edit" />
-                </MudTooltip>
-            </ActionContent>
-        </IPathHeader>
-        <MudPaper Elevation="1" Style="min-height: 10em;" Class="pa-2">
-            @if (vm.SelectedCommunity is null)
-            {
-                <MudText>nothing selected</MudText>
-            }
-            else
-            {
-                <MudStack Row Style="border-bottom: 1px solid;">
-                    <MudText Typo="Typo.h6">@T["Community groups"]</MudText>
-                    <MudSpacer />
-                    <MudTooltip Text=@T["add a new group"]>
-                        <MudFab StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="vm.CreateGroup" />
-                    </MudTooltip>
-                </MudStack>
+<MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
 
-                <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
-                    <GroupAdminLookup Label=@T["select exiting group"] @bind-Value="selectedGroupToAdd" Dense="true" Variant="Variant.Outlined" />
-                    <MudTooltip Text=@T["add a new group"]>
-                        <MudIconButton Icon="@Icons.Material.Filled.Send" Size="Size.Small" OnClick="AddGroup" />
-                    </MudTooltip>
-                </MudStack>
-                <MudDataGrid Items="@vm.SelectedCommunity.Groups" Dense="true" Class="mt-4">
-                    <Columns>
-                        <PropertyColumn Property="g => g.Name" />
-                        <TemplateColumn CellClass="d-flex justify-end">
-                            <CellTemplate>
-                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick=@(() => vm.RemoveGroup(context.Item)) />
-                            </CellTemplate>
-                        </TemplateColumn>
-                    </Columns>
-                </MudDataGrid>
-            }
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+@if (vm.SelectedCommunity is null)
+{
+    <IPathHeader Title=@T["Community Administration"] />
+}
+else
+{
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true"
+             PanelClass="pa-6" Color="Color.Info" IconColor="Color.Surface"
+             @bind-ActivePanelIndex="panelIndex">
+        <MudTabPanel Text=@T["Group Settings"] Icon="@Icons.Material.Filled.Settings">
+            <CommunityAdminSettings Model="@vm.SelectedCommunity" />
+        </MudTabPanel>
+        <MudTabPanel Text=@T["Members"] Icon="@Icons.Material.Filled.Person">
+            <CommunityAdminMembersTable Model="@vm.SelectedCommunity" />
+        </MudTabPanel>
+        <MudTabPanel Text=@T["Groups"] Icon="@Icons.Material.Filled.Groups">
+            <CommunityAdminGroups Model="@vm.SelectedCommunity" />
+        </MudTabPanel>
+        <MudTabPanel Text=@T["Questionnaires"] Icon="@Icons.Material.Filled.DynamicForm">
+            <CommunityAdminQuestionnaires Model="@vm.SelectedCommunity" />
+        </MudTabPanel>
+    </MudTabs>
+}
+
 
 @code {
-    GroupListDto selectedGroupToAdd;
+    [Parameter]
+    public string id { get; set; }
 
-    async Task AddGroup()
+    int panelIndex = 0;
+
+    CommunityDto Model { get; set; }
+
+    protected override async Task OnParametersSetAsync()
     {
-        if (selectedGroupToAdd != null)
+        await base.OnParametersSetAsync();
+        if (Guid.TryParse(id, out var cid))
         {
-            await vm.AddGroup(selectedGroupToAdd);
-            selectedGroupToAdd = null;
+            await vm.LoadCommunity(cid);
         }
     }
 }

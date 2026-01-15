@@ -1,0 +1,34 @@
+﻿@page "/admin/communities"
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject CommunityAdminViewModel vm
+@inject IStringLocalizer T
+
+<MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
+
+<IPathHeader Title=@T["Community Administration"]>
+    <ActionContent>
+        <MudTooltip Text=@T["Create a new community"]>
+            <MudFab StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="vm.Create" />
+        </MudTooltip>
+    </ActionContent>
+</IPathHeader>
+<MudDataGrid T="CommunityListDto" ServerData="vm.GetListAsync" @ref="vm.grid"
+             RowClick="@(async args => vm.GoToCommunity(args.Item))"
+             Dense="true" Hover="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="CommunityListDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await vm.LoadCommunity(null);
+    }
+}

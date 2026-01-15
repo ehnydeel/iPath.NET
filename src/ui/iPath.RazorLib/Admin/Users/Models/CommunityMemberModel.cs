@@ -4,10 +4,15 @@ namespace iPath.Blazor.Componenents.Admin.Users;
 public class CommunityMemberModel
 {
     public Guid UserId { get; private set; }
+    public string? UserName { get; private set; }
+
     public Guid CommunityId { get; private set; }
     public string CommunityName { get; private set; }
+
     public eMemberRole OriginalRole { get; private set; }
     public eMemberRole Role { get; set; }
+
+    public bool Saving { get; set; } = false;
     public bool HasChange => OriginalRole != Role;
 
     public bool IsModerator
@@ -35,20 +40,22 @@ public class CommunityMemberModel
         return Role == input ? eMemberRole.None : Role;
     }
 
-    public CommunityMemberModel(CommunityMemberDto dto, string communityName,  Guid userId)
+    public CommunityMemberModel(CommunityMemberDto dto, string communityName, Guid userId, string? username)
     {
         CommunityId = dto.CommunityId;        
         CommunityName = communityName;
         UserId = userId;
+        UserName = username;
         OriginalRole = (eMemberRole)dto.Role;
         Role = (eMemberRole)dto.Role;
     }
 
-    public CommunityMemberModel(Guid communityId, string communityName, Guid userId)
+    public CommunityMemberModel(Guid communityId, string communityName, Guid userId, string? username)
     {
         CommunityId = communityId;
         CommunityName = communityName;
         UserId = userId;
+        UserName = username;
         OriginalRole = eMemberRole.None;
         Role = eMemberRole.None;
     }

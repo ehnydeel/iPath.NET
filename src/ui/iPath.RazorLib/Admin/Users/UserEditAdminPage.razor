@@ -6,7 +6,7 @@
 
 @attribute [Authorize(Roles = "Admin")]
 
-<MudText Typo="Typo.h5">@T["Edit User:"] @vm.SelectedUser?.Username</MudText>
+<MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="mt-2"
          PanelClass="pa-6" Color="Color.Info" IconColor="Color.Surface"

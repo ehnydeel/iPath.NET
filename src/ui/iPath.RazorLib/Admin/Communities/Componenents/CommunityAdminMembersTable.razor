@@ -1,0 +1,140 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Community
+@using iPath.Blazor.Componenents.Admin.Communities
+@using iPath.Blazor.Componenents.Admin.Users
+
+
+@inject CommunityAdminViewModel vm
+@inject IStringLocalizer T
+@inject NavigationManager nm
+
+@if (Model is null)
+{
+    <LoadingMessage />
+}
+else
+{
+    <MudTable T="CommunityMemberModel" Items="@Items" @ref="table"
+              FixedHeader="true" Height="400px" Breakpoint="Breakpoint.Sm" Virtualize="true"
+              Dense="true" Striped="true" Hover="true"
+              Elevation="1">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">@T["Filter"]</MudText>
+            <MudSpacer />
+            <OwnerLookup Label=@T["Search user"] Clearable="true"
+                         @bind-Value="selectedUser" @bind-Value:after="OnUserSelected"
+                         Variant="Variant.Outlined" ShrinkLabel="true" Dense="true" Margin="Margin.Dense" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>@T["Username"]</MudTh>
+            <MudTh>@T["User"]</MudTh>
+            <MudTh>@T["Guest"]</MudTh>
+            <MudTh>@T["Moderator"]</MudTh>
+            <MudTh>@T["Banned"]</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Username">@context.UserName</MudTd>
+            <MudTd DataLabel="User">
+                <MudCheckBox @bind-Value="context.IsUser" @bind-Value:after=@(async () => await UpdateMember(context))
+                             StopClickPropagation="true" />
+            </MudTd>
+            <MudTd DataLabel="Guest">
+                <MudCheckBox @bind-Value="context.IsGuest" @bind-Value:after=@(async () => await UpdateMember(context))
+                             StopClickPropagation="true" />
+            </MudTd>
+            <MudTd DataLabel="Moderator">
+                <MudCheckBox @bind-Value="context.IsModerator" @bind-Value:after=@(async () => await UpdateMember(context))
+                             StopClickPropagation="true" />
+            </MudTd>
+            <MudTd DataLabel="Banned">
+                <MudCheckBox @bind-Value="context.IsBanned" @bind-Value:after=@(async () => await UpdateMember(context))
+                             StopClickPropagation="true" Color="Color.Warning" />
+            </MudTd>
+            <MudTd DataLabel="Progress">
+                @if (context.Saving)
+                {
+                    <MudProgressCircular Indeterminate="true" Color="Color.Info" Size="Size.Small" />
+                }
+                else if (context.HasChange)
+                {
+                    <MudIcon Size="Size.Small" Color="Color.Success" Icon="@Icons.Material.Filled.Check" />
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <MudButton Href="admin/communities" Variant="Variant.Filled" Class="mt-10">Ok</MudButton>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityDto Model { get; set; }
+
+    List<CommunityMemberModel> AllItems = new();
+    List<CommunityMemberModel> Items = new();
+    MudTable<CommunityMemberModel> table;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        if (vm.SelectedCommunity is not null)
+        {
+            AllItems = await vm.GetMembersAsync();
+            Items = AllItems;
+        }
+    }
+
+    OwnerDto selectedUser;
+
+    private async Task OnUserSelected()
+    {
+        if (selectedUser != null)
+        {
+            var item = AllItems.FirstOrDefault(x => x.UserId == selectedUser.Id);
+            if (item is not null)
+            {
+                // if user exists, filter to that user
+                Items = new List<CommunityMemberModel>() { item };
+            }
+            else
+            {
+                // new entry
+                item = new CommunityMemberModel(communityId: Model.Id, communityName: Model.Name, userId: selectedUser.Id, username: selectedUser.Username);
+                Items = new List<CommunityMemberModel>() { item };
+            }
+        }
+        else
+        {
+            Items = new();
+            table.Loading = true;
+            await LoadData();
+            table.Loading = false;
+        }
+    }
+
+    private async Task UpdateMember(CommunityMemberModel m)
+    {
+        try
+        {
+            m.Saving = true;
+            StateHasChanged();
+            await vm.UpdateMember(m);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            m.Saving = false;
+        }
+        StateHasChanged();
+    }
+
+}

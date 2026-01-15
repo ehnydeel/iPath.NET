@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iPath.EF.Core.Database;
 
@@ -11,9 +12,11 @@ using iPath.EF.Core.Database;
 namespace iPath.Database.Sqlite.Migrations
 {
     [DbContext(typeof(iPathDbContext))]
-    partial class iPathDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260115121822_Group_Community")]
+    partial class Group_Community
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -777,33 +780,6 @@ namespace iPath.Database.Sqlite.Migrations
                     b.ToTable("questionnaires", (string)null);
                 });
 
-            modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireForCommunity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("CommunityId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ExplicitVersion")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("QuestionnaireId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Usage")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommunityId");
-
-                    b.HasIndex("QuestionnaireId");
-
-                    b.ToTable("QuestionnaireForCommunity");
-                });
-
             modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireForGroup", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1264,25 +1240,6 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireForCommunity", b =>
-                {
-                    b.HasOne("iPath.Domain.Entities.Community", "Community")
-                        .WithMany("Quesionnaires")
-                        .HasForeignKey("CommunityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("iPath.Domain.Entities.QuestionnaireEntity", "Questionnaire")
-                        .WithMany("Communities")
-                        .HasForeignKey("QuestionnaireId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Community");
-
-                    b.Navigation("Questionnaire");
-                });
-
             modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireForGroup", b =>
                 {
                     b.HasOne("iPath.Domain.Entities.Group", "Group")
@@ -1345,8 +1302,6 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Navigation("Groups");
 
                     b.Navigation("Members");
-
-                    b.Navigation("Quesionnaires");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.Group", b =>
@@ -1373,8 +1328,6 @@ namespace iPath.Database.Sqlite.Migrations
 
             modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireEntity", b =>
                 {
-                    b.Navigation("Communities");
-
                     b.Navigation("Groups");
                 });
 

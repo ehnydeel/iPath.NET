@@ -1,0 +1,69 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Community
+@using iPath.Blazor.Componenents.Admin.Communities
+
+@inject GroupAdminViewModel vm
+@inject IStringLocalizer T
+@inject IPathApi api
+@inject NavigationManager nm
+
+@if (Model is null)
+{
+    <LoadingMessage />
+}
+else
+{
+    <MudDataGrid Items="Items" Dense="true" Striped Class="ipath_table"
+                 FixedHeader="true" Height="400px" Virtualize="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Questionnaires</MudText>
+            <MudSpacer />
+            <QuestionnaireLookup @bind-Value="selectedQ" @bind-Value:after="OnQuestionaireSelected" Clearable="true" @ref="lookup"
+                                 Label=@T["Questionnaire"]
+                                 Variant="Variant.Outlined" ShrinkLabel="true" Dense="true" Margin="Margin.Dense" />
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="q => q.NameAndId" Title="Name" />
+            @foreach (var e in Usages)
+            {
+                <TemplateColumn Title="@e.ToString()">
+                    <CellTemplate>
+                        <MudCheckBox @bind-Value="@context.Item.Usage[e]"
+                                     @bind-Value:after="@(() => vm.SaveQuestionnaireUsage(context.Item, e))" />
+                    </CellTemplate>
+                </TemplateColumn>
+            }
+        </Columns>
+    </MudDataGrid>
+
+    <MudButton Href="admin/communities" Variant="Variant.Filled" Class="mt-10">Ok</MudButton>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityDto Model { get; set; }
+
+    List<GroupQuestionnareModel> Items = new();
+    QuestionnaireListDto? selectedQ;
+    bool saving;
+
+    QuestionnaireLookup lookup;
+
+    eQuestionnaireUsage[] Usages => QuestionnairesViewModel.Usages;
+
+
+    async Task OnQuestionaireSelected()
+    {
+        if (selectedQ is not null)
+        {
+            var item = Items.FirstOrDefault(x => x.QuestionnaireId == selectedQ.Id);
+            if (item is null)
+            {
+                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, selectedQ.Name, Model.Id);
+                Items.Add(item);
+            }
+            selectedQ = null;
+            await lookup.ClearAsync();
+            StateHasChanged();
+        }
+    }
+}

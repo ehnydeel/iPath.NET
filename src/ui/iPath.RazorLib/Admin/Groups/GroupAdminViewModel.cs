@@ -17,6 +17,26 @@ public class GroupAdminViewModel(IPathApi api,
     public Action OnChange { get; set; }
 
 
+    public List<BreadcrumbItem> BreadCrumbs
+    {
+        get
+        {
+            var ret = new List<BreadcrumbItem> { new(T["Administration"], href: "admin") };
+            if (SelectedGroup is null)
+            {
+                ret.Add(new(T["Groups"], href: null, disabled: true));
+            }
+            else
+            {
+                ret.Add(new(T["Groups"], href: "admin/groups"));
+                ret.Add(new(SelectedGroup.Name, href: null, disabled: true));
+            }
+            return ret;
+        }
+    }
+
+
+
     public string SearchString { get; set; } = "";
     public MudDataGrid<GroupListDto> grid;
 
@@ -151,12 +171,13 @@ public class GroupAdminViewModel(IPathApi api,
         OnChange?.Invoke();
     }
 
-    public async Task ReloadGroup()
+    public async Task<GroupDto?> ReloadGroup()
     {
         if (SelectedGroup != null)
         {
             await LoadGroup(SelectedGroup.Id);
         }
+        return SelectedGroup;
     }
 
 
@@ -188,7 +209,8 @@ public class GroupAdminViewModel(IPathApi api,
                 Id = SelectedGroup.Id,
                 Name = SelectedGroup.Name,
                 Settings = SelectedGroup.Settings,
-                Owner = SelectedGroup.Owner
+                Owner = SelectedGroup.Owner,
+                Community = SelectedGroup.Community,
             };
 
             var p = new DialogParameters<EditGroupDialog> { { x => x.Model, m } };
@@ -212,7 +234,8 @@ public class GroupAdminViewModel(IPathApi api,
         {
             Id = editModel.Id.Value,
             Name = editModel.Name,
-            OwnerId = editModel.Owner.Id,
+            OwnerId = editModel.Owner?.Id,
+            CommunityId = editModel.Community?.Id,
             Settings = editModel.Settings
         };
         var resp = await api.UpdateGroup(cmd);
@@ -382,13 +405,13 @@ public class CreateGroupCommandModel : CreateGroupCommand
             }
         }
     }
-    public CommunityListDto? Community
+    public CommunityListDto Community
     {
         get;
         set
         {
             field = value;
-            CommunityId = value?.Id;
+            CommunityId = value.Id;
         }
     }
 

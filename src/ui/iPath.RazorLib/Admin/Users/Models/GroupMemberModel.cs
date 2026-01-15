@@ -9,8 +9,10 @@ public class GroupMemberModel : INotifyPropertyChanged
 {
     public Guid UserId { get; private set; }
     public string Username { get; private set; }
+
     public Guid GroupId { get; private set; }
     public string GroupName { get; private set; }
+
     public eMemberRole OriginalRole { get; private set; }
     public eMemberRole Role { get; set; }
 

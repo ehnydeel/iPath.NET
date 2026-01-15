@@ -13,11 +13,14 @@ else
     <MudDataGrid T="CommunityListDto" Items="@Communities" Dense="true" Class="ipath_table"
                  FixedHeader="true" Height="400px" Virtualize="true">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">@T["Communities"]</MudText>
+            <MudText Typo="Typo.h6">@T["Extra Communities"]</MudText>
             <MudSpacer />
-            <CommunityLookup Label=@T["add to community"] @bind-Value="communityToAdd" 
+            <CommunityLookup Label=@T["add to community"] @bind-Value="communityToAdd"
                              Variant="Variant.Outlined" ShrinkLabel="true" Dense="true" Margin="Margin.Dense" />
-            <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="AddCommunity" />
+            <MudTooltip Text=@T["Make the group visible in this community"]>
+                <MudFab StartIcon="@Icons.Material.Filled.Add" Class="ml-2" Size="Size.Small" OnClick="AddCommunity"
+                        Disabled=@(communityToAdd is null) />
+            </MudTooltip>
         </ToolBarContent>
         <Columns>
             <PropertyColumn Property="c => c.Name" />
@@ -29,7 +32,11 @@ else
         </Columns>
     </MudDataGrid>
 
-    <MudButton Href="admin/groups" Variant="Variant.Filled" Class="mt-10">Ok</MudButton>
+    <MudAlert Severity="Severity.Info" Class="border-2 mt-2 px-4 pa-0">
+        <strong>@T["Main communit"]:</strong> @(Model.Community?.Name)
+    </MudAlert>
+
+    <MudButton Href="admin/groups" Variant="Variant.Filled" Class="mt-4">Ok</MudButton>
 }
 
 @code {
@@ -38,9 +45,14 @@ else
 
     protected override void OnParametersSet()
     {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
         if (Model is not null)
         {
-            Communities = Model.Communities.ToList();
+            Communities = Model.ExtraCommunities is null ? new() : Model.ExtraCommunities.ToList();
             StateHasChanged();
         }
     }
@@ -54,13 +66,15 @@ else
         {
             await vm.AddToCommunity(communityToAdd);
             communityToAdd = null;
-            await vm.ReloadGroup();
+            Model = await vm.ReloadGroup();
+            LoadData();
         }
     }
     private async Task RemoveCommunity(CommunityListDto c)
     {
         await vm.RemoveFromCommunity(c);
-        await vm.ReloadGroup();
+        Model = await vm.ReloadGroup();
+        LoadData();
     }
 
 }

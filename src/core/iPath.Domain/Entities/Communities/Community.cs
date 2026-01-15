@@ -13,12 +13,16 @@ public class Community : AuditableEntity
 
     public CommunitySettings Settings { get; set; } = new();
 
-    public ICollection<CommunityGroup>? Groups { get; set; } = [];
+    public ICollection<Group>? Groups { get; set; } = [];
+    public ICollection<CommunityGroup>? ExtraGroups { get; set; } = [];
     public ICollection<CommunityMember>? Members { get; set; } = [];
 
     public eCommunityVisibility Visibility { get; set; } = eCommunityVisibility.Public;
 
-    
+
+    public ICollection<QuestionnaireForCommunity> Quesionnaires { get; set; } = [];
+
+
     public int? ipath2_id { get; set; }
 
     public Community()

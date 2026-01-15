@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="Nodes\Dialogs\" />
+    <Folder Include="wwwroot\fhir\" />
   </ItemGroup>
 
 </Project>

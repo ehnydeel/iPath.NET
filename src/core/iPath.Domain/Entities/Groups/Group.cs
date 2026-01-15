@@ -15,7 +15,10 @@ public class Group : AuditableEntity
     public eGroupType GroupType { get; set; } = eGroupType.DiscussionGroup;
     public eGroupVisibility Visibility { get; set; } = eGroupVisibility.MembersOnly;
 
-    public ICollection<CommunityGroup> Communities { get; set; } = [];
+    public Guid? CommunityId { get; set; }
+    public Community? Community { get; set; }
+
+    public ICollection<CommunityGroup> ExtraCommunities { get; set; } = [];
 
     public ICollection<Node> Nodes { get; set; } = [];
     public ICollection<GroupMember> Members { get; set; } = [];
@@ -31,7 +34,7 @@ public class Group : AuditableEntity
     {   
     }
 
-    public static Group Create(string Name, User Owner, Community? DefaultCommunity = null)
+    public static Group Create(string Name, User Owner, Community Community)
     {
         Guard.Against.NullOrEmpty(Name);
         Guard.Against.Null(Owner);
@@ -41,12 +44,8 @@ public class Group : AuditableEntity
             CreatedOn = DateTime.UtcNow,
             Name = Name,
             Owner = Owner,
+            Community = Community
         };
-
-        if (DefaultCommunity is not null)
-        {
-            grp.AssignToCommunity(DefaultCommunity);
-        }
 
         return grp;
     }
@@ -55,9 +54,9 @@ public class Group : AuditableEntity
 
     public Group AssignToCommunity(Community community)
     {
-        if (community != null && !this.Communities.Any(x => x.CommunityId == community.Id))
+        if (community != null && !this.ExtraCommunities.Any(x => x.CommunityId == community.Id))
         {
-            this.Communities.Add(new CommunityGroup()
+            this.ExtraCommunities.Add(new CommunityGroup()
             {
                 Group = this,
                 Community = community

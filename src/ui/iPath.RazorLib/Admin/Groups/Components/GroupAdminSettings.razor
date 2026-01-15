@@ -9,7 +9,14 @@
     <IPathHeader Typo="Typo.h6" Title=@T["Settings"] />
 
     <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" />
-    <OwnerLookup Label="Group Owner" Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" />
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <OwnerLookup Label=@T["Group Owner"] Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>        
+        <MudItem xs="12" sm="6">
+            <CommunityLookup Label=@T["Community"] Class="mt-4" @bind-Value="EditModel.Community" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </MudItem>
+    </MudGrid>
     <iPath.Blazor.Componenents.Groups.GroupSettingsForm Model="@EditModel.Settings" />
 
     <MudStack Row Class="mt-10" Spacing="2">
@@ -35,6 +42,7 @@
                 Id = vm.SelectedGroup.Id,
                 Name = vm.SelectedGroup.Name,
                 Owner = vm.SelectedGroup.Owner,
+                Community = vm.SelectedGroup.Community,
                 Settings = vm.SelectedGroup.Settings.Clone()
             };
             StateHasChanged();

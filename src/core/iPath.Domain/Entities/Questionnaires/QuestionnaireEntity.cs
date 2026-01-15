@@ -22,21 +22,7 @@ public class QuestionnaireEntity : AuditableEntity
     public required string Resource { get; set; }
 
     public ICollection<QuestionnaireForGroup> Groups { get; set; } = [];
-}
-
-
-public class QuestionnaireForGroup
-{
-    public Guid Id { get; set; }
-
-    public Guid QuestionnaireId { get; set; }
-    public QuestionnaireEntity Questionnaire { get; set; }
-
-    public Guid GroupId { get; set; }
-    public Group Group { get; set; }
-
-    public eQuestionnaireUsage Usage { get; set; }
-    public int? ExplicitVersion { get; set; } = null;
+    public ICollection<QuestionnaireForCommunity> Communities { get; set; } = [];
 }
 
 

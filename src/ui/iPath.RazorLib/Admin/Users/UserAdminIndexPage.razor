@@ -1,7 +1,11 @@
 ﻿@page "/admin/users"
 
+@attribute [Authorize(Roles = "Admin")]
 @inject UserAdminViewModel vm;
 @inject IStringLocalizer T
+
+
+<MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
 
 <iPath.Blazor.Componenents.Shared.IPathHeader Title=@T["User Administration"]>
     <ActionContent>
@@ -11,8 +15,8 @@
 
 <p class="mt-4" />
 
-<MudTable T="UserListDto" ServerData="vm.GetTableDataAsync" @ref="vm.table" 
-             RowStyleFunc="vm.SelectedRowStyle" Class="ipath_table" Dense>
+<MudTable T="UserListDto" ServerData="vm.GetTableDataAsync" @ref="vm.table"
+          RowStyleFunc="vm.SelectedRowStyle" Class="ipath_table" Dense>
     <ToolBarContent>
         <MudText Typo="Typo.h6">@T["Users"]</MudText>
         <MudSpacer />
@@ -34,7 +38,7 @@
                 <MudHighlighter Text="@context.Username" HighlightedText="@vm.SearchString" />
             </MudLink>
         </MudTd>
-        <MudTd Class="ipath_table"> 
+        <MudTd Class="ipath_table">
             <MudHighlighter Text="@context.Email" HighlightedText="@vm.SearchString" />
         </MudTd>
         <MudTd Class="ipath_table">@context.Roles.ToCSV()</MudTd>
@@ -61,3 +65,11 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await vm.LoadUser(null);
+    }
+}

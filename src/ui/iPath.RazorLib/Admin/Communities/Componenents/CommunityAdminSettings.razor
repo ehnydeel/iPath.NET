@@ -1,0 +1,53 @@
+﻿@namespace iPath.Blazor.Componenents.Admin.Community
+@using iPath.Blazor.Componenents.Admin.Communities
+
+@inject CommunityAdminViewModel vm
+@inject IStringLocalizer T
+@inject NavigationManager nm
+
+@if (EditModel != null)
+{
+    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" ShrinkLabel="true" />
+
+    <MudTextField Label=@T["Description"] @bind-Value="EditModel.Settings.Description"
+                  Variant="@Variant.Outlined" Lines="5" AutoGrow="true" ShrinkLabel="true" />
+
+    <OwnerLookup Label=@T["Community Owner"] Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />
+
+    <MudStack Row Class="mt-10" Spacing="2">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
+        <MudButton Variant="Variant.Filled">Cancel</MudButton>
+    </MudStack>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public CommunityDto Model { get; set; }
+
+    CommunityEditModel EditModel = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Model is not null)
+        {
+            base.OnInitialized();
+            EditModel = new CommunityEditModel
+            {
+                Id = Model.Id,
+                Name = Model.Name,
+                Owner = Model.Owner,
+                Settings = Model.Settings.Clone()
+            };
+            StateHasChanged();
+        }
+    }
+
+
+    async Task Save()
+    {
+        if (await vm.UpdateCommunity(EditModel))
+        {
+            nm.NavigateTo("admin/communities");
+        }
+    }
+}

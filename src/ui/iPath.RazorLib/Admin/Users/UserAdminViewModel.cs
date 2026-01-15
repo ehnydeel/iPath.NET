@@ -15,6 +15,25 @@ public class UserAdminViewModel(IPathApi api,
     : IViewModel
 {
 
+
+    public List<BreadcrumbItem> BreadCrumbs
+    {
+        get
+        {
+            var ret = new List<BreadcrumbItem> { new(T["Administration"], href: "admin") };
+            if (SelectedUser is null)
+            {
+                ret.Add(new(T["User"], href: null, disabled: true));
+            }
+            else
+            {
+                ret.Add(new(T["User"], href: "admin/users"));
+                ret.Add(new(SelectedUser.Username, href: null, disabled: true));
+            }
+            return ret;
+        }
+    }
+
     public string SearchString { get; set; } = "";
 
 

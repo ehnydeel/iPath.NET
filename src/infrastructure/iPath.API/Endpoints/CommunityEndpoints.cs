@@ -19,8 +19,8 @@ public static class CommunityEndpoints
             .Produces<CommunityDto>()
             .RequireAuthorization();
 
-        grp.MapPost("members", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new GetCommunityMembersQuery { CommunityId = Guid.Parse(id) }, ct))
+        grp.MapGet("{id}/members", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new GetCommunityMembersQuery { CommunityId = Guid.Parse(id), PageSize = null }, ct))
             .Produces<PagedResultList<CommunityMemberDto>>()
             .RequireAuthorization();
 
