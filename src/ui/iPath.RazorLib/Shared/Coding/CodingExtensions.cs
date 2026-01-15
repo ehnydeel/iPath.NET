@@ -1,5 +1,6 @@
 ﻿using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
+using iPath.Application.Coding;
 
 
 
@@ -48,5 +49,19 @@ public static class CodingExtensions
 
         public string ToAppend()
             => concept is null ? "" : $"- {concept.Display} [{concept.Code}]";
+    }
+
+
+
+
+    extension (CodeDisplay dsp)
+    {
+        public TreeItemData<CodeDisplay> ToTreeView() => new TreeItemData<CodeDisplay>
+        {
+            Value = dsp,
+            Text = dsp.ToString(),
+            Expanded = false,
+            Expandable = dsp.Children is not null && dsp.Children.Any()
+        };
     }
 }

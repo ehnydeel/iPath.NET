@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\core\iPath.Application\iPath.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>
