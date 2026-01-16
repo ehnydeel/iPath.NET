@@ -25,7 +25,17 @@ public class Group : AuditableEntity
 
     private List<GroupMember> _Members { get; set; } = new();
     public IReadOnlyCollection<GroupMember> Members => _Members;
-
+    public GroupMember AddMember(Guid userId, eMemberRole role)
+    {
+        var m = _Members.FirstOrDefault(x => x.UserId == userId);
+        if (m is null)
+        {
+            m = new GroupMember { Group = this, UserId = userId };
+            _Members.Add(m);
+        }
+        m.Role = role;
+        return m;
+    }
 
 
     public ICollection<QuestionnaireForGroup> Quesionnaires { get; set; } = [];
@@ -65,6 +75,19 @@ public class Group : AuditableEntity
             {
                 Group = this,
                 Community = community
+            });
+        }
+
+        return this;
+    }
+    public Group AssignToCommunity(Guid communityId)
+    {
+        if (!this.ExtraCommunities.Any(x => x.CommunityId == communityId))
+        {
+            this.ExtraCommunities.Add(new CommunityGroup()
+            {
+                Group = this,
+                CommunityId = communityId
             });
         }
 

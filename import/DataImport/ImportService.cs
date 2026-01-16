@@ -247,7 +247,6 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
                 DataImportExtensions.groupIds.Add(group.id, n.Id);
 
             // members
-            n.Members ??= new List<GroupMember>();
             foreach (var gm in group.members)
             {
                 // validate that the user_id is valid (contained in ownerCache)
@@ -260,13 +259,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
                     if ((gm.status & 2) != 0) role = eMemberRole.Inactive;
                     if ((gm.status & 8) != 0) role = eMemberRole.Guest;
 
-                    var newGM = new GroupMember()
-                    {
-                        GroupId = DataImportExtensions.NewGroupId(gm.group_id).Value,
-                        UserId = DataImportExtensions.NewUserId(gm.user_id).Value,
-                        Role = role
-                    };
-                    n.Members.Add(newGM);
+                    n.AddMember(DataImportExtensions.NewUserId(gm.user_id).Value, role);
                 }
                 else
                 {

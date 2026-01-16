@@ -324,7 +324,8 @@ public static class DataImportExtensions
         {
             if (NewCommunityId(cg.community_id).HasValue)
             {
-                n.Communities.Add(new CommunityGroup { Group = n, CommunityId = NewCommunityId(cg.community_id).Value });
+                n.AssignToCommunity(NewCommunityId(cg.community_id).Value);
+                // n.Communities.Add(new CommunityGroup { Group = n, CommunityId = NewCommunityId(cg.community_id).Value });
             }
         }
 
