@@ -1,10 +1,11 @@
 @page "/wsi/{id}"
+@using Microsoft.Extensions.Configuration
 @using iPath.Blazor.Componenents.Layouts
 
 @attribute [ExcludeFromInteractiveRouting]
 
 @layout WsiLayout
-@inject NavigationManager nm;
+@inject IConfiguration config
 
 <div id="osd" style="width: 1000px; height: 700px; background-color: black;"></div>
 
@@ -41,7 +42,10 @@
         {
             if (Guid.TryParse(id, out var nid))
             {
-                return nm.ToAbsoluteUri($"files/{nid}").AbsoluteUri;
+                var ret = config["BaseAddress"];
+                if (!ret.EndsWith("/")) ret += "/";
+                ret += "files/{nid}";
+                return ret;
             }
             return string.Empty;
         }
