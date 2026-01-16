@@ -44,7 +44,7 @@
             {
                 var ret = config["BaseAddress"];
                 if (!ret.EndsWith("/")) ret += "/";
-                ret += "files/{nid}";
+                ret += "files/" + nid;
                 return ret;
             }
             return string.Empty;
