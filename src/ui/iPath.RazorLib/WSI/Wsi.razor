@@ -36,21 +36,7 @@
 
     string errorMessage;
 
-    string url
-    {
-        get
-        {
-            if (Guid.TryParse(id, out var nid))
-            {
-                var ret = config["BaseAddress"];
-                if (!ret.EndsWith("/")) ret += "/";
-                ret += "files/" + nid;
-                return ret;
-            }
-            return string.Empty;
-        }
-    }
-
+    string url => Guid.TryParse(id, out var nid) ? $"files/{nid}" : "";
     
     string url_api => Guid.TryParse(id, out var nid) ? $"/api/v1/nodes/files{nid}" : "";
 }
