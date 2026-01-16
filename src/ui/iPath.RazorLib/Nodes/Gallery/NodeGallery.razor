@@ -18,9 +18,12 @@
         {
             <img src="@vm.SelectedNode.FileUrl" @onclick="@vm.GoNext" />
         }
-        else if (opts.Value.WsiViewerActive && vm.SelectedNode.FileExtension == ".svs")
+        else if (Wsi && vm.SelectedNode.FileExtension == ".svs")
         {
-            <iPath.OpenSeadragon.OsdViewer Style="width: 90%; max-height: 70vh; height: 70vh; background-color: black;" ImagePath="@vm.SelectedNode.BinarayDataUrl" />
+                <iframe id="wsiFrame"  title="WSI Viewer"
+                        width="1200" height="720"
+                        src="@wsiSrc">
+                </iframe>
         }
         else
         {
@@ -66,8 +69,12 @@ else
     [Parameter]
     public EventCallback<bool> OnShowingChildNode { get; set; }
 
+    bool Wsi => true; // opts.Value.WsiViewerActive;
+
     private bool Sorting;
     private bool Uploading;
+
+    string wsiSrc => $"wsi/{vm.SelectedNode.Id}";
 
     public void ActivateSort()
     {

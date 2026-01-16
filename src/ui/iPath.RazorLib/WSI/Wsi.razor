@@ -1,0 +1,30 @@
+@page "/wsi/{id}"
+@using iPath.Blazor.Componenents.Layouts
+
+
+@attribute [ExcludeFromInteractiveRouting]
+
+@layout WsiLayout
+
+<div id="osd" style="width: 1000px; height: 700px; background-color: black;"></div>
+
+<div style="margin-top: 1em;">
+    <string>Image: </string>
+    <span id="imageinfo">none</span>
+</div>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", (event) => {
+        // alert("ready");
+        svs.loadImage('osd', "@url");
+    });
+</script>
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    string url => Guid.TryParse(id, out var nid) ? $"/files/{nid}" : "";
+}
