@@ -24,7 +24,7 @@ svs.loadImage = async (elemId, url) => {
             id: elem.id,
             visibilityRatio: 1,
             minZoomImageRatio: 1,
-            ajaxWithCredentials: true,
+            // ajaxWithCredentials: true,
             prefixUrl: "_content/iPath.OpenSeadragon/images/",
             imageLoaderLimit: 5,
             timeout: 1000 * 1000,
