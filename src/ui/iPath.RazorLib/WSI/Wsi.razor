@@ -25,6 +25,6 @@
     [Parameter]
     public string id { get; set; }
 
-    string url_static => Guid.TryParse(id, out var nid) ? $"/files/{nid}" : "";
-    string url => Guid.TryParse(id, out var nid) ? $"/api/v1/nodes/files{nid}" : "";
+    string url => Guid.TryParse(id, out var nid) ? $"/files/{nid}" : "";
+    string url_api => Guid.TryParse(id, out var nid) ? $"/api/v1/nodes/files{nid}" : "";
 }
