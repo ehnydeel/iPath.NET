@@ -15,7 +15,7 @@ public class NodeViewModel(IPathApi api,
     IStringLocalizer T,
     NavigationManager nm,
     QuestionnaireCache qCache,
-    IOptions<iPathConfig> opts,
+    IOptions<iPathClientConfig> opts,
     ILogger<NodeViewModel> logger)
     : IViewModel
 {

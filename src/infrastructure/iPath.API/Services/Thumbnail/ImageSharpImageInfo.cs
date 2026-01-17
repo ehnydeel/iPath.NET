@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Processing;
 
 namespace iPath.API.Services.Thumbnail;
 
-public class ImageSharpImageInfo(IOptions<iPathConfig> opts) : IImageInfoService
+public class ImageSharpImageInfo(IOptions<iPathClientConfig> opts) : IImageInfoService
 {
     public async Task<iPath.Application.Contracts.ImageInfo> GetImageInfoAsync(string filename)
     {

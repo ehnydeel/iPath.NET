@@ -10,17 +10,19 @@ using iPath.Blazor.Componenents.Questionaiires;
 using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
 using iPath.Blazor.Server;
+using iPath.Domain.Config;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Translations;
 using Refit;
 using System.Data;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace iPath.RazorLib;
 
 public static class RazorLibServiceRegistration
 {
-    public static IServiceCollection AddRazorLibServices(this IServiceCollection services, string baseAddress, bool WasmClient)
+    public static async Task<IServiceCollection> AddRazorLibServices(this IServiceCollection services, string baseAddress, bool WasmClient)
     {
         services.AddMudTranslations();
 

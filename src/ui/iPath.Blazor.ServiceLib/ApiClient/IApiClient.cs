@@ -6,6 +6,7 @@ using iPath.Application.Features.Notifications;
 using iPath.Application.Features.Users;
 using iPath.Application.Localization;
 using iPath.Application.Querying;
+using iPath.Domain.Config;
 using iPath.Domain.Entities;
 using Refit;
 
@@ -20,6 +21,9 @@ public interface IPathApi
 
     [Get("/api/v1/session")]
     Task<IApiResponse<SessionUserDto?>> GetSession();
+
+    [Get("/api/v1/config")]
+    Task<IApiResponse<iPathClientConfig>> GetConfig();
 
     [Post("/api/v1/test/notify")]
     Task SendTestNodeEvent(TestEvent e);

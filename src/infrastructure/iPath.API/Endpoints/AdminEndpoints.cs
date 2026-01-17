@@ -1,16 +1,13 @@
-﻿using iPath.Application;
-using iPath.Application.Features.Admin;
-using iPath.Application.Features.Notifications;
+﻿using iPath.Application.Features.Notifications;
 using iPath.Application.Features.Users;
 using iPath.Application.Localization;
-using iPath.EF.Core.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using System.ComponentModel;
 using System.Linq.Dynamic.Core;
 using iPath.API.EndpointFilters;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Extensions.Options;
 
 namespace iPath.API;
 
@@ -69,6 +66,13 @@ public static class AdminEndpoints
         #endregion "-- Notifications --"
 
 
+        route.MapGet("config", (IOptions<iPathClientConfig> opts) => {
+            var config = new cfg { iPathClientConfig = opts.Value };
+            return Results.Ok(config);
+        })
+            .Produces<iPathClientConfig>()
+            .WithTags("Config")
+            .AllowAnonymous();
 
         route.MapGet("admin/roles", ([FromServices] IMediator mediator, CancellationToken ct)
             => mediator.Send(new GetRolesQuery(), ct))
@@ -101,4 +105,10 @@ public static class AdminEndpoints
 
         return route;
     }
+}
+
+
+public class cfg
+{
+    public iPathClientConfig iPathClientConfig { get; set;  } = new iPathClientConfig();
 }

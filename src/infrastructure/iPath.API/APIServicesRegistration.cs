@@ -24,6 +24,11 @@ public static class APIServicesRegistration
         var cfg = new iPathConfig();
         config.GetSection(iPathConfig.ConfigName).Bind(cfg);
 
+        // client config
+        services.Configure<iPathClientConfig>(config.GetSection(iPathClientConfig.ConfigName));
+        var clcfg = new iPathClientConfig();
+        config.GetSection(iPathClientConfig.ConfigName).Bind(clcfg);
+
         // create root folder if requested
         CreateDataRoot(cfg);
         

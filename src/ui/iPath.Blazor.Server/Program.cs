@@ -3,10 +3,8 @@ using iPath.Blazor.Server;
 using iPath.Blazor.Server.Components;
 using iPath.Blazor.Server.Components.Account;
 using iPath.Domain.Config;
-using iPath.OpenSeadragon;
 using iPath.RazorLib;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
@@ -95,10 +93,15 @@ builder.Services.AddAntiforgery();
 
 builder.Services.AddTransient<baseAuthDelegationHandler, ForwardCookiesHandler>();
 
-// Configuration
+// Server Configuration
 builder.Services.Configure<iPathConfig>(builder.Configuration.GetSection(iPathConfig.ConfigName));
 var cfg = new iPathConfig();
 builder.Configuration.GetSection(iPathConfig.ConfigName).Bind(cfg);
+
+// Client Configuration
+builder.Services.Configure<iPathClientConfig>(builder.Configuration.GetSection(iPathClientConfig.ConfigName));
+var clcfg = new iPathClientConfig();
+builder.Configuration.GetSection(iPathClientConfig.ConfigName).Bind(clcfg);
 
 // reverse Proxy
 if (!string.IsNullOrEmpty(cfg.ReverseProxyAddresse) && IPAddress.TryParse(cfg.ReverseProxyAddresse, out var proxyIP))
@@ -109,7 +112,7 @@ if (!string.IsNullOrEmpty(cfg.ReverseProxyAddresse) && IPAddress.TryParse(cfg.Re
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Limits.MaxRequestBodySize = cfg.MaxFileSizeBytes;
+    serverOptions.Limits.MaxRequestBodySize = clcfg.MaxFileSizeBytes;
 });
 
 

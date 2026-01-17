@@ -1,19 +1,21 @@
 ﻿@page "/admin/system"
+@using Microsoft.Extensions.Configuration
 @using Microsoft.Extensions.Options
 @using iPath.Domain.Config
 
 @attribute [ExcludeFromInteractiveRouting]
+@attribute [Authorize(Roles = "Admin")]
+
 
 <IPathHeader Title="System Satus" />
-
 <b>@RendererInfo.Name @RendererInfo.IsInteractive</b>
-
+<p>max filesize: @clopts.Value.MaxFileSize = @clopts.Value.MaxFileSizeBytes Bytes</p>
 <MudDivider />
 
 <p>
     <b>Temp Path: </b>
     <span>@opts.Value.TempDataPath</span>
-    @if(TempDataPathExists)
+    @if (TempDataPathExists)
     {
         <MudIcon Icon="@Icons.Material.Filled.Check" />
     }
@@ -28,7 +30,18 @@
     }
 </p>
 
+<MudDivider />
+
+<MudDataGrid Items="cfg.AsEnumerable()" Dense="true" Striped="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Key" />
+        <PropertyColumn Property="x => x.Value" />
+    </Columns>
+</MudDataGrid>
+
 @inject IOptions<iPathConfig> opts
+@inject IOptions<iPathClientConfig> clopts
+@inject IConfiguration cfg;
 
 
 @code {
