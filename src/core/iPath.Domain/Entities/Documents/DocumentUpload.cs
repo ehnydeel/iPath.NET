@@ -1,6 +1,6 @@
 ﻿namespace iPath.Domain.Entities;
 
-public class NodeDataUpload
+public class DocumentUpload
 {
     public Guid Id { get; set; }
     public Guid NodeId { get; set; }

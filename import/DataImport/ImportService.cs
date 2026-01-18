@@ -359,6 +359,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
         // debug => BulkSize = 1;
 
         var nodeBulk = new List<ServiceRequest>();
+        var docBulk = new List<DocumentNode>();
         var annotationBulk = new List<Annotation>();
         var importDataBulk = new List<NodeImport>();
         var count = 0;
@@ -379,7 +380,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
             o.CreateNewId();
 
             // convert root node
-            var n = o.ToNewEntity();
+            var n = o.ToServiceRequest();
             nodeBulk.Add(n);
 
             // data/info
@@ -391,11 +392,11 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
                 foreach (var c in o.ChildNodes.Where(c => c.sender_id > 0))
                 {
                     Console.WriteLine("- Child Node #{0} on Parent #{1}", c.id, o.id);
-                    var nc = c.ToNewEntity();
-                    nodeBulk.Add(nc);
+                    var document = c.ToDocument();
+                    docBulk.Add(document);
 
                     // data/info
-                    importDataBulk.AddRange(new NodeImport { NodeId = nc.Id, Info = c.info, Data = c.data });
+                    importDataBulk.AddRange(new NodeImport { NodeId = document.Id, Info = c.info, Data = c.data });
                 }
             }
 
@@ -409,6 +410,10 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
                 // node Bulk
                 OnMessage($"saving {nodeBulk.Count()} nodes (incl child nodes) ... ");
                 await SaveNodeImportAsync(nodeBulk, newDb, oldDb, ctk);
+
+                // annotations
+                await BulkInsertAsync(newDb, docBulk, ctk);
+                docBulk.Clear();
 
                 // annotations
                 await BulkInsertAsync(newDb, annotationBulk, ctk);
@@ -426,6 +431,9 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
 
         await BulkInsertAsync(newDb, annotationBulk, ctk);
         annotationBulk.Clear();
+
+        await BulkInsertAsync(newDb, docBulk, ctk);
+        docBulk.Clear();
 
         await BulkInsertAsync(newDb, importDataBulk, ctk);
         importDataBulk.Clear();
@@ -478,7 +486,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
         var total = await oldDb.lastvisits.CountAsync();
         var data = oldDb.lastvisits.AsNoTracking().Where(v => v.user_id > 0 && v.object_id > 0).AsAsyncEnumerable(); 
 
-        var bulk = new List<NodeLastVisit>();
+        var bulk = new List<ServiceRequestLastVisit>();
         var bulkSize = 10_000;
 
         OnMessage($"Saving {total} Items ...");
@@ -494,7 +502,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
 
             if (DataImportExtensions.userIds.ContainsKey(d.user_id) && DataImportExtensions.nodeIds.ContainsKey(d.object_id))
             {
-                var v = NodeLastVisit.Create(DataImportExtensions.NewUserId(d.user_id).Value, DataImportExtensions.NewNodeId(d.object_id).Value, d.visitdate.ToUniversalTime());
+                var v = ServiceRequestLastVisit.Create(DataImportExtensions.NewUserId(d.user_id).Value, DataImportExtensions.NewNodeId(d.object_id).Value, d.visitdate.ToUniversalTime());
                 bulk.Add(v);
                 count++;
             }

@@ -29,7 +29,7 @@ public class ServiceRequest : AuditableEntityWithEvents
 
 
     // public ICollection<FileUpload> Uploads { get; set; } = [];
-    public ICollection<NodeLastVisit>? LastVisits { get; set; } = [];
+    public ICollection<ServiceRequestLastVisit>? LastVisits { get; set; } = [];
 
     public string NodeType { get; set; } = default!;
 

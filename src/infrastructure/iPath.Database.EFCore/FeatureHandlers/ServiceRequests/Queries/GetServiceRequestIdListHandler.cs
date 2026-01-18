@@ -3,7 +3,7 @@
 namespace iPath.EF.Core.FeatureHandlers.Nodes;
 
 
-public class GetNodeIdListHandler(iPathDbContext db, IUserSession sess)
+public class GetServiceRequestIdListHandler(iPathDbContext db, IUserSession sess)
     : IRequestHandler<GetServiceRequestIdListQuery, Task<IReadOnlyList<Guid>>>
 {
     public async Task<IReadOnlyList<Guid>> Handle(GetServiceRequestIdListQuery request, CancellationToken cancellationToken)

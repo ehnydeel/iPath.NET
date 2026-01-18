@@ -87,7 +87,7 @@ public static class DataImportExtensions
         }
     }
     
-    public static ServiceRequest ToNewEntity(this i2object o)
+    public static ServiceRequest ToServiceRequest(this i2object o)
     {
         var n = new ServiceRequest()
         {
@@ -109,24 +109,6 @@ public static class DataImportExtensions
         }
         n.GroupId = NewGroupId(o.group_id);
 
-        n.RootNodeId = NewNodeId(o.topparent_id);
-        n.ParentNodeId = NewNodeId(o.parent_id);
-
-        if (o.parent_id.HasValue && !n.ParentNodeId.HasValue)
-        {
-            Console.WriteLine("Parent Node {0} not found in import of child {1}", o.parent_id, n.ipath2_id);
-        }
-
-        n.SortNr = o.sort_nr;
-
-        // old data and info fields
-        /*
-        n.ImportedData ??= new();
-        n.ImportedData.Data = o.data;
-        n.ImportedData.Info = o.info;
-        n.LastModifiedOn = o.modified.HasValue ? o.modified.Value.ToUniversalTime() : null;
-        */
-
         try
         {
             var xml = LoadDataDocument(o.data);
@@ -140,7 +122,51 @@ public static class DataImportExtensions
                 n.Description.Status = xml.SelectSingleNode("/data/casestat")?.InnerText;
                 n.Description.Text = xml.SelectSingleNode("/data/description")?.InnerText;
             }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
 
+        return n;
+    }
+
+
+    public static DocumentNode ToDocument(this i2object o)
+    {
+        var n = new DocumentNode()
+        {
+            Id = NewNodeId(o.id).Value,
+            ipath2_id = o.id
+        };
+
+        n.CreatedOn = o.entered.ToUniversalTime();
+        n.DocumentType = o.objclass ?? "file";
+
+        var newo = NewUserId(o.sender_id);
+        if (newo.HasValue)
+        {
+            n.OwnerId = newo.Value;
+        }
+        else
+        {
+            Console.WriteLine("--");
+        }
+
+        n.ServiceRequestId = NewNodeId(o.topparent_id).Value;
+        n.ParentNodeId = NewNodeId(o.parent_id);
+
+        if (o.parent_id.HasValue && !n.ParentNodeId.HasValue)
+        {
+            Console.WriteLine("Parent Node {0} not found in import of child {1}", o.parent_id, n.ipath2_id);
+        }
+
+        n.SortNr = o.sort_nr ?? 0;
+
+
+        try
+        {
+            var xml = LoadDataDocument(o.data);
 
             if (xml.SelectSingleNode("/data/filename") != null)
             {

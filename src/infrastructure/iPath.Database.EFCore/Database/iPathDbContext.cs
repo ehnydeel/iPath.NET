@@ -33,7 +33,7 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<DocumentNode> Documents { get; set; }
     public DbSet<Annotation> Annotations { get; set; }
     public DbSet<NodeImport> NodeImports { get; set; }
-    public DbSet<NodeLastVisit> NodeLastVisits { get; set; }
+    public DbSet<ServiceRequestLastVisit> NodeLastVisits { get; set; }
 
     public DbSet<QuestionnaireEntity> Questionnaires { get; set; }
 

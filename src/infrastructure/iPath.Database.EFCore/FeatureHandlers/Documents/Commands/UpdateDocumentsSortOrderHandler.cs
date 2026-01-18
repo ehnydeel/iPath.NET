@@ -1,6 +1,6 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+﻿namespace iPath.EF.Core.FeatureHandlers.Documents;
 
-public class UpdateChildNodeSortOrderCommandHandler(iPathDbContext db, IUserSession sess) 
+public class UpdateDocumentsSortOrderCommandHandler(iPathDbContext db, IUserSession sess) 
     : IRequestHandler<UpdateDocumentsSortOrderCommand, Task<ChildNodeSortOrderUpdatedEvent>>
 {
     public async Task<ChildNodeSortOrderUpdatedEvent> Handle(UpdateDocumentsSortOrderCommand request, CancellationToken ct)

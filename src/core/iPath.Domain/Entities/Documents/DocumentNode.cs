@@ -25,6 +25,8 @@ public class DocumentNode
 
     public ICollection<Annotation> Annotations { get; set; } = [];
 
+    public ICollection<ServiceRequestLastVisit>? LastVisits { get; set; } = [];
+
     public NodeFile? File { get; set; } = null!;
 
     public string DocumentType { get; set; } = "";

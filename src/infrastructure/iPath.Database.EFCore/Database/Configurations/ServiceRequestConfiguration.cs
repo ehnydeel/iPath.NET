@@ -25,6 +25,8 @@ internal class ServiceRequestConfiguration : IEntityTypeConfiguration<ServiceReq
 
         b.ComplexProperty(x => x.Description, pb => pb.ToJson("description"));
 
+        b.HasMany(x => x.LastVisits).WithOne().HasForeignKey(x => x.ServiceRequestId).IsRequired(false);
+
         b.HasQueryFilter(x => !x.DeletedOn.HasValue);
     }
 }
