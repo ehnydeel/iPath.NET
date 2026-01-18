@@ -126,11 +126,12 @@ namespace iPath.Database.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("ChildNodeId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("DcoumentNodeId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("document_id");
 
                     b.Property<DateTime?>("DeletedOn")
                         .HasColumnType("TEXT");
@@ -138,11 +139,13 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("NodeId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("OwnerId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("owner");
+
+                    b.Property<Guid?>("ServiceRequestId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("servicerequest_id");
 
                     b.Property<int?>("ipath2_id")
                         .HasColumnType("INTEGER");
@@ -183,11 +186,11 @@ namespace iPath.Database.Sqlite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChildNodeId");
-
-                    b.HasIndex("NodeId");
+                    b.HasIndex("DcoumentNodeId");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("ServiceRequestId");
 
                     b.ToTable("annotations", (string)null);
                 });
@@ -310,6 +313,76 @@ namespace iPath.Database.Sqlite.Migrations
                     b.ToTable("community_group_members", (string)null);
                 });
 
+            modelBuilder.Entity("iPath.Domain.Entities.DocumentNode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("owner_id");
+
+                    b.Property<Guid?>("ParentNodeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ServiceRequestId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("servicerequest_id");
+
+                    b.Property<int>("SortNr")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StorageId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ipath2_id")
+                        .HasColumnType("INTEGER");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "File", "iPath.Domain.Entities.DocumentNode.File#NodeFile", b1 =>
+                        {
+                            b1.Property<string>("Filename");
+
+                            b1.Property<int?>("ImageHeight");
+
+                            b1.Property<int?>("ImageWidth");
+
+                            b1.Property<DateTime?>("LastStorageExportDate");
+
+                            b1.Property<string>("MimeType");
+
+                            b1.Property<string>("ThumbData");
+
+                            b1
+                                .ToJson("file")
+                                .HasColumnType("TEXT");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("ParentNodeId");
+
+                    b.HasIndex("ServiceRequestId");
+
+                    b.ToTable("documents", (string)null);
+                });
+
             modelBuilder.Entity("iPath.Domain.Entities.EmailMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -415,7 +488,8 @@ namespace iPath.Database.Sqlite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("OwnerId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("owner_id");
 
                     b.Property<string>("StorageId")
                         .HasColumnType("TEXT");
@@ -520,128 +594,6 @@ namespace iPath.Database.Sqlite.Migrations
                     b.ToTable("group_members", (string)null);
                 });
 
-            modelBuilder.Entity("iPath.Domain.Entities.Node", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("GroupId")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("group_id");
-
-                    b.Property<bool>("IsDraft")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NodeType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("owner_id");
-
-                    b.Property<Guid?>("ParentNodeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("RootNodeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("SortNr")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("StorageId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ipath2_id")
-                        .HasColumnType("INTEGER");
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "Description", "iPath.Domain.Entities.Node.Description#NodeDescription", b1 =>
-                        {
-                            b1.Property<string>("AccessionNo");
-
-                            b1.Property<string>("CaseType");
-
-                            b1.Property<string>("Status");
-
-                            b1.Property<string>("Subtitle");
-
-                            b1.Property<string>("Text");
-
-                            b1.Property<string>("Title")
-                                .IsRequired();
-
-                            b1.ComplexProperty(typeof(Dictionary<string, object>), "BodySite", "iPath.Domain.Entities.Node.Description#NodeDescription.BodySite#CodedConcept", b2 =>
-                                {
-                                    b2.Property<string>("Code")
-                                        .IsRequired();
-
-                                    b2.Property<string>("Display")
-                                        .IsRequired();
-
-                                    b2.Property<string>("System")
-                                        .IsRequired();
-                                });
-
-                            b1.ComplexProperty(typeof(Dictionary<string, object>), "Questionnaire", "iPath.Domain.Entities.Node.Description#NodeDescription.Questionnaire#QuestionnaireResponseData", b2 =>
-                                {
-                                    b2.Property<string>("QuestionnaireId")
-                                        .IsRequired();
-
-                                    b2.Property<string>("Resource")
-                                        .IsRequired();
-
-                                    b2.Property<int?>("Version");
-                                });
-
-                            b1
-                                .ToJson("description")
-                                .HasColumnType("TEXT");
-                        });
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "File", "iPath.Domain.Entities.Node.File#NodeFile", b1 =>
-                        {
-                            b1.Property<string>("Filename");
-
-                            b1.Property<int?>("ImageHeight");
-
-                            b1.Property<int?>("ImageWidth");
-
-                            b1.Property<DateTime?>("LastStorageExportDate");
-
-                            b1.Property<string>("MimeType");
-
-                            b1.Property<string>("ThumbData");
-
-                            b1
-                                .ToJson("file")
-                                .HasColumnType("TEXT");
-                        });
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("OwnerId");
-
-                    b.HasIndex("RootNodeId");
-
-                    b.ToTable("nodes", (string)null);
-                });
-
             modelBuilder.Entity("iPath.Domain.Entities.NodeImport", b =>
                 {
                     b.Property<Guid>("NodeId")
@@ -659,7 +611,7 @@ namespace iPath.Database.Sqlite.Migrations
 
                     b.HasKey("NodeId");
 
-                    b.ToTable("NodeImports", (string)null);
+                    b.ToTable("NodeImports");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.NodeLastVisit", b =>
@@ -801,7 +753,7 @@ namespace iPath.Database.Sqlite.Migrations
 
                     b.HasIndex("QuestionnaireId");
 
-                    b.ToTable("QuestionnaireForCommunity", (string)null);
+                    b.ToTable("QuestionnaireForCommunity");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireForGroup", b =>
@@ -854,9 +806,6 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Property<DateTime>("ModifiedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("NodeId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("TEXT");
 
@@ -867,15 +816,18 @@ namespace iPath.Database.Sqlite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("ServiceRequestId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AnnotationId");
 
-                    b.HasIndex("NodeId");
-
                     b.HasIndex("OwnerId");
 
                     b.HasIndex("QuestionnaireId");
+
+                    b.HasIndex("ServiceRequestId");
 
                     b.ToTable("questionnaire_responses", (string)null);
                 });
@@ -905,6 +857,98 @@ namespace iPath.Database.Sqlite.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("iPath.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("group_id");
+
+                    b.Property<bool>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NodeType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("owner_id");
+
+                    b.Property<string>("StorageId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ipath2_id")
+                        .HasColumnType("INTEGER");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Description", "iPath.Domain.Entities.ServiceRequest.Description#RequestDescription", b1 =>
+                        {
+                            b1.Property<string>("AccessionNo");
+
+                            b1.Property<string>("CaseType");
+
+                            b1.Property<string>("Status");
+
+                            b1.Property<string>("Subtitle");
+
+                            b1.Property<string>("Text");
+
+                            b1.Property<string>("Title")
+                                .IsRequired();
+
+                            b1.ComplexProperty(typeof(Dictionary<string, object>), "BodySite", "iPath.Domain.Entities.ServiceRequest.Description#RequestDescription.BodySite#CodedConcept", b2 =>
+                                {
+                                    b2.Property<string>("Code")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Display")
+                                        .IsRequired();
+
+                                    b2.Property<string>("System")
+                                        .IsRequired();
+                                });
+
+                            b1.ComplexProperty(typeof(Dictionary<string, object>), "Questionnaire", "iPath.Domain.Entities.ServiceRequest.Description#RequestDescription.Questionnaire#QuestionnaireResponseData", b2 =>
+                                {
+                                    b2.Property<string>("QuestionnaireId")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Resource")
+                                        .IsRequired();
+
+                                    b2.Property<int?>("Version");
+                                });
+
+                            b1
+                                .ToJson("description")
+                                .HasColumnType("TEXT");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("servicerequests", (string)null);
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.User", b =>
@@ -1093,13 +1137,9 @@ namespace iPath.Database.Sqlite.Migrations
 
             modelBuilder.Entity("iPath.Domain.Entities.Annotation", b =>
                 {
-                    b.HasOne("iPath.Domain.Entities.Node", "ChildNode")
-                        .WithMany()
-                        .HasForeignKey("ChildNodeId");
-
-                    b.HasOne("iPath.Domain.Entities.Node", "Node")
+                    b.HasOne("iPath.Domain.Entities.DocumentNode", "Document")
                         .WithMany("Annotations")
-                        .HasForeignKey("NodeId")
+                        .HasForeignKey("DcoumentNodeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("iPath.Domain.Entities.User", "Owner")
@@ -1108,11 +1148,16 @@ namespace iPath.Database.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("ChildNode");
+                    b.HasOne("iPath.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("Annotations")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Node");
+                    b.Navigation("Document");
 
                     b.Navigation("Owner");
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.Community", b =>
@@ -1150,18 +1195,44 @@ namespace iPath.Database.Sqlite.Migrations
                     b.HasOne("iPath.Domain.Entities.Community", "Community")
                         .WithMany("Members")
                         .HasForeignKey("CommunityId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("iPath.Domain.Entities.User", "User")
                         .WithMany("CommunityMembership")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Community");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("iPath.Domain.Entities.DocumentNode", b =>
+                {
+                    b.HasOne("iPath.Domain.Entities.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("iPath.Domain.Entities.DocumentNode", "ParentNode")
+                        .WithMany("ChildNodes")
+                        .HasForeignKey("ParentNodeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("iPath.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("ParentNode");
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.Group", b =>
@@ -1191,7 +1262,7 @@ namespace iPath.Database.Sqlite.Migrations
                     b.HasOne("iPath.Domain.Entities.User", "User")
                         .WithMany("GroupMembership")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -1199,33 +1270,9 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("iPath.Domain.Entities.Node", b =>
-                {
-                    b.HasOne("iPath.Domain.Entities.Group", "Group")
-                        .WithMany("Nodes")
-                        .HasForeignKey("GroupId");
-
-                    b.HasOne("iPath.Domain.Entities.User", "Owner")
-                        .WithMany("OwnedNodes")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("iPath.Domain.Entities.Node", "RootNode")
-                        .WithMany("ChildNodes")
-                        .HasForeignKey("RootNodeId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("Group");
-
-                    b.Navigation("Owner");
-
-                    b.Navigation("RootNode");
-                });
-
             modelBuilder.Entity("iPath.Domain.Entities.NodeLastVisit", b =>
                 {
-                    b.HasOne("iPath.Domain.Entities.Node", "Node")
+                    b.HasOne("iPath.Domain.Entities.ServiceRequest", "ServiceRequest")
                         .WithMany("LastVisits")
                         .HasForeignKey("NodeId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1237,7 +1284,7 @@ namespace iPath.Database.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Node");
+                    b.Navigation("ServiceRequest");
 
                     b.Navigation("User");
                 });
@@ -1308,10 +1355,6 @@ namespace iPath.Database.Sqlite.Migrations
                         .WithMany("QuestionnaireResponses")
                         .HasForeignKey("AnnotationId");
 
-                    b.HasOne("iPath.Domain.Entities.Node", "Node")
-                        .WithMany("QuestionnaireResponses")
-                        .HasForeignKey("NodeId");
-
                     b.HasOne("iPath.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -1324,13 +1367,34 @@ namespace iPath.Database.Sqlite.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Annotation");
+                    b.HasOne("iPath.Domain.Entities.ServiceRequest", "ServiceRequest")
+                        .WithMany("QuestionnaireResponses")
+                        .HasForeignKey("ServiceRequestId");
 
-                    b.Navigation("Node");
+                    b.Navigation("Annotation");
 
                     b.Navigation("Owner");
 
                     b.Navigation("Questionnaire");
+
+                    b.Navigation("ServiceRequest");
+                });
+
+            modelBuilder.Entity("iPath.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.HasOne("iPath.Domain.Entities.Group", "Group")
+                        .WithMany("ServiceRequests")
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("iPath.Domain.Entities.User", "Owner")
+                        .WithMany("OwnedNodes")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.Annotation", b =>
@@ -1349,26 +1413,22 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Navigation("Quesionnaires");
                 });
 
+            modelBuilder.Entity("iPath.Domain.Entities.DocumentNode", b =>
+                {
+                    b.Navigation("Annotations");
+
+                    b.Navigation("ChildNodes");
+                });
+
             modelBuilder.Entity("iPath.Domain.Entities.Group", b =>
                 {
                     b.Navigation("ExtraCommunities");
 
                     b.Navigation("Members");
 
-                    b.Navigation("Nodes");
-
                     b.Navigation("Quesionnaires");
-                });
 
-            modelBuilder.Entity("iPath.Domain.Entities.Node", b =>
-                {
-                    b.Navigation("Annotations");
-
-                    b.Navigation("ChildNodes");
-
-                    b.Navigation("LastVisits");
-
-                    b.Navigation("QuestionnaireResponses");
+                    b.Navigation("ServiceRequests");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.QuestionnaireEntity", b =>
@@ -1376,6 +1436,17 @@ namespace iPath.Database.Sqlite.Migrations
                     b.Navigation("Communities");
 
                     b.Navigation("Groups");
+                });
+
+            modelBuilder.Entity("iPath.Domain.Entities.ServiceRequest", b =>
+                {
+                    b.Navigation("Annotations");
+
+                    b.Navigation("Documents");
+
+                    b.Navigation("LastVisits");
+
+                    b.Navigation("QuestionnaireResponses");
                 });
 
             modelBuilder.Entity("iPath.Domain.Entities.User", b =>

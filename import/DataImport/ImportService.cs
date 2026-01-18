@@ -31,7 +31,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
 
     public async Task TestInsert()
     {
-        var c = new Node()
+        var c = new ServiceRequest()
         {
             Id = Guid.CreateVersion7(),
             NodeType = "test"
@@ -44,7 +44,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
         c.Description.Title = "Test Case";
 
         var id = c.Id.ToString();
-        await newDb.Nodes.AddAsync(c);
+        await newDb.ServiceRequests.AddAsync(c);
 
         if (id != c.Id.ToString())
         {
@@ -55,7 +55,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
             await newDb.SaveChangesAsync();
             Console.WriteLine("node #{0} saved", id);
 
-            newDb.Nodes.Remove(c);
+            newDb.ServiceRequests.Remove(c);
             await newDb.SaveChangesAsync();
             Console.WriteLine("node #{0} deleted", id);
         }
@@ -331,7 +331,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
             Console.WriteLine("delete imported node data");
             await newDb.NodeImports.ExecuteDeleteAsync();
             await newDb.Annotations.Where(a => a.ipath2_id.HasValue).ExecuteDeleteAsync();
-            await newDb.Nodes.Where(n => n.ipath2_id.HasValue).ExecuteDeleteAsync();
+            await newDb.ServiceRequests.Where(n => n.ipath2_id.HasValue).ExecuteDeleteAsync();
             DataImportExtensions.nodeIds.Clear();
         }
 
@@ -358,7 +358,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
 
         // debug => BulkSize = 1;
 
-        var nodeBulk = new List<Node>();
+        var nodeBulk = new List<ServiceRequest>();
         var annotationBulk = new List<Annotation>();
         var importDataBulk = new List<NodeImport>();
         var count = 0;
@@ -439,7 +439,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
     }
 
 
-    private async Task SaveNodeImportAsync(List<Node> bulk, iPathDbContext newDb, OldDB oldDb, CancellationToken ctk = default)
+    private async Task SaveNodeImportAsync(List<ServiceRequest> bulk, iPathDbContext newDb, OldDB oldDb, CancellationToken ctk = default)
     {
         if (bulk != null && bulk.Any())
         {

@@ -20,7 +20,7 @@ public class Group : AuditableEntity
 
     public ICollection<CommunityGroup> ExtraCommunities { get; set; } = [];
 
-    public ICollection<Node> Nodes { get; set; } = [];
+    public ICollection<ServiceRequest> ServiceRequests { get; set; } = [];
 
 
     private List<GroupMember> _Members { get; set; } = new();

@@ -2,6 +2,6 @@
 
 public interface IThumbImageService
 {
-    ValueTask Handle(NodeThumnailNotCreatedNotification request, CancellationToken cancellationToken);
+    ValueTask Handle(DocumentThumnailNotCreatedNotification request, CancellationToken cancellationToken);
     Task<NodeFile> UpdateNodeAsync(NodeFile file, string filename);
 }

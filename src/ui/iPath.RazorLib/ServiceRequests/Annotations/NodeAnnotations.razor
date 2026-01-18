@@ -1,0 +1,109 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@inherits ServiceRequestViewComponentBase
+
+<MudPaper Class="@Class" Elevation="0">
+
+    @if (vm.SelectedRequest != null)
+    {
+        <div class="ipath_section_header">
+            <div class="ipath_header_title">Annotations</div>
+            <div class="ipath_header_actions">
+                <MudTooltip Text="Add Annotation">
+                    <MudIcon Size="Size.Small" Icon=@SortIcon @onclick="ToggleSort" />
+                    <MudIcon Size="Size.Small" Icon="@Icons.Material.Rounded.Add" @onclick="vm.StartAnnotation" Disabled="vm.AnnotateDisabled" />
+                </MudTooltip>
+            </div>
+        </div>
+
+        @if (!ShowAnnotations)
+        {
+            <MudAlert Severity="Severity.Warning" Class="ma-2" Dense Icon="@Icons.Material.Filled.Note">
+                @T["Annotations of other users will become visible only after writing your own annotation on this case"];
+                <MudButton Class="ml-8" Variant="Variant.Outlined">show</MudButton>
+            </MudAlert>
+        }
+
+        <div class="ipath_annotations">
+            @if (vm.NewAnnotation is not null)
+            {
+                <div class="mb-10">
+                    <AnnotationForm Model="vm.NewAnnotation" @ref="annotationForm" />
+                    <MudStack Row>
+                        <MudButton OnClick="OnSubmit" Variant="Variant.Filled" Color="Color.Primary">@T["Submit"]</MudButton>
+                        <MudButton OnClick="Reset" Variant="Variant.Filled">@T["Cancel"]</MudButton>
+                    </MudStack>
+                </div>
+            }
+
+
+            @foreach (var a in vm.SelectedRequest.Annotations.OrderByDirection(Sort, a => a.CreatedOn))
+            {
+                @if (ShowAnnotations)
+                {
+                    <AnnotationItemView Item="a" OnDelete="OnDelete" />
+                }
+                else
+                {
+                    <AnnotationSkeleton />
+                }
+            }
+        </div>
+    }
+</MudPaper>
+
+
+@inject AppState appState
+
+@code {
+    [Parameter]
+    public string Class { get; set; }
+
+    bool ShowAnnotations
+    {
+        get
+        {
+            // Option Hide Annotaiton not active => show annotations
+            if (!vm.AnnotationsHide) return true;
+
+            // Show annotations only when current user has already written an annotation
+            return vm.SelectedRequest.Annotations.Any(a => a.OwnerId == appState.User?.Id);
+        }
+    }
+
+
+    async Task OnDelete(AnnotationDto item)
+    {
+        await vm.DeleteAnnotation(item);
+        await vm.ReloadNode();
+    }
+
+
+    private SortDirection Sort = SortDirection.Ascending;
+    string SortIcon => Sort == SortDirection.Ascending ? Icons.Material.Filled.KeyboardDoubleArrowUp : Icons.Material.Filled.KeyboardDoubleArrowDown;
+    void ToggleSort()
+    {
+        Sort = (Sort == SortDirection.Ascending) ? SortDirection.Descending : SortDirection.Ascending;
+    }
+
+
+    AnnotationForm annotationForm;
+
+
+    async Task OnSubmit()
+    {
+        if (annotationForm != null)
+        {
+            await annotationForm.Validate();
+            if (vm.NewAnnotation.Data.ValidateInput())
+            {
+                await vm.SubmitAnnotation();
+            }
+        }
+    }
+
+    async Task Reset()
+    {
+        await vm.CancelAnnotation();
+    }
+}

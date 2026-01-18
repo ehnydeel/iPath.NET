@@ -41,7 +41,7 @@ public class Notification : BaseEntity
         };
     }
 
-    public static Notification Create(eNodeNotificationType type, eNotificationTarget target, bool dailySummary, Guid userId, NodeEvent evt)
+    public static Notification Create(eNodeNotificationType type, eNotificationTarget target, bool dailySummary, Guid userId, ServiceRequestEvent evt)
     {
         var options = new JsonSerializerOptions
         {
@@ -50,7 +50,7 @@ public class Notification : BaseEntity
         };
 
         var context = new NodeNofiticationSerializerContext(options);
-        var json = JsonSerializer.Serialize(evt, typeof(NodeEvent), context);
+        var json = JsonSerializer.Serialize(evt, typeof(ServiceRequestEvent), context);
 
         return new Notification
         {
@@ -90,7 +90,7 @@ public class Notification : BaseEntity
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     WriteIndented = false)]
-[JsonSerializable(typeof(NodeEvent))]
+[JsonSerializable(typeof(ServiceRequestEvent))]
 internal partial class NodeNofiticationSerializerContext : JsonSerializerContext
 {
 }

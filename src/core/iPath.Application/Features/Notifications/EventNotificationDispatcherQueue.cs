@@ -14,11 +14,11 @@ namespace iPath.Application.Features.Notifications;
 
 public class EventNotificationDispatcherQueue : IEventNotificationDispatcherQueue
 {
-    private readonly Channel<NodeEvent> _channel;
+    private readonly Channel<ServiceRequestEvent> _channel;
 
     public EventNotificationDispatcherQueue(int maxQueueSize)
     {
-        _channel = Channel.CreateBounded<NodeEvent>(new BoundedChannelOptions(maxQueueSize)
+        _channel = Channel.CreateBounded<ServiceRequestEvent>(new BoundedChannelOptions(maxQueueSize)
         {
             SingleReader = false,
             SingleWriter = false,
@@ -26,13 +26,13 @@ public class EventNotificationDispatcherQueue : IEventNotificationDispatcherQueu
         });
     }
 
-    public async ValueTask EnqueueAsync(NodeEvent item)
+    public async ValueTask EnqueueAsync(ServiceRequestEvent item)
     {
         if (item != null)
             await _channel.Writer.WriteAsync(item);
     }
 
-    public async ValueTask<NodeEvent> DequeueAsync(CancellationToken cancellationToken)
+    public async ValueTask<ServiceRequestEvent> DequeueAsync(CancellationToken cancellationToken)
     {
         var item = await _channel.Reader.ReadAsync(cancellationToken);
         return item;

@@ -1,0 +1,59 @@
+﻿@page "/node/edit/{id}"
+
+@inherits ServiceRequestViewComponentBase
+
+<NodeHeader />
+@if (vm.SelectedRequest != null)
+{
+    <ServiceRequestEditForm Model="vm.SelectedRequest.Description" GroupId="vm.SelectedRequest.GroupId.Value" Variant="Variant.Outlined" Class="my-8 z-50" @ref="frm" />
+
+    <NodeGalleryDropZone />
+
+    <MudStack Row Spacing="4">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save"
+                    OnClick=@(() => vm.Save())>@SaveText</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel"
+                    OnClick=@(() => vm.CancelEdit())>Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete">Delete</MudButton>
+    </MudStack>
+}
+
+@code {
+
+    [Parameter]
+    public string id { get; set; }
+
+    ServiceRequestEditForm frm;
+
+    string SaveText = "Save";
+    string Title = "New Case";
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        vm.OnBeforeSaveEvent += OnBeforeSaveEventHandler;
+    }
+
+    protected override void OnDisposed()
+    {
+        vm.OnBeforeSaveEvent -= OnBeforeSaveEventHandler;    
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Guid.TryParse(id, out var nodeId))
+        {
+            await vm.LoadNode(nodeId);
+            SaveText = T["Save"];
+            Title = T["Edit Case"] + ": " + vm.SelectedRequest.Title;
+        }
+        vm.IsEditing = true;
+    }
+
+    async Task OnBeforeSaveEventHandler(object sender)
+    {
+        await frm.Validate();
+    }
+
+}

@@ -1,0 +1,9 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+@inject ServiceRequestViewModel vm
+
+<QuestionnaireResponseView Data="Model.Questionnaire" />
+
+@code {
+    [Parameter]
+    public RequestDescription Model { get; set; }
+}

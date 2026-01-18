@@ -1,0 +1,86 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@inherits ServiceRequestViewComponentBase
+
+@if (vm.SelectedRequest is not null)
+{
+    @if (ExpandDescription)
+    {
+        <div class="ipath_node">
+            <div class="ipath_node_title">
+                <div class="ipath_bold">
+                    <MudHighlighter Text="@vm.SelectedRequest.Title" HighlightedText="@vm.SearchString" />
+                    <span>@vm.SelectedRequest.Description.BodySite?.ToAppend()</span>
+                </div>
+                <div>@vm.SelectedRequest.SubTitle</div>
+            </div>
+            <div class="ipath_node_type">
+                <div class="ipath_bold">Type:</div>
+                <div>@vm.SelectedRequest.CaseType</div>
+            </div>
+            <div class="ipath_node_sender">
+                <div class="ipath_bold">Sender:</div>
+                <OwnerLink Owner="vm.SelectedRequest.Owner" />
+            </div>
+            <div class="ipath_node_date">
+                <b><GroupLink GroupId="@vm.SelectedRequest.GroupId" /></b>
+                <div>@vm.SelectedRequest.CreatedOn.ToString("d")</div>
+            </div>
+        </div>
+        @if (vm.SelectedRequest.Description.Questionnaire is null)
+        {
+            <div class="ipath_node_description">
+                <MudHighlighter Text="@vm.SelectedRequest.DescriptionHtml" Markup="true" HighlightedText="@vm.SearchString" />
+            </div>
+        }
+        else
+        {
+            <ServiceRequestQuestionnaire Model="@vm.SelectedRequest.Description" />
+        }
+    }
+    else
+    {
+        <div class="ipath_node">
+            <div class="ipath_node_title2">
+                <div><b>Filename: </b>@vm.SelectedDocument.GalleryCaption.ShortenTo(50)</div>
+                <div onclick="@ToggleDescription">
+                    <MudIcon Icon="@ExpandIcon" Size="Size.Small" />
+                    <b>@vm.SelectedRequest.Title</b>
+                </div>
+                <div class="ipath_node_description" hidden="@HideDescription">
+                    @vm.SelectedRequest.DescriptionMarkup
+                </div>
+            </div>
+            <div class="ipath_node_sender2">
+                <div>
+                    <b>Sender:</b> <OwnerLink Owner="vm.SelectedRequest.Owner" />
+                </div>
+                <div><b>Type:</b> @vm.SelectedRequest.CaseType</div>
+            </div>
+            <div class="ipath_node_date2">
+                <div>@vm.SelectedRequest.CreatedOn.ToString()</div>
+                <div>@vm.SelectedRequest.GroupId</div>
+            </div>
+        </div>
+    }
+}
+
+
+
+@code {
+    [Parameter]
+    public bool ExpandDescription { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<bool> ExpandDescriptionChanged { get; set; }
+
+    [Parameter]
+    public bool HideDescription { get; set; } = true;
+
+    string ExpandIcon => HideDescription ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ExpandLess;
+
+    void ToggleDescription()
+    {
+        HideDescription = !HideDescription;
+    }
+}

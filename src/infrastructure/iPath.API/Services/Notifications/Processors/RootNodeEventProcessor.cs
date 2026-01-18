@@ -19,18 +19,18 @@ namespace iPath.API.Services.Notifications.Processors;
 
 public class RootNodeEventProcessor(iPathDbContext db, INotificationQueue queue) : INodeEventProcessor
 {
-    public async Task ProcessEvent(NodeEvent evt, CancellationToken ct)
+    public async Task ProcessEvent(ServiceRequestEvent evt, CancellationToken ct)
     {
 
         // we only process root nodes here => nodes that have GroupId
-        if (!evt.Node.GroupId.HasValue) return;
+        if (!evt.ServiceRequest.GroupId.HasValue) return;
 
         // find all subscriptions for this group (active users only)
         var subscriptions = await db.Set<GroupMember>()
             .Include(m => m.User)
             .AsNoTracking()
             .Where(m => m.User.IsActive)
-            .Where(m => m.GroupId == evt.Node.GroupId && m.NotificationSource != eNotificationSource.None)
+            .Where(m => m.GroupId == evt.ServiceRequest.GroupId && m.NotificationSource != eNotificationSource.None)
             .ToListAsync(ct);
 
         // Filter by Notification Source
@@ -45,7 +45,7 @@ public class RootNodeEventProcessor(iPathDbContext db, INotificationQueue queue)
                     // For NewAnnotationOnMyCase => filter by case owner 
                     if (s.NotificationSource.HasFlag(eNotificationSource.NewAnnotationOnMyCase))
                     {
-                        if (evt.Node.OwnerId == s.UserId)
+                        if (evt.ServiceRequest.OwnerId == s.UserId)
                         {
                             await Enqueue(eNodeNotificationType.NewAnnotation, evt, s, ct);
                         }
@@ -68,7 +68,7 @@ public class RootNodeEventProcessor(iPathDbContext db, INotificationQueue queue)
 
 
     // Rules by notification target
-    protected async Task Enqueue(eNodeNotificationType t, NodeEvent evt, GroupMember m, CancellationToken ct)
+    protected async Task Enqueue(eNodeNotificationType t, ServiceRequestEvent evt, GroupMember m, CancellationToken ct)
     {
         if (m.NotificationTarget.HasFlag(eNotificationTarget.InApp))
         {
@@ -82,7 +82,7 @@ public class RootNodeEventProcessor(iPathDbContext db, INotificationQueue queue)
         }
     }
 
-    protected async Task Enqueue(eNodeNotificationType t, NodeEvent n, eNotificationTarget target, bool dailySummary, Guid ReceiverId, CancellationToken ct)
+    protected async Task Enqueue(eNodeNotificationType t, ServiceRequestEvent n, eNotificationTarget target, bool dailySummary, Guid ReceiverId, CancellationToken ct)
     {
         var entity = Notification.Create(t, target, false, ReceiverId, n);
         await db.NotificationQueue.AddAsync(entity, ct);

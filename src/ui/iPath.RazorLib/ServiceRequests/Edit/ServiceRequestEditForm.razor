@@ -1,0 +1,112 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+@using Tizzani.MudBlazor.HtmlEditor
+@using iPath.Application.Features.ServiceRequests
+
+@inject ServiceRequestViewModel vm;
+@inject IStringLocalizer T
+
+<MudForm Model="Model" Class="@Class" @ref="frm">
+    <MudGrid>
+        <MudItem xs="12" sm="8">
+            @if (vm.ActiveGroup.Settings.UseCaseTitleField)
+            {
+                <MudTextField Label=@T["Title"] @bind-Value="Model.Title" For="@(() => Model.Title)" Variant="Variant" Margin="@Margin" AutoFocus="true" />
+            }
+
+            @if (vm.ActiveGroup.Settings.UseCaseSubTitleField)
+            {
+                <MudTextField Label=@T["Subtitle"] @bind-Value="Model.Subtitle" Variant="Variant" Margin="@Margin" ShrinkLabel="true" />
+            }
+
+            <MudPaper Elevation="0" Class="mb-2">
+
+                @if (useQuestionnaire)
+                {
+                    <iPath.LHCForms.LhcForm @ref="lhcForm" ReadOnly="false" />
+                }
+                else if (useHtmlEditor)
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mt-2 mb-2">@T["Desciption"]</MudText>
+                    <MudHtmlEditor @bind-Html="Model.Text" style="min-height: 12em;">
+                        <MudHtmlToolbarOptions InsertImage="false" />
+                    </MudHtmlEditor>
+                }
+                else
+                {
+                    <MudTextField @bind-Value="Model.Text" Lines="6" AutoGrow="true" Variant="Variant" />
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            @if (vm.ActiveGroup.Settings.UseCaseTypeField)
+            {
+                @if (vm.ActiveGroup.Settings.CaseTypes.IsEmpty())
+                {
+                    <MudTextField Label=@T["Case Type"] @bind-Value="Model.CaseType" Variant="Variant" Margin="@Margin" ShrinkLabel="true" />
+                }
+                else
+                {
+                    <CaseTypeLookup Label=@T["Case Type"] GroupId="GroupId" @bind-Value="Model.CaseType" Variant="Variant"
+                                    Clearable="true" Dense="true" CoerceValue="true" Margin="@Margin" ShrinkLabel="true" />
+                }
+            }
+
+            <MudTextField Label=@T["Accession No"] Placeholder=@T["Sender reference no"] @bind-Value="Model.AccessionNo" Variant="Variant" Margin="@Margin" ShrinkLabel="true" />
+
+            <DescriptionBodySite Model="Model" Group="vm.ActiveGroup" Margin="@Margin" />
+        </MudItem>
+    </MudGrid>
+</MudForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public RequestDescription Model { get; set; }
+
+    [Parameter, EditorRequired]
+    public Guid GroupId { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Outlined;
+
+    [Parameter]
+    public Margin Margin { get; set; } = Margin.Dense;
+
+    private iPath.LHCForms.LhcForm lhcForm;
+
+    bool useQuestionnaire => Model?.Questionnaire != null;
+    bool useHtmlEditor => vm.ActiveGroup.Settings.DescriptionAllowHtml;
+
+    private MudForm frm;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && useQuestionnaire)
+        {
+            var qResource = await vm.GetQuesiotnnaire(Model);
+            if (!string.IsNullOrEmpty(qResource))
+            {
+                await lhcForm.LoadFormAsync(qResource, Model.Questionnaire.Resource);
+            }
+        }
+    }
+
+
+    public async Task Validate()
+    {
+        if (useQuestionnaire)
+        {
+            Model.Questionnaire.Resource = await lhcForm.GetDataAsync() ?? "";
+        }
+        else
+        {
+            Model.Questionnaire = null;
+        }
+
+        await frm.Validate();
+    }
+
+    public bool IsValid => frm.IsValid;
+}

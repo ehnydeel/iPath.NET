@@ -10,7 +10,7 @@ internal class NodeLastVisitConfiguration : IEntityTypeConfiguration<NodeLastVis
 
         b.HasOne(x => x.User).WithMany(u => u.NodeVisitis).HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.NoAction);
-        b.HasOne(v => v.Node).WithMany(n => n.LastVisits).HasForeignKey(v => v.NodeId)
+        b.HasOne(v => v.ServiceRequest).WithMany(n => n.LastVisits).HasForeignKey(v => v.NodeId)
             .OnDelete(DeleteBehavior.NoAction);
         b.HasIndex(x => x.NodeId);
     }

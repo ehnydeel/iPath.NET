@@ -54,7 +54,7 @@ public static class DataImportExtensions
             .Select(u => new {u.ipath2_id, u.Id})
             .ToDictionaryAsync(u => u.ipath2_id.Value, u => u.Id);
 
-        nodeIds = await newDb.Nodes.AsNoTracking()
+        nodeIds = await newDb.ServiceRequests.AsNoTracking()
             .Where(u => u.ipath2_id.HasValue)
             .Select(u => new {u.ipath2_id, u.Id})
             .ToDictionaryAsync(u => u.ipath2_id.Value, u => u.Id);
@@ -87,9 +87,9 @@ public static class DataImportExtensions
         }
     }
     
-    public static Node ToNewEntity(this i2object o)
+    public static ServiceRequest ToNewEntity(this i2object o)
     {
-        var n = new Node()
+        var n = new ServiceRequest()
         {
             Id = NewNodeId(o.id).Value,
             ipath2_id = o.id
@@ -176,7 +176,7 @@ public static class DataImportExtensions
             throw new Exception($"Annotation {a.id}: Owner user id {a.sender_id} not found");
         }
         n.OwnerId = nn.Value; 
-        n.NodeId = NewNodeId(a.object_id);
+        n.ServiceRequestId = NewNodeId(a.object_id);
 
         n.Data ??= new AnnotationData();
 

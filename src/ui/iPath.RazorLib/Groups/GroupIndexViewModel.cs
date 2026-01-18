@@ -1,5 +1,4 @@
 ﻿using iPath.Application.Contracts;
-using iPath.Blazor.Componenents.Nodes;
 using iPath.Blazor.Componenents.Shared;
 
 namespace iPath.Blazor.Componenents.Groups;
@@ -8,7 +7,7 @@ public class GroupIndexViewModel(IPathApi api,
     AppState appState,
     ISnackbar snackbar, 
     IDialogService dialog,
-    NodeViewModel nvm) : IViewModel
+    ServiceRequestViewModel nvm) : IViewModel
 {
     public GroupDto Model { get; private set; }
 

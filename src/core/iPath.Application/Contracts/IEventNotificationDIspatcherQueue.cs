@@ -4,6 +4,6 @@ public interface IEventNotificationDispatcherQueue
 {
     int QueueSize { get; }
 
-    ValueTask<NodeEvent> DequeueAsync(CancellationToken cancellationToken);
-    ValueTask EnqueueAsync(NodeEvent item);
+    ValueTask<ServiceRequestEvent> DequeueAsync(CancellationToken cancellationToken);
+    ValueTask EnqueueAsync(ServiceRequestEvent item);
 }

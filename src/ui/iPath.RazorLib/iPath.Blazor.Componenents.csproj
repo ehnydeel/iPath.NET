@@ -37,7 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Nodes\Dialogs\" />
+    <Folder Include="Documents\" />
+    <Folder Include="ServiceRequests\Dialogs\" />
     <Folder Include="wwwroot\fhir\" />
   </ItemGroup>
 

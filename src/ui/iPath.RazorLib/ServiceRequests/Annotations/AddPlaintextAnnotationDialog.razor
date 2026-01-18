@@ -1,0 +1,40 @@
+﻿<MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+    <MudDialog ContentStyle="width: 720px; min-height: 350px;">
+        <TitleContent>
+            <MudText Typo="Typo.h6">Annotation</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField AutoGrow="true" @bind-Value="Model.Data.Text" Immediate="true"
+                          Lines="12" Variant="Variant.Outlined"
+                          Label="Annotation"
+                          Style="width: 100%;" />
+
+            @if (Model.AskMorphology)
+            {
+                <MorphoLookup Label="Morphology" @bind-Value="Model.Data.Morphology" Dense="true" ShrinkLabel="true" Variant="Variant.Outlined" />
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton Color="Color.Primary" OnClick="@Save" Variant="Variant.Filled">
+                Save
+            </MudButton>
+            <MudButton Color="Color.Error" OnClick="@Cancel" Variant="Variant.Filled">
+                Cancel
+            </MudButton>
+        </DialogActions>
+    </MudDialog>
+</MudFocusTrap>
+
+@inject ServiceRequestViewModel vm
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public AnnotationEditModel Model { get; set; } = new();
+
+
+    private void Save() => MudDialog.Close(DialogResult.Ok(Model));
+
+	private void Cancel() => MudDialog.Cancel();
+}

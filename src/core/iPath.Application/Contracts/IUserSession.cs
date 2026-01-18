@@ -21,11 +21,11 @@ public static class UserSessionExtensions
         /// </summary>
         /// <param name="GroupId"></param>
         /// <exception cref="NotAllowedException"></exception>
-        public void AssertInGroup(Guid GroupId)
+        public void AssertInGroup(Guid? GroupId)
         {
             if (!session.IsAdmin)
             {
-                if (!session.User.groups.ContainsKey(GroupId))
+                if (!GroupId.HasValue || !session.User.groups.ContainsKey(GroupId.Value))
                 {
                     throw new NotAllowedException($"You are not allowed to access group {GroupId}");
                 }
@@ -43,8 +43,8 @@ public static class UserSessionExtensions
         }
 
 
-        public bool IsGroupModerator(Guid groupId)
-            => session.IsAuthenticated && session.User.groups.ContainsKey(groupId) && session.User.groups[groupId] == eMemberRole.Moderator;
+        public bool IsGroupModerator(Guid? groupId)
+            => groupId.HasValue && session.IsAuthenticated && session.User.groups.ContainsKey(groupId.Value) && session.User.groups[groupId.Value] == eMemberRole.Moderator;
 
         // Admin or user himself
         public bool CanModifyUser(Guid UserId)
@@ -53,7 +53,7 @@ public static class UserSessionExtensions
 
         public string Username => session.Username;
 
-        public bool CanEditNode(NodeDto? node)
+        public bool CanEditNode(ServiceRequestDto? node)
         {
             if (session.User is null || node is null )
                 return false;
@@ -61,7 +61,7 @@ public static class UserSessionExtensions
             if (session.IsAdmin)
                 return true;
 
-            if (node.GroupId.HasValue && session.IsGroupModerator(node.GroupId.Value))
+            if (session.IsGroupModerator(node.GroupId))
                 return true;
 
             if (node.OwnerId == session.User.Id)

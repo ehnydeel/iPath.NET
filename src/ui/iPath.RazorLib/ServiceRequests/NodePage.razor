@@ -1,0 +1,60 @@
+﻿@page "/node/{id}"
+
+@inherits ServiceRequestViewComponentBase
+
+
+<NodeHeader />
+
+@if (vm.SelectedRequest is null)
+{
+    <LoadingMessage />
+}
+else
+{
+    <NodeDescriptionView ExpandDescription="ShowDescription" />
+    <NodeGallery OnShowingChildNode="@(e => ShowDescription = !e)" />
+    <NodeAnnotations Class="mt-8" @ref="annotationView" />
+}
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    bool ShowDescription = true;
+    bool Loading;
+
+    NodeAnnotations annotationView;
+
+
+    protected override void OnInitialized()
+    {
+        vm.OnLoadingStarted += StartLoding;
+        vm.OnLoadingStarted += StartLoding;
+    }
+
+    protected override void OnDisposed()
+    {
+        vm.OnLoadingStarted -= StartLoding;
+        vm.OnLoadingStarted -= StartLoding;
+    }
+
+    void StartLoding()
+    {
+        Loading = true;
+    }
+
+    void StoptLoding()
+    {
+        Loading = false;
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await vm.LoadNode(Guid.Parse(id));
+        StateHasChanged();
+
+        await vm.MarkAsVisited();
+    }
+}

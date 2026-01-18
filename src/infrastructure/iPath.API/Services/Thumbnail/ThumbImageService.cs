@@ -9,16 +9,16 @@ public class ThumbImageService(IOptions<iPathConfig> opts,
     iPathDbContext db,
     IImageInfoService srv,
     ILogger<ThumbImageService> logger)
-    : INotificationHandler<NodeThumnailNotCreatedNotification>, IThumbImageService
+    : INotificationHandler<DocumentThumnailNotCreatedNotification>, IThumbImageService
 {
-    public async ValueTask Handle(NodeThumnailNotCreatedNotification request, CancellationToken cancellationToken)
+    public async ValueTask Handle(DocumentThumnailNotCreatedNotification request, CancellationToken cancellationToken)
     {
         try
         {
-            var node = await db.Nodes.FindAsync(request.nodeId, cancellationToken);
+            var node = await db.Docoments.FindAsync(request.Id, cancellationToken);
             if (node != null)
             {
-                logger.LogInformation($"creating thumbnail for node {node.Id}");
+                logger.LogInformation($"creating thumbnail for document {node.Id}");
 
                 var fn = Path.Combine(opts.Value.TempDataPath, node.Id.ToString());
                 if (System.IO.File.Exists(fn))

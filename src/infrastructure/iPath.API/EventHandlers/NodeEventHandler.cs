@@ -19,7 +19,7 @@ public class DomainEventHandler(IHubContext<NodeNotificationsHub> hub,
 {
     public async ValueTask Handle(EventEntity evt, CancellationToken ct)
     {
-        if (evt is NodeEvent ne)
+        if (evt is ServiceRequestEvent ne)
         {
             string payload = JsonSerializer.Serialize(ne);
             var msg = new NotificationMessage(evt.EventDate, ne.GetType().Name, payload);

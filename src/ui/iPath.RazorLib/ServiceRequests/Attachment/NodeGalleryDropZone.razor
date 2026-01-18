@@ -1,0 +1,48 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+@using iPath.Application.Features.ServiceRequests
+@using iPath.Domain.Config
+
+@inherits ServiceRequestViewComponentBase
+@inject IOptions<iPathClientConfig> opts
+
+<style>
+    .file-upload-input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 10;
+        opacity: 0;
+    }
+</style>
+
+@**** Gallery View **********************************************@
+
+<MudFileUpload T="IReadOnlyList<IBrowserFile>"
+               OnFilesChanged="OnInputFileChanged"
+               AppendMultipleFiles
+               Error="true"
+               MaximumFileCount="@MaximumFileCount"
+               MaxFileSize="@opts.Value.MaxFileSizeBytes"
+               Hidden="@false"
+               InputClass="file-upload-input"
+               @ondrop="@ClearDragClass" @ondragenter="@SetDragClass"
+               @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
+    <ActivatorContent>
+        <MudPaper Class="@_dragClass" Style="min-height: 300px;" Outlined="true" Elevation="0">
+            <MudText Typo="Typo.h6">
+                Drag and drop files here or click (Maximum @MaximumFileCount Files, @opts.Value.MaxFileSize)
+            </MudText>
+
+            <div id="gallery" class="gallery">
+                @foreach (var u in _uploads)
+                {
+                    <div class="gallery-item">
+                        <UploadGalleryItem Upload="@u" />
+                    </div>
+                }
+            </div>
+        </MudPaper>
+    </ActivatorContent>
+</MudFileUpload>
+

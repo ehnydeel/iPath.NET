@@ -1,0 +1,132 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@inherits ServiceRequestViewComponentBase
+
+@inject IJSRuntime JS
+
+
+@**** Gallery View **********************************************@
+
+<div class="sortableGallery">
+    <div id="gallery" class="gallery" style="z-index: 20;">
+        @foreach (var c in vm.SelectedRequest.Documents.OrderBy(c => c.SortNr))
+        {
+            <NodeGallerySortableItem Model="c" 
+                                     Selected="IsSelected(c.Id)"
+                                     SelectedChanged="@(val => OnChildSelectedChanged(c.Id, val))"
+                                     @key="c.Id" />
+        }
+    </div>
+</div>
+
+<div class="sortableGallery_footer" hidden="@HideSaveButtons">
+    <p>Drag images to change sort order</p>
+    <MudStack Row Spacing="2">
+        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" OnClick="SaveSortAsync">Save</MudButton>
+        <MudButton Color="Color.Warning" StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" OnClick="DeleteSelection" Disabled="DeleteDisabled">Delete</MudButton>
+        <MudButton Variant="Variant.Outlined" OnClick="CancelSort">Cancel</MudButton>
+    </MudStack>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnSortingFinished { get; set; }
+
+    [Parameter]
+    public bool HideSaveButtons { get; set; }
+
+    private DotNetObjectReference<NodeGallerySortable> _dotNetHelper;
+    private Dictionary<string, int> _SortOrder;
+    private bool sortHasChanged = false;
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _SortOrder = vm.SelectedRequest.Documents.Select(x => new { Key = x.Id.ToString(), Value = x.SortNr }).ToDictionary(i => i.Key, i => (i.Value ?? 0));
+            _dotNetHelper = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initializeSortable", "gallery", _dotNetHelper);
+            StateHasChanged();
+        }
+    }
+
+
+    [JSInvokable]
+    public void UpdateSortOrder(List<string> newOrder)
+    {
+        foreach (var c in vm.SelectedRequest.Documents)
+        {
+            _SortOrder[c.Id.ToString()] = newOrder.IndexOf(c.Id.ToString()) + 1;
+        }
+        sortHasChanged = true;
+        StateHasChanged();
+    }
+
+
+    public async Task SaveSortAsync()
+    {
+        var newSort = new Dictionary<Guid, int>();
+        foreach (var c in vm.SelectedRequest.Documents)
+        {
+            c.SortNr = _SortOrder[c.Id.ToString()];
+            newSort.Add(c.Id, c.SortNr.Value);
+        }
+        await vm.SaveChildNodeSortOrder(newSort);
+        await OnSortingFinished.InvokeAsync(true);
+    }
+
+    async Task CancelSort()
+    {
+        await OnSortingFinished.InvokeAsync(false);
+    }
+
+
+    protected override void OnDisposed()
+    {
+        if (_dotNetHelper is not null)
+        {
+            try
+            {
+                _dotNetHelper.Dispose();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+
+
+
+    // --- Selection helpers added ---
+    private HashSet<Guid> Selection = new();
+
+    private bool IsSelected(Guid id)
+    {
+        return Selection.Contains(id);
+    }
+
+    private void OnChildSelectedChanged(Guid id, bool value)
+    {
+        if (!value)
+        {
+            if (Selection.Contains(id)) Selection.Remove(id);
+        }
+        else
+        {
+            if (!Selection.Contains(id)) Selection.Add(id);
+        }
+        StateHasChanged();
+    }
+
+    bool DeleteDisabled => !Selection.Any();
+
+    async Task DeleteSelection()
+    {
+        await vm.DeleteDcouments(Selection);
+        await OnSortingFinished.InvokeAsync(true);
+    }
+}

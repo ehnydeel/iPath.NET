@@ -1,0 +1,97 @@
+﻿@page "/node/{id}/slideshow"
+
+@using MudBlazor.Services
+@using iPath.Application.Features.ServiceRequests
+@using iPath.Blazor.Componenents.Layouts
+@layout SlideshowLayout
+
+@inherits ServiceRequestViewComponentBase
+
+<MudFocusTrap DefaultFocus="DefaultFocus.FirstChild">
+    <MudSwipeArea Style="height: 100%; width: 100%; background-color: black;"
+                  OnSwipeEnd="OnSwipeHandler"
+                  @onkeydown="@((args) => OnKeyDown(args))"
+                  @onclick="@(() => vm.SelectNextImage())">
+
+        @if (vm.SelectedDocument is not null)
+        {
+            <div class="d-flex justify-center flex-grow-1 gap-4 mb-10">
+                <MudIconButton Icon="@Icons.Material.Filled.ArrowLeft" Size="Size.Small" OnClick="@(() => vm.SelectPreviousImage())" />
+                <MudIconButton Icon="@Icons.Material.Filled.ArrowRight" Size="Size.Small" OnClick="@(() => vm.SelectNextImage())" />
+                <MudIconButton Icon="@Icons.Material.Filled.Comment" Size="Size.Small" OnClick="@(() => vm.Annotate(vm.SelectedDocument.Id))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="@(() => vm.GoUp())" />
+            </div>
+
+            <div class="ipath_image slideshow">
+                @if (vm.SelectedDocument.IsImage)
+                {
+                    <img src="@vm.SelectedDocument.FileUrl" class="ipath_image_slideshow"/>
+                }
+                else
+                {
+                    <MudIcon Size="Size.Large" Icon="@vm.SelectedDocument.FileIcon" />
+                }
+                <div class="mt-2">@vm.SelectedDocument.GalleryCaption.ShortenTo(80)</div>
+            </div>
+        }
+        else
+        {
+            vm.GoUp();
+        }
+    </MudSwipeArea>
+</MudFocusTrap>
+
+@code
+{
+    [Parameter]
+    public string id { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await vm.LoadNode(Guid.Parse(id));
+
+        // select first images
+        if (vm.HasImages)
+        {
+            vm.SelectDocument(vm.SelectedRequest.Documents.FirstOrDefault(n => n.IsImage).Id);
+        }
+        else
+        {
+            await vm.GoUp();
+        }
+    }
+
+
+    async Task OnSwipeHandler(SwipeEventArgs args)
+    {
+        if (args.SwipeDirection == SwipeDirection.RightToLeft)
+        {
+            await vm.SelectNextImage();
+        }
+        else if (args.SwipeDirection == SwipeDirection.LeftToRight)
+        {
+            await vm.SelectPreviousImage();
+        }
+    }
+
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        var code = args.Code ?? string.Empty;
+
+        if (code == "Space" || code == "ArrowRight")
+        {
+            await vm.SelectNextImage();
+        }
+        else if (code == "ArrowLeft")
+        {
+            await vm.SelectPreviousImage();
+        }
+        else if (code == "Escape")
+        {
+            await vm.GoUp();
+        }
+    }
+
+}

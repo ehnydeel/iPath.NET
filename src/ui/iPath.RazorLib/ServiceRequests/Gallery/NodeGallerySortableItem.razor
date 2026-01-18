@@ -1,0 +1,34 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+
+<MudPaper class="gallery-item" data-id="@Model.Id">
+    @if (Model.IsImage)
+    {
+        <img src="@Model.ThumbUrl" alt="@Model.GalleryCaption.ShortenTo(25)">
+    }
+    else
+    {
+        <MudIcon Size="Size.Large" Icon="@Model.FileIcon" />
+        <br />
+    }
+    <div class="gallery-item-label">@Model.File?.Filename.ShortenTo(12)</div>
+    <MudCheckBox @bind-Value="@Selected" @bind-Value:after="OnSelectedChanged" Style="position: absolute; top: -12px; left: -12px;" />
+</MudPaper>
+
+
+
+@code {
+    [Parameter]
+    public DocumentDto Model { get; set; }
+
+    [Parameter]
+    public bool Selected { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> SelectedChanged { get; set; }
+
+    async Task OnSelectedChanged()
+    {
+        await SelectedChanged.InvokeAsync(Selected);   
+    }
+}

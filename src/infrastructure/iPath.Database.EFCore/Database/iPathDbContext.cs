@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using System.Reflection.Metadata;
 
 namespace iPath.EF.Core.Database;
 
@@ -29,7 +29,8 @@ public class iPathDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Community> Communities { get; set; }
     public DbSet<Group> Groups { get; set; }
 
-    public DbSet<Node> Nodes { get; set; }
+    public DbSet<ServiceRequest> ServiceRequests { get; set; }
+    public DbSet<DocumentNode> Docoments { get; set; }
     public DbSet<Annotation> Annotations { get; set; }
     public DbSet<NodeImport> NodeImports { get; set; }
     public DbSet<NodeLastVisit> NodeLastVisits { get; set; }

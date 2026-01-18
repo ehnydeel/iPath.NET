@@ -5,7 +5,7 @@ using iPath.Blazor.Componenents.Admin.Groups;
 using iPath.Blazor.Componenents.Admin.Questionnaires;
 using iPath.Blazor.Componenents.Admin.Users;
 using iPath.Blazor.Componenents.Communities;
-using iPath.Blazor.Componenents.Nodes;
+using iPath.Blazor.Componenents.ServiceRequests;
 using iPath.Blazor.Componenents.Questionaiires;
 using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
@@ -85,7 +85,7 @@ public static class RazorLibServiceRegistration
         services.AddScoped<GroupListViewModel>();
         services.AddScoped<GroupIndexViewModel>();
         services.AddScoped<NodeListViewModel>();
-        services.AddScoped<NodeViewModel>();
+        services.AddScoped<ServiceRequestViewModel>();
         services.AddScoped<UserViewModel>();
         services.AddScoped<QuestionnairesViewModel>();
 

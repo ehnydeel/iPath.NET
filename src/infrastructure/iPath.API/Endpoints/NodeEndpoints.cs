@@ -1,5 +1,6 @@
 ﻿
 using Ardalis.GuardClauses;
+using iPath.Application.Features.Documents;
 using Microsoft.AspNetCore.Mvc;
 
 namespace iPath.API.Endpoints;
@@ -14,16 +15,16 @@ public static class NodeEndpoints
         // Queries
 
         grp.MapGet("{id}", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new GetRootNodeByIdQuery(Guid.Parse(id)), ct))
-            .Produces<NodeDto>()
+            => await mediator.Send(new GetServiceRequestByIdQuery(Guid.Parse(id)), ct))
+            .Produces<ServiceRequestDto>()
             .RequireAuthorization();
 
-        grp.MapPost("list", async (GetNodesQuery request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPost("list", async (GetServiceRequestsQuery request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
-            .Produces<PagedResultList<NodeListDto>>()
+            .Produces<PagedResultList<ServiceRequestListDto>>()
             .RequireAuthorization();
 
-        grp.MapPost("idlist", async (GetNodeIdListQuery request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPost("idlist", async (GetServiceRequestIdListQuery request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
             .Produces<IReadOnlyList<Guid>>()
             .RequireAuthorization();
@@ -32,7 +33,7 @@ public static class NodeEndpoints
         {
             if (Guid.TryParse(id, out var nodeId))
             {
-                var res = await mediator.Send(new GetNodeFileQuery(nodeId), ct);
+                var res = await mediator.Send(new GetDocumentFileQuery(nodeId), ct);
 
                 if (res.NotFound)
                 {
@@ -56,32 +57,32 @@ public static class NodeEndpoints
 
 
         // Commands
-        grp.MapPost("create", async (CreateNodeCommand request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPost("create", async (CreateServiceRequestCommand request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
-            .Produces<NodeDto>()
+            .Produces<ServiceRequestDto>()
             .RequireAuthorization();
 
         grp.MapDelete("{id}", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new DeleteNodeCommand(Guid.Parse(id)), ct))
-            .Produces<NodeDeletedEvent>()
+            => await mediator.Send(new DeleteServiceRequestCommand(Guid.Parse(id)), ct))
+            .Produces<ServiceRequestDeletedEvent>()
             .RequireAuthorization();
 
-        grp.MapPut("update", async (UpdateNodeCommand request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPut("update", async (UpdateServiceRequestCommand request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
             .Produces<bool>()
             .RequireAuthorization();
 
-        grp.MapPut("order", async (UpdateChildNodeSortOrderCommand request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPut("order", async (UpdateDcoumentsSortOrderCommand request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
             .Produces<ChildNodeSortOrderUpdatedEvent>()
             .RequireAuthorization();
 
         grp.MapPost("visit/{id}", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new UpdateNodeVisitCommand(Guid.Parse(id)), ct))
+            => await mediator.Send(new UpdateServiceRequestVisitCommand(Guid.Parse(id)), ct))
             .Produces<bool>()
             .RequireAuthorization();
 
-        grp.MapPost("upload/{id}", async (string id, [FromForm] IFormFile file, 
+        grp.MapPost("{requestId}/upload/{parentId}", async (string requestId, string? parentId, [FromForm] IFormFile file, 
             [FromServices] IMediator mediator, CancellationToken ct) =>
         {
             if (file is not null)
@@ -92,10 +93,10 @@ public static class NodeEndpoints
 
                 Guard.Against.Null(fileSize);
 
-                if (Guid.TryParse(id, out var parentId))
+                if (Guid.TryParse(requestId, out var requestGuid))
                 {
                     await using Stream stream = file.OpenReadStream();
-                    var req = new UploadNodeFileCommand(ParentNodeId: parentId, filename: fileName, fileSize: fileSize, fileStream: stream, contenttype: contentType);
+                    var req = new UploadDocumentCommand(RequestId: requestGuid, ParentId: Guid.Parse(parentId) , filename: fileName, fileSize: fileSize, fileStream: stream, contenttype: contentType);
                     var node = await mediator.Send(req, ct);
                     return node is null ? Results.NoContent() : Results.Ok(node);
                 }
@@ -107,17 +108,17 @@ public static class NodeEndpoints
             return Results.NoContent();
         })
             .DisableAntiforgery()
-            .Produces<NodeDto>()
+            .Produces<DocumentDto>()
             .RequireAuthorization();
 
 
-        grp.MapPost("annotation", async (CreateNodeAnnotationCommand request, [FromServices] IMediator mediator, CancellationToken ct)
+        grp.MapPost("annotation", async (CreateAnnotationCommand request, [FromServices] IMediator mediator, CancellationToken ct)
             => await mediator.Send(request, ct))
             .Produces<AnnotationDto>()
             .RequireAuthorization();
 
         grp.MapDelete("annotation/{id}", async (string id, [FromServices] IMediator mediator, CancellationToken ct)
-            => await mediator.Send(new DeleteNodeAnnotationCommand(Guid.Parse(id)), ct))
+            => await mediator.Send(new DeleteAnnotationCommand(Guid.Parse(id)), ct))
             .Produces<Guid>()
             .RequireAuthorization();
 

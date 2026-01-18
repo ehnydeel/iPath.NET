@@ -13,7 +13,7 @@ public class NotificationEventHandler(IEventNotificationDispatcherQueue queue)
 {
     public async ValueTask Handle(EventEntity evt, CancellationToken cancellationToken)
     {
-        if (evt is NodeEvent ne)
+        if (evt is ServiceRequestEvent ne)
             await queue.EnqueueAsync(ne);
     }
 }

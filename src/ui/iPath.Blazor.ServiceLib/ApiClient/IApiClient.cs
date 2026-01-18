@@ -1,8 +1,10 @@
 ﻿using FluentResults;
 using Humanizer;
 using iPath.Application.Features;
-using iPath.Application.Features.Nodes;
+using iPath.Application.Features.Documents;
+using iPath.Application.Features.ServiceRequests;
 using iPath.Application.Features.Notifications;
+using iPath.Application.Features.ServiceRequests;
 using iPath.Application.Features.Users;
 using iPath.Application.Localization;
 using iPath.Application.Querying;
@@ -133,43 +135,49 @@ public interface IPathApi
     #endregion
 
 
-    #region "-- Nodes --"
-    [Get("/api/v1/nodes/{id}")]
-    Task<IApiResponse<NodeDto>> GetNodeById(Guid id);
+    #region "-- ServiceRequest --"
+    [Get("/api/v1/requests/{id}")]
+    Task<IApiResponse<ServiceRequestDto>> GetNodeById(Guid id);
 
-    [Post("/api/v1/nodes/list")]
-    Task<IApiResponse<PagedResultList<NodeListDto>>> GetNodeList(GetNodesQuery query);
+    [Post("/api/v1/requests/list")]
+    Task<IApiResponse<PagedResultList<ServiceRequestListDto>>> GetNodeList(GetServiceRequestsQuery query);
 
-    [Post("/api/v1/nodes/idlist")]
-    Task<IApiResponse<IReadOnlyList<Guid>>> GetNodeIdList(GetNodeIdListQuery query);
+    [Post("/api/v1/requests/idlist")]
+    Task<IApiResponse<IReadOnlyList<Guid>>> GetNodeIdList(GetServiceRequestIdListQuery query);
 
-    [Post("/api/v1/nodes/create")]
-    Task<IApiResponse<NodeDto>> CreateNode(CreateNodeCommand query);
+    [Post("/api/v1/requests/create")]
+    Task<IApiResponse<ServiceRequestDto>> CreateNode(CreateServiceRequestCommand query);
 
-    [Delete("/api/v1/nodes/{id}")]
-    Task<IApiResponse<NodeDeletedEvent>> DeleteNode(Guid id);
+    [Delete("/api/v1/requests/{id}")]
+    Task<IApiResponse<ServiceRequestDeletedEvent>> DeleteNode(Guid id);
 
-    [Put("/api/v1/nodes/update")]
-    Task<IApiResponse<bool>> UpdateNode(UpdateNodeCommand request);
+    [Put("/api/v1/requests/update")]
+    Task<IApiResponse<bool>> UpdateNode(UpdateServiceRequestCommand request);
 
-    [Put("/api/v1/nodes/order")]
-    Task<IApiResponse<ChildNodeSortOrderUpdatedEvent>> UpdateNodeSortOrder(UpdateChildNodeSortOrderCommand request);
+    [Put("/api/v1/requests/order")]
+    Task<IApiResponse<ChildNodeSortOrderUpdatedEvent>> UpdateNodeSortOrder(UpdateDcoumentsSortOrderCommand request);
 
-    [Post("/api/v1/nodes/visit/{id}")]
+    [Post("/api/v1/requests/visit/{id}")]
     Task<IApiResponse<bool>> UpdateNodeVisit(Guid id);
 
-    [Multipart]
-    [Post("/api/v1/nodes/upload/{parentNodeId}")]
-    Task<IApiResponse<NodeDto>> UploadNodeFile([AliasAs("file")] StreamPart file, Guid parentNodeId);
+    [Post("/api/v1/requests/annotation")]
+    Task<IApiResponse<AnnotationDto>> CreateAnnotation(CreateAnnotationCommand request);
 
-
-    [Post("/api/v1/nodes/annotation")]
-    Task<IApiResponse<AnnotationDto>> CreateAnnotation(CreateNodeAnnotationCommand request);
-
-    [Delete("/api/v1/nodes/annotation/{id}")]
+    [Delete("/api/v1/requests/annotation/{id}")]
     Task<IApiResponse<Guid>> DeleteAnnotation(Guid id);
+    #endregion
 
 
+    #region "-- Request-Documents --"
+    [Multipart]
+    [Post("/api/v1/requests/{requestId}/upload/{parentId}")]
+    Task<IApiResponse<DocumentDto>> UploadNodeFile([AliasAs("file")] StreamPart file, Guid requestId, Guid? parentId = null);
+
+    [Delete("/api/v1/requests/document/{id}")]
+    Task<IApiResponse<Guid>> DeleteDocument(Guid id);
+
+    [Put("/api/v1/requests/document/{id}")]
+    Task<IApiResponse<Guid>> UpdateDocument(Guid id);
     #endregion
 
 

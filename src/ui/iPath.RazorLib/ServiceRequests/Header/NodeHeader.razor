@@ -1,0 +1,75 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@inherits ServiceRequestViewComponentBase
+
+<MudSwipeArea OnSwipeEnd="OnSwipeHandler">
+    <div class="mud-theme-info ipath_node_header">
+        <div class="ipath_header_title">@Title</div>
+        <div class="ipath_header_actions">
+            <MudIconButton OnClick="vm.GoPrevious" Icon="@Icons.Material.Filled.ArrowLeft" Size="Size.Small" Title="Previous" />
+            <MudIconButton OnClick="vm.GoUp" Icon="@Icons.Material.Filled.ArrowDropUp" Size="Size.Small" Title="Up" />
+            <MudIconButton OnClick="vm.GoNext" Icon="@Icons.Material.Filled.ArrowRight" Size="Size.Small" Title="Next" />
+        </div>
+        <div class="ipath_header_toolbar">
+            <MudToolBar>
+                <MudIconButton Icon="@EditIcon" OnClick="OnEditClick" Disabled="vm.EditDisabled" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Save" OnClick="@(() => vm.Save())" hidden="@hideSave" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => vm.Delete())" Disabled="vm.DeleteDisabled" />
+                <FileUploadButton Disabled="@vm.AttachFileDisabled" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Comment" OnClick="@(() => vm.StartAnnotation())" Disabled="vm.AnnotateDisabled" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Slideshow" OnClick="@(() => vm.StartSlideshow())" Disabled=@(!vm.HasImages) />
+            </MudToolBar>
+        </div>
+    </div>
+</MudSwipeArea>
+
+
+@code {
+    bool hideSave => !vm.IsEditing;
+
+    private string EditIcon => vm.IsEditing ? Icons.Material.Outlined.Cancel : Icons.Material.Outlined.Edit;
+
+
+    async Task OnSwipeHandler(SwipeEventArgs args)
+    {
+        if (args.SwipeDirection == SwipeDirection.RightToLeft)
+        {
+            await vm.GoNext();
+        }
+        else if (args.SwipeDirection == SwipeDirection.LeftToRight)
+        {
+            await vm.GoNext();
+        }
+    }
+
+
+
+    async Task OnEditClick()
+    {
+        if (vm.IsEditing)
+            await vm.CancelEdit();
+        else
+            await vm.Edit();
+    }
+
+
+    string Title
+    {
+        get
+        {
+            if (vm.SelectedRequest is null)
+                return T["loading ..."];
+            else if (vm.SelectedRequest.IsDraft)
+                return T["New Case"];
+
+            var ret = vm.SelectedRequest.Title;
+
+            if (!vm.IsRootNodeSelected && vm.SelectedDocument is not null)
+            {
+                ret += " >> " + vm.SelectedDocument.File?.Filename;
+            }
+
+            return ret;
+        }
+    }
+}

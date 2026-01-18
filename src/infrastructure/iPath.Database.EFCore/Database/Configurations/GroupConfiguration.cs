@@ -10,6 +10,8 @@ internal class GroupConfiguration : IEntityTypeConfiguration<Group>
 
         b.Property(x => x.Name).HasMaxLength(200);
 
+
+        b.Property(x => x.OwnerId).HasColumnName("owner_id");
         b.HasOne(g => g.Owner).WithMany().HasForeignKey(g => g.OwnerId).IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
@@ -17,7 +19,7 @@ internal class GroupConfiguration : IEntityTypeConfiguration<Group>
         b.HasMany(x => x.ExtraCommunities).WithOne(x => x.Group).IsRequired(true);
 
         b.HasMany(x => x.Members).WithOne(m => m.Group).HasForeignKey(m => m.GroupId);
-        b.HasMany(x => x.Nodes).WithOne(n => n.Group).HasForeignKey(n => n.GroupId).IsRequired();
+        b.HasMany(x => x.ServiceRequests).WithOne(n => n.Group).HasForeignKey(n => n.GroupId).IsRequired();
 
         b.ComplexProperty(x => x.Settings, pb => pb.ToJson());
 

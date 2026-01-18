@@ -1,0 +1,19 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@if (Model.IsImage)
+{
+    <img src="@Model.ThumbUrl" alt="@Model.GalleryCaption.ShortenTo(25)">
+}
+else
+{
+    <MudIcon Size="Size.Large" Icon="@Model.FileIcon" />
+    <br />
+}
+<div class="gallery-item-label">@Model.File?.Filename.ShortenTo(12)</div>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public DocumentDto Model { get; set; }
+
+}

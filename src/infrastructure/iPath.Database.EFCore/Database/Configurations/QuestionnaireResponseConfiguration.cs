@@ -18,9 +18,9 @@ internal class QuestionnaireResponseConfiguration : IEntityTypeConfiguration<Que
             .IsRequired(true)
             .OnDelete(DeleteBehavior.NoAction);
 
-        b.HasOne(r => r.Node)
+        b.HasOne(r => r.ServiceRequest)
             .WithMany(n => n.QuestionnaireResponses)
-            .HasForeignKey(r => r.NodeId)
+            .HasForeignKey(r => r.ServiceRequestId)
             .IsRequired(false);
 
         b.HasOne(r => r.Annotation)

@@ -56,7 +56,7 @@ public class User : IdentityUser<Guid>, IBaseEntity
 
 
 
-    public ICollection<Node> OwnedNodes { get; set; } = [];    
+    public ICollection<ServiceRequest> OwnedNodes { get; set; } = [];    
     public ICollection<NodeLastVisit> NodeVisitis { get; set; } = [];
 
     public ICollection<Role> Roles { get; set; } = [];

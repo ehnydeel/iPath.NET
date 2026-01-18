@@ -11,8 +11,8 @@ public class QuestionnaireResponseEntity : AuditableEntity
     public DateTime CreatedOn { get; set; }
     public DateTime ModifiedOn { get; set; }
 
-    public Guid? NodeId { get; set; }
-    public Node? Node { get; set; }
+    public Guid? ServiceRequestId { get; set; }
+    public ServiceRequest? ServiceRequest { get; set; }
 
     public Guid? AnnotationId { get; set; }
     public Annotation? Annotation { get; set; }

@@ -67,9 +67,9 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
             var uid = sess.User.Id;
 
             dtoQuery = q.Select(x => new GroupListDto(x.Id, x.Name, x.Visibility,
-                x.Nodes.Count(),
-                x.Nodes.Count(n => n.CreatedOn > minDate && !n.LastVisits.Any(v => v.UserId == uid)),
-                x.Nodes.Count(n => n.Annotations.Any(a => a.CreatedOn > minDate &&
+                x.ServiceRequests.Count(),
+                x.ServiceRequests.Count(n => n.CreatedOn > minDate && !n.LastVisits.Any(v => v.UserId == uid)),
+                x.ServiceRequests.Count(n => n.Annotations.Any(a => a.CreatedOn > minDate &&
                                                         (!n.LastVisits.Any(v => v.UserId == uid) || a.CreatedOn > n.LastVisits.First(v => v.UserId == uid).Date)))
                 ));
         }
