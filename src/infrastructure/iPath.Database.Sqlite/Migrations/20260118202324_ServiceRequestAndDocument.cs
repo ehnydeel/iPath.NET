@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace iPath.Database.Sqlite.Migrations
 {
     /// <inheritdoc />
-    public partial class ServiceRequestAndDocuments : Migration
+    public partial class ServiceRequestAndDocument : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,15 +28,22 @@ namespace iPath.Database.Sqlite.Migrations
                 table: "groups");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_node_lastvisits_nodes_NodeId",
-                table: "node_lastvisits");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_questionnaire_responses_nodes_NodeId",
                 table: "questionnaire_responses");
 
             migrationBuilder.DropTable(
+                name: "node_lastvisits");
+
+            migrationBuilder.DropTable(
                 name: "nodes");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_NodeImports",
+                table: "NodeImports");
+
+            migrationBuilder.RenameTable(
+                name: "NodeImports",
+                newName: "node_data_import");
 
             migrationBuilder.RenameColumn(
                 name: "NodeId",
@@ -87,6 +94,11 @@ namespace iPath.Database.Sqlite.Migrations
                 name: "IX_annotations_ChildNodeId",
                 table: "annotations",
                 newName: "IX_annotations_document_id");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_node_data_import",
+                table: "node_data_import",
+                column: "NodeId");
 
             migrationBuilder.CreateTable(
                 name: "servicerequests",
@@ -160,6 +172,35 @@ namespace iPath.Database.Sqlite.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "servicerequest_lastvisits",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ServiceRequestId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DocumentNodeId = table.Column<Guid>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_servicerequest_lastvisits", x => new { x.UserId, x.ServiceRequestId });
+                    table.ForeignKey(
+                        name: "FK_servicerequest_lastvisits_documents_DocumentNodeId",
+                        column: x => x.DocumentNodeId,
+                        principalTable: "documents",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_servicerequest_lastvisits_servicerequests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "servicerequests",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_servicerequest_lastvisits_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_documents_owner_id",
                 table: "documents",
@@ -174,6 +215,21 @@ namespace iPath.Database.Sqlite.Migrations
                 name: "IX_documents_servicerequest_id",
                 table: "documents",
                 column: "servicerequest_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_servicerequest_lastvisits_Date",
+                table: "servicerequest_lastvisits",
+                column: "Date");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_servicerequest_lastvisits_DocumentNodeId",
+                table: "servicerequest_lastvisits",
+                column: "DocumentNodeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_servicerequest_lastvisits_ServiceRequestId",
+                table: "servicerequest_lastvisits",
+                column: "ServiceRequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_servicerequests_group_id",
@@ -216,13 +272,6 @@ namespace iPath.Database.Sqlite.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_node_lastvisits_servicerequests_NodeId",
-                table: "node_lastvisits",
-                column: "NodeId",
-                principalTable: "servicerequests",
-                principalColumn: "id");
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_questionnaire_responses_servicerequests_ServiceRequestId",
                 table: "questionnaire_responses",
                 column: "ServiceRequestId",
@@ -250,18 +299,25 @@ namespace iPath.Database.Sqlite.Migrations
                 table: "groups");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_node_lastvisits_servicerequests_NodeId",
-                table: "node_lastvisits");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_questionnaire_responses_servicerequests_ServiceRequestId",
                 table: "questionnaire_responses");
+
+            migrationBuilder.DropTable(
+                name: "servicerequest_lastvisits");
 
             migrationBuilder.DropTable(
                 name: "documents");
 
             migrationBuilder.DropTable(
                 name: "servicerequests");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_node_data_import",
+                table: "node_data_import");
+
+            migrationBuilder.RenameTable(
+                name: "node_data_import",
+                newName: "NodeImports");
 
             migrationBuilder.RenameColumn(
                 name: "ServiceRequestId",
@@ -313,6 +369,11 @@ namespace iPath.Database.Sqlite.Migrations
                 table: "annotations",
                 newName: "IX_annotations_ChildNodeId");
 
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_NodeImports",
+                table: "NodeImports",
+                column: "NodeId");
+
             migrationBuilder.CreateTable(
                 name: "nodes",
                 columns: table => new
@@ -353,6 +414,39 @@ namespace iPath.Database.Sqlite.Migrations
                         principalTable: "users",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "node_lastvisits",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    NodeId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_node_lastvisits", x => new { x.UserId, x.NodeId });
+                    table.ForeignKey(
+                        name: "FK_node_lastvisits_nodes_NodeId",
+                        column: x => x.NodeId,
+                        principalTable: "nodes",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_node_lastvisits_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_node_lastvisits_Date",
+                table: "node_lastvisits",
+                column: "Date");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_node_lastvisits_NodeId",
+                table: "node_lastvisits",
+                column: "NodeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_nodes_group_id",
@@ -397,13 +491,6 @@ namespace iPath.Database.Sqlite.Migrations
                 column: "OwnerId",
                 principalTable: "users",
                 principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_node_lastvisits_nodes_NodeId",
-                table: "node_lastvisits",
-                column: "NodeId",
-                principalTable: "nodes",
-                principalColumn: "id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_questionnaire_responses_nodes_NodeId",

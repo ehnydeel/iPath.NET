@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="mig_XX\**" />
+	  <EmbeddedResource Remove="mig_XX\**" />
+	  <None Remove="mig_XX\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\iPath.Database.EFCore\iPath.Database.EFCore.csproj" />
 	</ItemGroup>
 

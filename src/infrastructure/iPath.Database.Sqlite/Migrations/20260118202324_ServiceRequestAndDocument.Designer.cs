@@ -12,8 +12,8 @@ using iPath.EF.Core.Database;
 namespace iPath.Database.Sqlite.Migrations
 {
     [DbContext(typeof(iPathDbContext))]
-    [Migration("20260118170348_LastVisit")]
-    partial class LastVisit
+    [Migration("20260118202324_ServiceRequestAndDocument")]
+    partial class ServiceRequestAndDocument
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
