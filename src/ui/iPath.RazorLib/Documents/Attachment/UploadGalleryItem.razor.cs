@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace iPath.Blazor.Componenents.ServiceRequests;
+namespace iPath.Blazor.Componenents.Documents;
 
 public partial class UploadGalleryItem : IDisposable
 {

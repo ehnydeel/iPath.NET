@@ -1,8 +1,8 @@
 using System.ComponentModel;
 
-namespace iPath.Blazor.Componenents.ServiceRequests;
+namespace iPath.Blazor.Componenents.Documents;
 
-public partial class NodeGalleryDropZone
+public partial class GalleryDropZone
 {
     [Parameter, DefaultValue(25)]
     public int MaximumFileCount { get; set; } = 25;

@@ -28,18 +28,18 @@ public class UploadDocumentFileCommandHandler(iPathDbContext db,
         }
 
         // get root node
-        var node = await db.ServiceRequests
+        var serviceRequest = await db.ServiceRequests
             .Include(x => x.Documents)
             .AsNoTracking()
             .SingleOrDefaultAsync(n => n.Id == request.RequestId, ct);
 
-        Guard.Against.NotFound(request.RequestId, node);
+        Guard.Against.NotFound(request.RequestId, serviceRequest);
 
         // create entity
         var document = new DocumentNode
         {
             Id = Guid.CreateVersion7(),
-            ServiceRequestId = node.Id,
+            ServiceRequestId = serviceRequest.Id,
             ParentNodeId = request.ParentId,
             CreatedOn = DateTime.UtcNow,
             OwnerId = sess.User.Id
@@ -47,7 +47,7 @@ public class UploadDocumentFileCommandHandler(iPathDbContext db,
 
         // rootNode.ChildNodes.Add(newNode);
 
-        document.SortNr = node.Documents.IsEmpty() ? 0 : node.Documents.Where(n => n.ParentNodeId == request.ParentId).Max(n => n.SortNr) + 1;
+        document.SortNr = serviceRequest.Documents.IsEmpty() ? 0 : serviceRequest.Documents.Where(n => n.ParentNodeId == request.ParentId).Max(n => n.SortNr) + 1;
 
         document.File = new()
         {
@@ -82,7 +82,7 @@ public class UploadDocumentFileCommandHandler(iPathDbContext db,
             await db.Documents.AddAsync(document);
 
             // publish domain event
-            var evtinput = new UploadDocumentInput(RequestId: node.Id, ParentId: request.ParentId, filename: request.filename);
+            var evtinput = new UploadDocumentInput(RequestId: serviceRequest.Id, ParentId: request.ParentId, filename: request.filename);
             // TODO: event
 
             await db.SaveChangesAsync(ct);

@@ -74,6 +74,22 @@ public class ServiceRequestViewModel(IPathApi api,
     }
 
 
+
+    public List<DocumentDto> GetVisibleDocuments(DocumentDto? parent = null)
+    {
+        if (SelectedRequest is not null)
+        {
+            // ToDo: Filter by parent document
+            return SelectedRequest.Documents
+                .Where(d => !d.ParentNodeId.HasValue)
+                .OrderBy(d => d.SortNr)
+                .ToList();
+        }
+        return new();
+    }
+
+
+
     public void ClearData()
     {
         SelectedRequest = null;
@@ -83,35 +99,28 @@ public class ServiceRequestViewModel(IPathApi api,
 
     public async Task LoadNode(Guid id)
     {
-        // check if this is just the root or a child node and if so select it
-        if (SelectedRequest is not null && SelectedRequest.Id == id)
+        ClearData();
+
+        OnLoadingStarted?.Invoke();
+        var respN = await api.GetRequestById(id);
+        if (respN.IsSuccessful)
         {
-            // same
-            SelectedDocument = null;
+            SelectedRequest = respN.Content;
+
+            // load Group
+            if (SelectedRequest.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != SelectedRequest.GroupId))
+            {
+                var respG = await api.GetGroup(SelectedRequest.GroupId.Value);
+                if (respG.IsSuccessful)
+                    ActiveGroup = respG.Content;
+            }
         }
         else
         {
-            OnLoadingStarted?.Invoke();
-            var respN = await api.GetRequestById(id);
-            if (respN.IsSuccessful)
-            {
-                SelectedRequest = respN.Content;
-
-                // load Group
-                if (SelectedRequest.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != SelectedRequest.GroupId))
-                {
-                    var respG = await api.GetGroup(SelectedRequest.GroupId.Value);
-                    if (respG.IsSuccessful)
-                        ActiveGroup = respG.Content;
-                }
-            }
-            else
-            {
-                snackbar.AddWarning(respN.ErrorMessage);
-                nm.NavigateTo("/");
-            }
-            OnLoadingFinished?.Invoke();
+            snackbar.AddWarning(respN.ErrorMessage);
+            nm.NavigateTo("/");
         }
+        OnLoadingFinished?.Invoke();
     }
 
     public async Task ReloadNode()
@@ -411,8 +420,8 @@ public class ServiceRequestViewModel(IPathApi api,
                 var resp = await api.DeleteRequest(SelectedRequest.Id);
                 if (resp.IsSuccessful)
                 {
-                        IsEditing = false;
-                        await GoUp();
+                    IsEditing = false;
+                    await GoUp();
                 }
                 else
                 {
@@ -490,7 +499,7 @@ public class ServiceRequestViewModel(IPathApi api,
     public delegate Task BeforeSaveEventHandler(object? sender);
     public event BeforeSaveEventHandler? OnBeforeSaveEvent;
 
-    public async Task Save()
+    public async Task Save(bool finishEditing = true)
     {
         if (OnBeforeSaveEvent is not null)
             await OnBeforeSaveEvent.Invoke(this);
@@ -502,14 +511,15 @@ public class ServiceRequestViewModel(IPathApi api,
             if (!resp.IsSuccessful)
             {
                 snackbar.AddError(resp.ErrorMessage);
+                return;
             }
-            else
+            NotifyStateChanged();
+
+            if (finishEditing)
             {
+                IsEditing = false;
                 nm.NavigateTo($"request/{SelectedRequest.Id}");
             }
-            IsEditing = false;
-
-            OnChange();
         }
     }
 
@@ -585,7 +595,7 @@ public class ServiceRequestViewModel(IPathApi api,
                 {
                     // append to child nodes
                     SelectedRequest.Documents.Add(t.Result);
-                    OnChange();
+                    NotifyStateChanged();
                 }
                 else
                 {

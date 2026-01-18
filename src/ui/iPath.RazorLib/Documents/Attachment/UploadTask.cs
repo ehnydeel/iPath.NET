@@ -1,7 +1,7 @@
 ﻿using iPath.Application.Features.Documents;
 using Refit;
 
-namespace iPath.Blazor.Componenents.ServiceRequests;
+namespace iPath.Blazor.Componenents.Documents;
 
 public class UploadTask(IPathApi api, long MaxFileSize)
 {

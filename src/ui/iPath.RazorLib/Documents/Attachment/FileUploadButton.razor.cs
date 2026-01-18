@@ -1,9 +1,4 @@
-using iPath.Blazor.Componenents.ServiceRequests;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.Logging;
-
-namespace iPath.Blazor.Componenents.ServiceRequests;
+namespace iPath.Blazor.Componenents.Documents;
 
 public partial class FileUploadButton(ServiceRequestViewModel vm, ISnackbar snackbar, ILogger<FileUploadButton> logger)
 {

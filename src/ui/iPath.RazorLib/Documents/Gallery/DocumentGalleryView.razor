@@ -8,9 +8,9 @@
 
 @**** Gallery View **********************************************@
 <div class="gallery">
-    @foreach (var c in Items)
+    @foreach (var c in vm.GetVisibleDocuments())
     {
-        <div class="gallery-item" @onclick="@(() => OnChildClick(c))">
+        <div class="gallery-item" @onclick="@(() => vm.NavigateToDocument(c))">
 
             <div class="gallery-contextmenu">
                 <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.TopCenter" Disabled="vm.EditDisabled">
@@ -36,24 +36,3 @@
         </div>
     }
 </div>
-
-
-@code {
-    List<DocumentDto> Items = new();
-
-    protected override void OnInitialized()
-    {
-        if (vm.SelectedRequest is not null)
-        {
-            Items = vm.SelectedRequest.Documents
-                .Where(d => !d.ParentNodeId.HasValue)
-                .OrderBy(d => d.SortNr).ToList();
-        }
-    }
-
-
-    void OnChildClick(DocumentDto child)
-    {
-        vm.NavigateToDocument(child);
-    }
-}
