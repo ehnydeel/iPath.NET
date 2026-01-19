@@ -11,7 +11,8 @@ public record CommunityListDto(Guid Id, string Name, OwnerDto? Owner = null, Com
 public record CommunityDto(Guid Id, string Name, CommunitySettings Settings, eCommunityVisibility Visibility,
     OwnerDto? Owner, 
     GroupListDto[] Groups,
-    GroupListDto[]? ExtraGroups);
+    GroupListDto[]? ExtraGroups,
+    QuestionnaireForGroupDto[]? Questionnaires);
 
 
 public class GetCommunityListQuery : PagedQuery<CommunityListDto>

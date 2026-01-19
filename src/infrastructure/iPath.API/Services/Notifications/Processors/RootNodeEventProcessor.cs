@@ -21,10 +21,6 @@ public class RootNodeEventProcessor(iPathDbContext db, INotificationQueue queue)
 {
     public async Task ProcessEvent(ServiceRequestEvent evt, CancellationToken ct)
     {
-
-        // we only process root nodes here => nodes that have GroupId
-        if (!evt.ServiceRequest.GroupId.HasValue) return;
-
         // find all subscriptions for this group (active users only)
         var subscriptions = await db.Set<GroupMember>()
             .Include(m => m.User)

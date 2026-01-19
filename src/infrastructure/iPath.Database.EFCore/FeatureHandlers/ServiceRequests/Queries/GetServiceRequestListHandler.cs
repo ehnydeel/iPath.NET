@@ -9,13 +9,12 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
     public async Task<PagedResultList<ServiceRequestListDto>> Handle(GetServiceRequestsQuery request, CancellationToken cancellationToken)
     {
         // prepare query (only root nodes)
-        var q = db.ServiceRequests.AsNoTracking()
-            .Where(n => n.GroupId.HasValue);
+        var q = db.ServiceRequests.AsNoTracking();
 
         if (request.GroupId.HasValue)
         {
             sess.AssertInGroup(request.GroupId.Value);
-            q = q.Where(n => n.GroupId.HasValue && n.GroupId.Value == request.GroupId.Value);
+            q = q.Where(n => n.GroupId == request.GroupId.Value);
         }
 
         if (request.OwnerId.HasValue)

@@ -140,22 +140,6 @@ public class CommunityAdminViewModel(IPathApi api,
         OnChange?.Invoke();
     }
 
-    /*
-    public async Task RemoveGroupMember(CommunityMemberModel member)
-    {
-        if (SelectedCommunity is not null)
-        {
-            CommunityMemberModel[] list = {
-                new CommunityMemberModel(CommunityId: SelectedCommunity.Id, Groupname: "", Role: eMemberRole.None)
-            };
-            var cmd = new UpdateGroupMembershipCommand(member.UserId, list);
-            var resp = await api.UpdateGroupMemberships(cmd);
-            if (!resp.IsSuccessful)
-                snackbar.AddError(resp.ErrorMessage);
-        }
-    }
-    */
-
 
 
     public async Task Create()

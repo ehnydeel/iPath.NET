@@ -25,7 +25,7 @@ public class GetServiceRequestByIdQueryHandler(iPathDbContext db, IUserSession s
         {
             if (node.Visibility != eNodeVisibility.Public)
             {
-                sess.AssertInGroup(node.GroupId.Value);
+                sess.AssertInGroup(node.GroupId);
             }
 
             var spec = new NodeIsVisibleSpecifications(sess.IsAuthenticated ? sess.User.Id : null);

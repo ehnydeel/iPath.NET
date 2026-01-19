@@ -12,8 +12,8 @@ public class ServiceRequest : AuditableEntityWithEvents
     public Guid OwnerId { get; set; }
     public User Owner { get; set; } = null!;
 
-    public Guid? GroupId { get; set; }
-    public Group? Group { get; set; }
+    public Guid GroupId { get; set; }
+    public Group Group { get; set; }
 
     /*
     public Guid? RootNodeId { get; set; }

@@ -33,7 +33,7 @@ public class UpdateServiceRequestHandler(iPathDbContext db, IMediator mediator, 
         {
             // Specification for UserId and Group Membership (not banned)
             Specification<User> spec = new UserHasIdSpecifications(request.NewOwnerId.Value);
-            spec = spec.And(new UserIsGroupMemberSpecifications(node.GroupId.Value));
+            spec = spec.And(new UserIsGroupMemberSpecifications(node.GroupId));
 
             var newOwner = await db.Users
                 .AsNoTracking()

@@ -19,8 +19,7 @@ public class DeleteServiceRequestCommandHandler(iPathDbContext db, IUserSession 
             if (node.OwnerId != sess.User.Id)
             {
                 // if not , check if user id group moderator
-                if (node.GroupId.HasValue)
-                    sess.AssertInGroup(node.GroupId.Value);
+                sess.AssertInGroup(node.GroupId);
             }
         }
 

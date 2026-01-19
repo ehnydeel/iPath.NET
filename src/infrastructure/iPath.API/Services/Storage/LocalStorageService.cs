@@ -53,8 +53,8 @@ public class LocalStorageService(IOptions<iPathConfig> opts,
         {
             Guard.Against.Null(document);
 
-            if (document.ServiceRequest is null || !document.ServiceRequest.GroupId.HasValue)
-                return new StorageRepsonse(false, "Root node does not beldong to a group");
+            if (document.ServiceRequest is null)
+                return new StorageRepsonse(false, "Document node does not belong to a group");
 
             if (string.IsNullOrEmpty(document.StorageId)) throw new Exception("File does not have a StorageId. It has not been previously exported to storage");
 
@@ -103,7 +103,7 @@ public class LocalStorageService(IOptions<iPathConfig> opts,
         {
             Guard.Against.Null(document);
 
-            if (document.ServiceRequest is null || !document.ServiceRequest.GroupId.HasValue) throw new Exception("ServiceRequest does not beldong to a group");
+            if (document.ServiceRequest is null) throw new Exception("ServiceRequest does not beldong to a group");
 
             if (string.IsNullOrEmpty(document.StorageId))
             {

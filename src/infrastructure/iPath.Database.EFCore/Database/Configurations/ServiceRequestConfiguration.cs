@@ -15,7 +15,7 @@ internal class ServiceRequestConfiguration : IEntityTypeConfiguration<ServiceReq
         b.HasOne(x => x.Owner).WithMany(u => u.OwnedNodes).HasForeignKey(x => x.OwnerId).IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
 
-        b.HasOne(x => x.Group).WithMany(g => g.ServiceRequests).HasForeignKey(x => x.GroupId).IsRequired(false);
+        b.HasOne(x => x.Group).WithMany(g => g.ServiceRequests).HasForeignKey(x => x.GroupId).IsRequired(true);
 
         b.HasMany(x => x.Documents).WithOne(c => c.ServiceRequest).HasForeignKey(c => c.ServiceRequestId).OnDelete(DeleteBehavior.Cascade);
 
