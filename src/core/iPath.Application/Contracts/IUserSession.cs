@@ -43,8 +43,17 @@ public static class UserSessionExtensions
         }
 
 
-        public bool IsGroupModerator(Guid? groupId)
-            => groupId.HasValue && session.IsAuthenticated && session.User.groups.ContainsKey(groupId.Value) && session.User.groups[groupId.Value] == eMemberRole.Moderator;
+        public bool IsGroupModerator(Guid? groupId, bool AllowAdminAsModerator = true)
+        {
+            if (groupId.HasValue && session.IsAuthenticated)
+            {
+                if (AllowAdminAsModerator && session.IsAdmin)
+                    return true;
+                if (session.User.groups.ContainsKey(groupId.Value) && session.User.groups[groupId.Value] == eMemberRole.Moderator)
+                    return true;
+            }
+            return false;
+        }
 
         // Admin or user himself
         public bool CanModifyUser(Guid UserId)

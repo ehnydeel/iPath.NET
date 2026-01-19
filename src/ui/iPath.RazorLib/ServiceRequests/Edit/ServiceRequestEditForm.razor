@@ -38,6 +38,9 @@
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="4">
+            <OwnerLookup Label=@T["Sender"] @bind-Value="Owner" @bind-Value:after="OnOwnerChanged" GroupId="vm.SelectedRequest.GroupId"
+                         Variant="Variant" Margin="@Margin" ShrinkLabel="true" Disabled="vm.DisableSenderChange" />
+
             @if (vm.ActiveGroup.Settings.UseCaseTypeField)
             {
                 @if (vm.ActiveGroup.Settings.CaseTypes.IsEmpty())
@@ -61,6 +64,12 @@
 @code {
     [Parameter, EditorRequired]
     public RequestDescription Model { get; set; }
+
+    [Parameter]
+    public OwnerDto? Owner { get; set; }
+
+    [Parameter]
+    public EventCallback<OwnerDto?> OwnerChanged { get; set; }
 
     [Parameter, EditorRequired]
     public Guid GroupId { get; set; }
@@ -93,6 +102,10 @@
         }
     }
 
+    async Task OnOwnerChanged()
+    {
+        await OwnerChanged.InvokeAsync(Owner);
+    }
 
     public async Task Validate()
     {

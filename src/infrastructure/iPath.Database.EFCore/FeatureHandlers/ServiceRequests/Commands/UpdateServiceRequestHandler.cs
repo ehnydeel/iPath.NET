@@ -1,5 +1,7 @@
 ﻿
 using DispatchR;
+using iPath.EF.Core.FeatureHandlers.Users;
+using Microsoft.Identity.Client;
 
 namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
 
@@ -26,6 +28,22 @@ public class UpdateServiceRequestHandler(iPathDbContext db, IMediator mediator, 
         }
 
         node.UpdateNode(request, sess.User.Id);
+
+        if (request.NewOwnerId.HasValue)
+        {
+            // Specification for UserId and Group Membership (not banned)
+            Specification<User> spec = new UserHasIdSpecifications(request.NewOwnerId.Value);
+            spec = spec.And(new UserIsGroupMemberSpecifications(node.GroupId.Value));
+
+            var newOwner = await db.Users
+                .AsNoTracking()
+                .Where(spec.ToExpression())
+                .SingleOrDefaultAsync(ct);
+
+            Guard.Against.NotFound(request.NewOwnerId.Value, newOwner);
+            node.OwnerId = newOwner.Id;
+        }
+
         await db.SaveChangesAsync(ct);
 
         // update user visit

@@ -111,11 +111,11 @@ public class UserViewModel(IPathApi api,
         ClearProfileCache(userId);
     }
 
-    public async Task<IEnumerable<UserListDto>> Search(string? search, CancellationToken ct)
+    public async Task<IEnumerable<UserListDto>> Search(string? search, Guid? GroupId, CancellationToken ct = default)
     {
         if (search is not null)
         {
-            var query = new GetUserListQuery { SearchString = search, Page = 0, PageSize = 100 };
+            var query = new GetUserListQuery { SearchString = search, GroupId = GroupId, Page = 0, PageSize = 100 };
             var resp = await api.GetUserList(query);
             if (resp.IsSuccessful)
             {
@@ -124,11 +124,11 @@ public class UserViewModel(IPathApi api,
         }
         return new List<UserListDto>();
     }
-    public async Task<IEnumerable<OwnerDto>> SearchOwners(string? search, CancellationToken ct)
+    public async Task<IEnumerable<OwnerDto>> SearchOwners(string? search, Guid? GroupId, CancellationToken ct = default)
     {
         if (search is not null)
         {
-            var query = new GetUserListQuery { SearchString = search, Page = 0, PageSize = 100 };
+            var query = new GetUserListQuery { SearchString = search, GroupId = GroupId, Page = 0, PageSize = 100 };
             var resp = await api.GetUserList(query);
             if (resp.IsSuccessful)
             {

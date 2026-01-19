@@ -2,7 +2,7 @@
 
 namespace iPath.Application.Features.ServiceRequests;
 
-public record UpdateServiceRequestCommand(Guid NodeId, RequestDescription? Description, bool? IsDraft)
+public record UpdateServiceRequestCommand(Guid NodeId, RequestDescription? Description, Guid? NewOwnerId = null, bool? IsDraft = null)
     : IRequest<UpdateServiceRequestCommand, Task<bool>>
     , IEventInput
 {

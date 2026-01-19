@@ -58,8 +58,11 @@
                 <div><b>Type:</b> @vm.SelectedRequest.CaseType</div>
             </div>
             <div class="ipath_node_date2">
-                <div>@vm.SelectedRequest.CreatedOn.ToString()</div>
-                <div>@vm.SelectedRequest.GroupId</div>
+                <div>@vm.SelectedRequest.CreatedOn.ToString("d")</div>
+                @if (@vm.SelectedDocument is not null)
+                {
+                    <div>@vm.SelectedDocument.GalleryCaption.ShortenTo(20)</div>
+                }
             </div>
         </div>
     }

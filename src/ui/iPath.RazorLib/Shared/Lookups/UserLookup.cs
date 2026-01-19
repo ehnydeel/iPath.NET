@@ -5,9 +5,12 @@ namespace iPath.Blazor.Componenents.Shared.Lookups;
 public class UserLookup(UserViewModel vm)
     : MudAutocomplete<UserListDto>
 {
+    [Parameter]
+    public Guid? GroupId { get; set; }
+
     protected override void OnInitialized()
     {
         this.ToStringFunc = u => u is null ? "" : $"{u.Username} [{u.Email}]";
-        this.SearchFunc = (string? term, CancellationToken ct) => vm.Search(term, ct);
+        this.SearchFunc = (string? term, CancellationToken ct) => vm.Search(term, GroupId, ct);
     }
 }

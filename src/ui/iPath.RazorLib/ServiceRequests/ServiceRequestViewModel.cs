@@ -33,6 +33,8 @@ public class ServiceRequestViewModel(IPathApi api,
 
     public ServiceRequestDto? SelectedRequest { get; private set; }
     public DocumentDto? SelectedDocument { get; private set; }
+    public OwnerDto? RequestOwner { get; set; } // May be modified by view
+
     public GroupDto? ActiveGroup { get; private set; }
 
 
@@ -94,6 +96,7 @@ public class ServiceRequestViewModel(IPathApi api,
     {
         SelectedRequest = null;
         SelectedDocument = null;
+        RequestOwner = null;
         NotifyStateChanged();
     }
 
@@ -106,6 +109,7 @@ public class ServiceRequestViewModel(IPathApi api,
         if (respN.IsSuccessful)
         {
             SelectedRequest = respN.Content;
+            RequestOwner = SelectedRequest.Owner;
 
             // load Group
             if (SelectedRequest.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != SelectedRequest.GroupId))
@@ -344,6 +348,10 @@ public class ServiceRequestViewModel(IPathApi api,
     #region  "-- Actions --"
 
 
+    public bool IsModerator => ActiveGroup is not null && appState.IsGroupModerator(ActiveGroup.Id);
+    public bool DisableSenderChange => !IsModerator; // could maybe change to admin only
+
+
     public bool SortingDisabled = false;
 
     public async Task SaveChildNodeSortOrder(Dictionary<Guid, int> sortOrder)
@@ -392,11 +400,12 @@ public class ServiceRequestViewModel(IPathApi api,
         }
     }
 
+
+
     public async Task CreateNew()
     {
         snackbar.AddWarning("not implemented");
     }
-
 
 
     public bool DeleteDisabled => EditDisabled;
@@ -506,7 +515,9 @@ public class ServiceRequestViewModel(IPathApi api,
 
         if (SelectedRequest != null && !SaveDisabled && IsEditing)
         {
-            var cmd = new UpdateServiceRequestCommand(NodeId: SelectedRequest.Id, Description: SelectedRequest.Description, IsDraft: false);
+            Guid? newOwnerId = SelectedRequest.OwnerId != RequestOwner?.Id ? RequestOwner.Id : null;
+
+            var cmd = new UpdateServiceRequestCommand(NodeId: SelectedRequest.Id, Description: SelectedRequest.Description, NewOwnerId: newOwnerId, IsDraft: false);
             var resp = await api.UpdateRequest(cmd);
             if (!resp.IsSuccessful)
             {

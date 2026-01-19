@@ -21,6 +21,18 @@ public class GetUserListHandler(iPathDbContext db)
         }
 
 
+        var spec = Specification<User>.All;
+        if (request.GroupId.HasValue)
+        {
+            spec = spec.And(new UserIsGroupMemberSpecifications(request.GroupId.Value));
+        }
+        if (request.CommunityId.HasValue)
+        {
+            spec = spec.And(new UserIsCommunityMemberSpecifications(request.CommunityId.Value));
+        }
+        q = q.Where(spec.ToExpression());
+
+
         // project
         var dto = q.Select(u => new UserListDto(Id: u.Id, Username: u.UserName, 
             Email: u.Email, Initials: u.Profile.Initials,
