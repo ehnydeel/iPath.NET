@@ -107,7 +107,7 @@ public static class DataImportExtensions
         {
             Console.WriteLine("--");
         }
-        n.GroupId = NewGroupId(o.group_id);
+        n.GroupId = NewGroupId(o.group_id).Value;
 
         try
         {
