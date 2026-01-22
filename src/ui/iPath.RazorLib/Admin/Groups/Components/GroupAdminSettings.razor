@@ -6,7 +6,7 @@
 
 @if (EditModel != null)
 {
-    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" />
+    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" Margin="Margin.Dense" />
     <MudGrid>
         <MudItem xs="12" sm="6">
             <OwnerLookup Label=@T["Group Owner"] Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />

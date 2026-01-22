@@ -45,7 +45,7 @@ public static class DocumentEndpoints
                 }
                 else
                 {
-                    using var stream = new FileStream(res.TempFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    var stream = new FileStream(res.TempFile, FileMode.Open, FileAccess.Read, FileShare.Read);
                     return Results.File(stream, contentType: res.Info.MimeType, fileDownloadName: res.Info.Filename);
                 }
             }

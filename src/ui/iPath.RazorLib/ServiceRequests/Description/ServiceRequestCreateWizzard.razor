@@ -1,0 +1,195 @@
+﻿@namespace iPath.Blazor.Componenents.ServiceRequests
+
+@inherits ServiceRequestViewComponentBase
+
+<MudStepper Vertical ShowResetButton @ref="stepper"
+            OnPreviewInteraction="wizzardVM.OnPreviewInteraction"
+            CompleteButtonIcon="@Icons.Material.Filled.Send"
+            @bind-ActiveIndex="wizzardVM.ActiveStepIndex">
+    <ChildContent>
+        <MudStep Title=@T["Body Site"] SecondaryText="@wizzardVM.TopoText"
+                 HasError="@(wizzardVM.Step1Complete == false)">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <IPathHeader Typo="Typo.subtitle1" Title=@T["Body Region / Organ"] />
+                    <MudTreeView T="CodeDisplay" Hover="true" Dense="true" @bind-SelectedValue="wizzardVM.Organ">
+                        @if (wizzardVM.RootCodes is not null)
+                        {
+                            @foreach (var i in wizzardVM.RootCodes)
+                            {
+                                <MudTreeViewItem Value="i">
+                                    <BodyContent>
+                                        <div style="display: grid; grid-template-columns: 3fr 7fr; align-items: start; width: 100%">
+                                            <div><h3>@i.Code</h3></div>
+                                            <div>@i.Display </div>
+                                        </div>
+                                    </BodyContent>
+                                </MudTreeViewItem>
+                            }
+                        }
+                    </MudTreeView>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <IPathHeader Typo="Typo.subtitle1" Title=@T["Body Site / Topography"]>
+                        <ActionContent>
+                            <MudTooltip Placement="Placement.Left">
+                                <ChildContent>
+                                    <MudToggleIconButton @bind-Toggled="wizzardVM.TopoAutoSelect" Size="Size.Small"
+                                                         Icon="@Icons.Material.Filled.PlaylistAddCheck"
+                                                         Color="@Color.Default"
+                                                         ToggledIcon="@Icons.Material.Filled.PlaylistAddCheckCircle"
+                                                         ToggledColor="@Color.Success" />
+                                </ChildContent>
+                                <TooltipContent>
+                                    <div style="max-width: 240px;">
+                                        <MudText Typo="Typo.subtitle1">@T["Auto Select"]</MudText>
+                                        <MudText Typo="Typo.body2">@T["Continue directly to patient info when body site is selected."]</MudText>
+                                        <div class="mt-4">
+                                            <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheckCircle" /> ON
+                                            <MudIcon Icon="@Icons.Material.Filled.PlaylistAddCheck" Class="ml-8" /> OFF
+                                        </div>
+                                    </div>
+                                </TooltipContent>
+                            </MudTooltip>
+                        </ActionContent>
+                    </IPathHeader>
+                    @if (wizzardVM.Organ is null)
+                    {
+                        <MudText>@T["please select a body region"]</MudText>
+                    }
+                    <CodingTree @bind-Value="@wizzardVM.Topo" @bind-Value:after="OnTopoSelected"  TreeItems="@wizzardVM.BodySiteCodes" />
+                </MudItem>
+            </MudGrid>
+        </MudStep>
+
+        <MudStep Title=@T["Patient information"] SecondaryText="@wizzardVM.PatientText"
+                 HasError="@(wizzardVM.Step2Complete == false)">
+
+            <MudStack>
+                <MudGrid>
+                    <MudItem xs="12" sm="12" md="4">
+                        <MudTextField Label=@T["Accession No"] @bind-Value="@wizzardVM.Data.AccessionNo"
+                                      Placeholder=@T["your reference- or lab-number"]
+                                      HelperText=@T["if you want to enter your won reference/accession no, please make sure it does not contain any patient details"]
+                                      Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <GenderSelect Label=@T["Gender"] @bind-Value="@wizzardVM.Data.PatientInfo.Gender" Dense="true"
+                                      Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudNumericField @bind-Value="@wizzardVM.Data.PatientInfo.Age" Label=@T["Age (years)"] Min="0" Max="199"
+                                         Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                    </MudItem>
+                </MudGrid>
+
+
+                @if (wizzardVM.Data.Questionnaire is null)
+                {
+                    <IPathHeader Typo="Typo.subtitle1" Class="mt-4" Title=@T["Clinical Information"] />
+                    <MudTextField @bind-Value="@wizzardVM.Data.Text" Required="true" Label=@T["Clinical History"] Lines="8"
+                                  HelperText=@T["please make sure it does not contain any sensitive patient details like name or exact date of birth"]
+                                  Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                }
+                else
+                {
+                    <iPath.LHCForms.LhcForm @ref="qrForm" ReadOnly="false" OnAfterRendered="wizzardVM.LoadQuestionnaire" />
+                }
+
+            </MudStack>
+        </MudStep>
+
+        <MudStep Title="Upload Images">
+            <GalleryDropZone />
+
+            <MudSwitch @bind-Value="wizzardVM.SaveAsDraft" Color="Color.Warning" Label=@T["Save as Draft (not published in group yet)"] />
+        </MudStep>
+    </ChildContent>
+    <CompletedContent>
+        <IPathHeader Typo="Typo.h6" Title=@T["next steps"] />
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Create" OnClick="Reset">@T["Create another Request"]</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="vm.GoUp" StartIcon="@Icons.Material.Filled.List">@T["Back to list"]</MudButton>
+    </CompletedContent>
+</MudStepper>
+
+
+
+
+@implements IDisposable
+@inject IServiceProvider sp
+@inject IStringLocalizer T
+
+@code {
+    [Parameter, EditorRequired]
+    public string ValueSetId { get; set; }
+
+    [Parameter, EditorRequired]
+    public string CodingService { get; set; } = "";
+
+
+    [Parameter]
+    public bool NeedFullTopo
+    {
+        get => wizzardVM.NeedFullTopo;
+        set => wizzardVM.NeedFullTopo = value;
+    }
+
+    private ServiceRequestCreateWizzardViewModel wizzardVM;
+
+    string AutoSelectText => wizzardVM.TopoAutoSelect ? T["auto-select ON"] : T["auto-select OFF"];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (wizzardVM is null && RendererInfo.IsInteractive)
+        {
+            wizzardVM = new ServiceRequestCreateWizzardViewModel(sp, vm);
+
+            if (!string.IsNullOrEmpty(ValueSetId))
+            {
+                await wizzardVM.InitializeAsync(CodingService, ValueSetId);
+                wizzardVM.OnComplete += OnCompleted;
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        wizzardVM.OnComplete -= OnCompleted;
+    }
+
+    bool isCompleted = false;
+
+    void OnCompleted()
+    {
+        isCompleted = true;
+    }
+
+
+    MudStepper stepper;
+
+
+
+    async Task Reset()
+    {
+        await vm.CreateNewNode(vm.ActiveGroup.Id);
+        await stepper.ResetAsync();
+    }
+
+    iPath.LHCForms.LhcForm qrForm
+    {
+        get => field;
+        set
+        {
+            field = value;
+            wizzardVM.QuestionnaireViewer = field;
+        }
+    }
+    private async Task OnTopoSelected()
+    {
+        if (wizzardVM.TopoAutoSelect && wizzardVM.Topo is not null && wizzardVM.Topo.Children.IsEmpty())
+        {
+            await stepper.NextStepAsync();
+        }
+    }
+}

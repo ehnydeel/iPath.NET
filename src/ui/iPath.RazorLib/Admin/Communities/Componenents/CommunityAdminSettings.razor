@@ -8,10 +8,10 @@
 
 @if (EditModel != null)
 {
-    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" ShrinkLabel="true" />
+    <MudTextField Label=@T["Name"] @bind-Value="EditModel.Name" Variant="@Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
 
     <MudTextField Label=@T["Description"] @bind-Value="EditModel.Settings.Description"
-                  Variant="@Variant.Outlined" Lines="5" AutoGrow="true" ShrinkLabel="true" />
+                  Variant="@Variant.Outlined" Lines="5" ShrinkLabel="true" Margin="Margin.Dense" />
 
     <OwnerLookup Label=@T["Community Owner"] Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />
 

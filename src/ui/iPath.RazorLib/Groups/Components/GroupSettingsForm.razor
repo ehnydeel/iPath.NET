@@ -23,7 +23,8 @@
 
 
     <MudSwitch Label=@T["Body Site input active"] @bind-Value="Model.DescriptionWithBodySite" Color="Color.Info" Class="mt-4" />
-    <MudSwitch Label=@T["Use grouped Body Site input"] @bind-Value="Model.DescriptionGroupedBodySiteInput" Color="Color.Info" />
+
+    <MudSwitch Label=@T["Use case description wizzard"] @bind-Value="Model.UseDescriptionWizzard" Color="Color.Info" />
 
     <MudTextField Label=@T["Case types"] @bind-Value="CaseTypeList" @bind-Value:after="ReadCaseTypes" Lines="8" Variant="@Variant" />
 </MudForm>

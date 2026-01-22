@@ -2,7 +2,7 @@
 
 namespace iPath.Application.Features.ServiceRequests;
 
-public record ServiceRequestDto
+public class ServiceRequestDto
 {
     public string NodeType { get; init; } = default!;
     public int? SortNr { get; set; }
@@ -18,13 +18,24 @@ public record ServiceRequestDto
     public Guid? ParentNodeId { get; init; }
     public bool IsDraft { get; init; }
 
-    public RequestDescription? Description { get; init; } = new();
+    private RequestDescription? _Description = new();
+    public RequestDescription? Description {
+        get => _Description;
+        init => _Description = value;
+    }
+
     public NodeFile? File { get; init; } = null!;
 
     public int? ipath2_id { get; init; }
 
     public ICollection<DocumentDto> Documents { get; init; } = [];
     public ICollection<AnnotationDto> Annotations { get; init; } = [];
+
+    public void ResetDescription()
+    {
+        if (!IsDraft) throw new Exception("Description can be reset on drafts only");
+        _Description = new();
+    }
 }
 
 

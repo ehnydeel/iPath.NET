@@ -594,6 +594,28 @@ public class ServiceRequestViewModel(IPathApi api,
         }
     }
 
+
+    public async Task SaveDraft(bool isDraft)
+    {
+        if (OnBeforeSaveEvent is not null)
+            await OnBeforeSaveEvent.Invoke(this);
+
+        if (SelectedRequest != null && !SaveDisabled && IsEditing)
+        {
+            Guid? newOwnerId = SelectedRequest.OwnerId != RequestOwner?.Id ? RequestOwner.Id : null;
+
+            var cmd = new UpdateServiceRequestCommand(NodeId: SelectedRequest.Id, Description: SelectedRequest.Description, NewOwnerId: newOwnerId, IsDraft: isDraft);
+            var resp = await api.UpdateRequest(cmd);
+            if (!resp.IsSuccessful)
+            {
+                snackbar.AddError(resp.ErrorMessage);
+            }
+            NotifyStateChanged();
+        }
+    }
+
+
+
     public async Task CancelEdit()
     {
         if (SelectedRequest != null)
@@ -612,7 +634,7 @@ public class ServiceRequestViewModel(IPathApi api,
                 else
                 {
                     // when cancelling a draft, save current state ...
-                    var cmd = new UpdateServiceRequestCommand(NodeId: SelectedRequest.Id, Description: SelectedRequest.Description, IsDraft: true);
+                    var cmd = new UpdateServiceRequestCommand(NodeId: SelectedRequest.Id, Description: SelectedRequest.Description);
                     resp = await api.UpdateRequest(cmd);
                 }
 
@@ -826,6 +848,14 @@ public class ServiceRequestViewModel(IPathApi api,
     public async Task EditDocument(DocumentDto document)
     {
         throw new NotImplementedException();
+    }
+
+    internal void ResetRequest()
+    {
+        if (SelectedRequest is not null && SelectedRequest.IsDraft)
+        {
+            SelectedRequest.ResetDescription();
+        }
     }
 }
 

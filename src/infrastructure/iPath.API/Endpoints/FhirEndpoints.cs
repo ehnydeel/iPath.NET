@@ -19,7 +19,7 @@ public static class FhirEndpoints
                 filename = System.IO.Path.Combine(filename, id) + ".json";
                 if (System.IO.File.Exists(filename))
                 {
-                    using var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    var stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                     return Results.File(stream, contentType: "text/json");
                 }
             }
