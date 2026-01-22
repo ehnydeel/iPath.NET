@@ -4,11 +4,14 @@
 {
     @if (Group.Settings.DescriptionGroupedBodySiteInput)
     {
-        <TopoDetailLookup @bind-Code="Model.BodySite" />
+        <!--
+         <TopoDetailLookup @bind-Concept="Model.BodySite" />
+        -->
+        <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Concept="Model.BodySite" Margin="@Margin" />
     }
     else
     {
-        <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Value="Model.BodySite" Margin="@Margin" />
+        <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Concept="Model.BodySite" Margin="@Margin" />
     }
 }
 

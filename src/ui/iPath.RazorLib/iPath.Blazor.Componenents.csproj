@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Shared\Coding_v1\**" />
+    <Content Remove="Shared\Coding_v1\**" />
+    <EmbeddedResource Remove="Shared\Coding_v1\**" />
+    <None Remove="Shared\Coding_v1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Groups\GroupListPage - Copy.razor.cs" />
   </ItemGroup>
 
@@ -37,6 +44,7 @@
 
   <ItemGroup>
     <Folder Include="ServiceRequests\Dialogs\" />
+    <Folder Include="Shared\Coding\tmp\" />
     <Folder Include="wwwroot\fhir\" />
   </ItemGroup>
 

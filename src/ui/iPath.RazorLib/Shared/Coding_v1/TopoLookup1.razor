@@ -1,13 +1,12 @@
-﻿@inject CodingService srv
+﻿@inject CodingService_v1 srv
 
-<MudAutocomplete Label="@Label" Variant="Variant"
-                 T="CodedConcept" MaxItems="100"
+<MudAutocomplete Label="@Label" Variant="Variant" MaxItems="100"
+                 T="CodedConcept"
                  @bind-Value="Code"
                  @bind-Value:after="OnCodeChanged"
-                 ToStringFunc=@(x => x is null ? "" : $"{x.Display} [{x.Code}]")
-                 SearchFunc="srv.FindMorphoConcepts"
-                 Clearable="true">
-</MudAutocomplete>
+                 ToStringFunc=@(x => x.ToDisplay())
+                 SearchFunc="srv.FindTopoConcetps" 
+                 Clearable="true" />
 
 @code {
     [Parameter]
@@ -22,7 +21,7 @@
     }
 
     [Parameter]
-    public string Label { get; set; } = "Morphology";
+    public string Label { get; set; } = "Topography";
 
     [Parameter]
     public Variant Variant { get; set; } = Variant.Outlined;

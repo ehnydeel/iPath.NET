@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace iPath.Razorlib.Coding;
 
-public class CodingService(HttpClient http)
+public class CodingService_v1(HttpClient http)
 {
     const string CodingBaseUrl = "_content/iPath.Blazor.Componenents";
 

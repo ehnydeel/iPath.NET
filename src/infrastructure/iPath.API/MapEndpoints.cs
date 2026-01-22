@@ -20,6 +20,7 @@ public static class MapEndpoints
             .MapDocumentEndpoints()
             .MapNotificationApi()
             .MapQuesionnairesApi()
+            .MapFhirApi()
             .MapTestApi()
             .MapIPathHubs();
 

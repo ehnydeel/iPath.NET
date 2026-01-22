@@ -13,9 +13,10 @@ global using iPath.Blazor.Componenents.Groups;
 global using iPath.Blazor.ServiceLib.ApiClient;
 global using iPath.Domain.Entities;
 global using Task = System.Threading.Tasks.Task;
-global using iPath.Razorlib.Coding;
 global using iPath.Blazor.Componenents.Documents;
 global using iPath.Blazor.Componenents.ServiceRequests;
+global using iPath.Application.Coding;
+global using iPath.Blazor.Componenents.Shared.Coding;
 
 
 namespace iPath.RazorLib;

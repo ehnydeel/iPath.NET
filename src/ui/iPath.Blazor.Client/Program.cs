@@ -1,3 +1,4 @@
+using iPath.Application.Fhir;
 using iPath.Blazor.Server;
 using iPath.Domain.Config;
 using iPath.RazorLib;
@@ -23,6 +24,7 @@ try
 }
 catch (Exception ex)
 {
+    throw ex;
 }
 
 

@@ -1,91 +1,57 @@
-﻿using Hl7.Fhir.Model;
-using Hl7.Fhir.Serialization;
+﻿using Ardalis.GuardClauses;
+using Hl7.Fhir.Model;
+using iPath.Application.Coding;
+using iPath.Application.Fhir;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace iPath.Application.Coding;
 
-public class CodingService(ILogger<CodingService> logger)
+public class CodingService
 {
-    private readonly Dictionary<string, CodeSystem> _codeSystems = new();
-    private readonly Dictionary<string, CodeSystem> _designations = new();
-    private readonly Dictionary<string, ValueSetProvider> _valueSet = new();
+    private readonly ILogger<CodingService> logger;
+    private readonly IFhirDataLoader loader;
+    private readonly Dictionary<string, ValueSetDisplay> _valueSet = new();
+    private readonly string _codeSystemId;
+    private CodeSystem _codeSystem;
 
-    public CodeSystem LoadCodeSystem(string codeSystemJson)
+    public CodingService(IServiceProvider sp, string csKey)
     {
-        var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
-        var cs = JsonSerializer.Deserialize<CodeSystem>(codeSystemJson, options);
-        var url = cs?.Url.ToLowerInvariant().Trim();
-        if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("CodeSystem.Url");
-
-        if (!_codeSystems.ContainsKey(url))
-        {
-            _codeSystems.Add(url, cs);
-        }
-        else
-        {
-            _codeSystems[url] = cs;
-        }
-        return _codeSystems[url];
+        logger = sp.GetRequiredService<ILogger<CodingService>>();
+        loader = sp.GetRequiredService<IFhirDataLoader>();
+        var config = sp.GetRequiredService<IConfiguration>();
+        _codeSystemId = config[$"CodeSystems:{csKey}"] ?? csKey;
     }
 
-    public CodeSystem? DefaultCodeSystem => _codeSystems.Values.FirstOrDefault();
-    public CodeSystem? GetCodeSysten(string url) => _codeSystems[url.ToLowerInvariant().Trim()];
-
-
-
-    public CodeSystem LoadDesignationsSystem(string codeSystemJson, string codeSystemUrl)
+    public CodingService(ILogger<CodingService> logger, IFhirDataLoader loader, string codeSystemId)
     {
-        var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
-        var cs = JsonSerializer.Deserialize<CodeSystem>(codeSystemJson, options);
-        var url = codeSystemUrl.ToLowerInvariant().Trim();
-        if (string.IsNullOrEmpty(url)) throw new ArgumentNullException("codeSystemUrl");
-
-        if (!_designations.ContainsKey(url))
-        {
-            _designations.Add(url, cs);
-        }
-        else
-        {
-            _designations[url] = cs;
-        }
-        return _designations[url];
-    }
-
-    public string GetDesignation(string codeSystemUrl, string language, string code)
-    {
-        codeSystemUrl = codeSystemUrl.ToLowerInvariant().Trim();
-        if (_designations.ContainsKey(codeSystemUrl))
-        {
-            var ds = _designations[codeSystemUrl];
-            if (ds is not null)
-            {
-                var concept = ds.Concept.FirstOrDefault(c => c.Code == code);
-                if (concept is not null)
-                {
-                    var des = concept.Designation.FirstOrDefault(d => d.Language.ToLower() == language.ToLower());
-                    if (des is not null && !string.IsNullOrEmpty(des.Value))
-                    {
-                        return des.Value;
-                    }
-                }
-                // fallback to display
-                return concept.Display;
-            }
-        }
-        return string.Empty;
+        this.logger = logger;
+        this.loader = loader;
+        _codeSystemId = codeSystemId;
     }
 
 
-    public void LoadValueSet(string valueSetJson, string? vsId = null)
+    public async Task LoadCodeSystem()
     {
-        var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
-        var vs = JsonSerializer.Deserialize<ValueSet>(valueSetJson, options);
-        LoadValueSet(vs, vsId);
+        if (_codeSystem is null && !string.IsNullOrEmpty(_codeSystemId))
+        {
+            _codeSystem = await loader.GetResourceAsync<CodeSystem>($"CodeSystem/{_codeSystemId}");   
+        }
+    }
+
+    public CodeSystem CodeSystem => _codeSystem;
+    public string CodeSystemUrl => _codeSystem is null ? "" : _codeSystem.Url.ToLowerInvariant().Trim();
+
+    public async Task LoadValueSet(string id)
+    {
+        var vs = await loader.GetResourceAsync<ValueSet>($"ValueSet/{id}");
+        if (vs is not null)
+            LoadValueSet(vs, id);
     }
 
 
-    public void LoadValueSet(ValueSet vs, string? vsId = null)
+    public async Task LoadValueSet(ValueSet vs, string? vsId = null)
     {
         vsId ??= vs.Id;
 
@@ -97,9 +63,9 @@ public class CodingService(ILogger<CodingService> logger)
         if (string.IsNullOrEmpty(vsSystemUrl)) throw new ArgumentNullException("ValueSet.Compose.Include.System");
 
         // asser that coodesystem has been loaded
-        if (!_codeSystems.ContainsKey(vsSystemUrl)) throw new ArgumentNullException("CodeSystem not loaded");
+        if (CodeSystemUrl != vsSystemUrl) throw new ArgumentNullException("CodeSystem not loaded");
 
-        var provider = new ValueSetProvider(this, _codeSystems[vsSystemUrl], vs);
+        var provider = new ValueSetDisplay(CodeSystem, vs);
 
         if (_valueSet.ContainsKey(vsId))
         {
@@ -112,7 +78,7 @@ public class CodingService(ILogger<CodingService> logger)
     }
 
 
-    public ValueSetProvider? GetValueSet(string vsId)
+    public ValueSetDisplay? GetValueSetDisplay(string vsId)
     {
         if (!string.IsNullOrEmpty(vsId))
         {

@@ -1,17 +1,11 @@
-﻿namespace iPath.Blazor.Componenents.Shared;
+﻿namespace iPath.Blazor.Componenents.Shared.Coding;
 
-public class TopoLookup(CodingService srv)
-    : MudAutocomplete<CodedConcept>
+public class TopoLookup(IServiceProvider sp) : CodingLookup(sp)
 {
     protected override void OnInitialized()
-    {  
-        this.ToStringFunc = x => x is null ? "" : $"{x.Display} [{x.Code}]";
-        this.SearchFunc = Search; // (string? term, CancellationToken ct) => Search(term, ct);
-        base.OnInitialized();
-    }
-
-    async Task<IEnumerable<CodedConcept>> Search(string? term, CancellationToken ct)
     {
-        return await srv.FindTopoConcetps(term, ct);
+        CodingService = "icdo";
+        ValueSetId = "icdo-topo";
+        base.OnInitialized();
     }
 }

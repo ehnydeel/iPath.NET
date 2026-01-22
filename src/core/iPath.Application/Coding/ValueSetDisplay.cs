@@ -1,52 +1,44 @@
 ﻿using Hl7.Fhir.Model;
-using Hl7.Fhir.Serialization;
-using System.Diagnostics;
-using System.Text.Json;
+using iPath.Application.Coding;
 
 namespace iPath.Application.Coding;
 
-public class ValueSetProvider
+public class ValueSetDisplay
 {
-    private readonly CodingService _srv;
     private readonly ValueSet? _valueSet;
 
-    public ValueSetProvider(CodingService srv, CodeSystem codeSystem, ValueSet valueSet)
+    public ValueSetDisplay(CodeSystem codeSystem, ValueSet valueSet)
     {
-        _srv = srv;
         _valueSet = valueSet;
         CodeSystem = codeSystem;
+        LoadData();
     }
 
     public ValueSet? ValueSet => _valueSet;
-
 
     private string? CodeSystemUrl => CodeSystem.Url;
     public readonly CodeSystem CodeSystem;
 
 
-    private List<CodeDisplay> _codes;
+    private List<CodeDisplay> _displayTree;
+    private List<CodeDisplay> _values;
 
-    public List<CodeDisplay> Displays
+    public List<CodeDisplay> DisplayTree => _displayTree;
+
+    private void LoadData()
     {
-        get
+        if (_displayTree is null)
         {
-            if (_codes is null)
+            _displayTree = new List<CodeDisplay>();
+
+            _values = ValueSet.Expansion.Contains.Select(x => x.ToDisplay()).ToList();
+
+            // find root codes in System
+            var _roots = CodeSystem.Concept.Where(x => !x.Property.Any(x => x.Code.ToString() == "parent")).ToList();
+            foreach (var root in _roots)
             {
-                _codes = new List<CodeDisplay>();
-
-                var _values = ValueSet.Expansion.Contains.Select(x => new CodeDisplay { Code = x.Code, Display = x.Display }).ToList();
-
-                // find root codes in System
-                var _roots = CodeSystem.Concept.Where(x => !x.Property.Any(x => x.Code.ToString() == "parent")).ToList();
-                foreach (var root in _roots)
-                {
-                    LoadValues(root, _values);
-                }
-
-                LoadMissingDesignations(_codes);
+                LoadValues(root, _values);
             }
-
-            return _codes;
         }
     }
 
@@ -97,7 +89,7 @@ public class ValueSetProvider
         // add root items to _codes
         if (disp is not null && disp.Parent is null)
         {
-            _codes.Add(disp);
+            _displayTree.Add(disp);
         }
 
         return disp;
@@ -132,64 +124,15 @@ public class ValueSetProvider
         return item;
     }
 
-    private void LoadMissingDesignations(List<CodeDisplay>? items)
-    {
-        if (items is null) return;
 
-        foreach (var item in items)
-        {
-            if (string.IsNullOrEmpty(item.Display))
-            {
-                item.Display = _srv.GetDesignation(CodeSystemUrl, ValueSet.Language, item.Code);
-            }
-            LoadMissingDesignations(item.Children);
-        }
+    public async Task<IEnumerable<CodeDisplay>> FindConcepts(string search, CancellationToken ct = default)
+    {
+        return _values.FindConcepts(search);
     }
 
 
-
-
-    public ValueSet? TranslateValues(string lang)
+    public CodeDisplay FindConceptByCode(string code)
     {
-        if (ValueSet is not null && !string.IsNullOrEmpty(lang))
-        {
-            // Clone the ValueSet
-            var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector).Pretty();
-            var json = JsonSerializer.Serialize(ValueSet, options);
-            var copy = JsonSerializer.Deserialize<ValueSet>(json, options);
-
-
-            // set language 
-            copy.Language = lang;
-            var dsp = copy.Expansion.Parameter.FirstOrDefault(x => x.Name == "displayLanguage");
-            if (dsp is not null)
-            {
-                dsp.Value = new FhirString(lang);
-            }
-
-                        // find translations
-            foreach (var item in copy.Expansion.Contains)
-            {
-                item.Display = _srv.GetDesignation(CodeSystemUrl, lang, item.Code);
-            }
-
-            return copy;
-        }
-        return null;
+        return _values.FirstOrDefault(x => x.Code == code);
     }
-
-}
-
-
-[DebuggerDisplay("{Code} - {Display}")]
-public class CodeDisplay
-{
-    public string Code { get; set; }
-    public string Display { get; set; }
-    public bool InValueSet { get; set; }
-
-    public CodeDisplay? Parent { get; set; }
-    public List<CodeDisplay>? Children { get; set; }
-
-    public override string ToString() => $"{Code} - {Display}" + (InValueSet ? "" : " *");
 }

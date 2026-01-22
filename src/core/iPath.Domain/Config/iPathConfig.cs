@@ -12,6 +12,7 @@ public class iPathConfig
     public string DataRoot { get; set; } = string.Empty;
     public string TempDataPath { get; set; } = string.Empty;
     public string LocalDataPath { get; set; } = string.Empty;
+    public string FhirResourceFilePath { get; set; } = string.Empty;
 
     public bool ExportNodeJson { get; set; }
 

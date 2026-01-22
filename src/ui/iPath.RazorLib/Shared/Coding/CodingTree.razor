@@ -1,0 +1,23 @@
+﻿<MudTreeView T="CodeDisplay" Items="@TreeItems"
+             @bind-SelectedValue="Value" @bind-SelectedValue:after="OnValueChanged"   
+             Hover="true" Dense="true" Color="Color.Tertiary">
+    <ItemTemplate>
+        <MudTreeViewItem T="CodeDisplay" Items="@context.Children" @bind-Expanded="@context.Expanded" Value="@context.Value" Text="@context.Value.ToDisplay()" />
+    </ItemTemplate>
+</MudTreeView>
+
+@code {
+    [Parameter]
+    public List<TreeItemData<CodeDisplay>> TreeItems { get; set; } = [];
+
+    [Parameter]
+    public CodeDisplay? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<CodeDisplay?> ValueChanged { get; set; }
+
+    async Task OnValueChanged()
+    {
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

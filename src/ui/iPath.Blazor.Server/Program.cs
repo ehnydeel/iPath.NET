@@ -1,4 +1,5 @@
 using iPath.API;
+using iPath.Application.Fhir;
 using iPath.Blazor.Server;
 using iPath.Blazor.Server.Components;
 using iPath.Blazor.Server.Components.Account;
@@ -102,6 +103,7 @@ builder.Configuration.GetSection(iPathConfig.ConfigName).Bind(cfg);
 builder.Services.Configure<iPathClientConfig>(builder.Configuration.GetSection(iPathClientConfig.ConfigName));
 var clcfg = new iPathClientConfig();
 builder.Configuration.GetSection(iPathClientConfig.ConfigName).Bind(clcfg);
+
 
 // reverse Proxy
 if (!string.IsNullOrEmpty(cfg.ReverseProxyAddresse) && IPAddress.TryParse(cfg.ReverseProxyAddresse, out var proxyIP))

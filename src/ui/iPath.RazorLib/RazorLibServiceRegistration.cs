@@ -1,4 +1,6 @@
-﻿using iPath.Application.Localization;
+﻿using iPath.Application.Coding;
+using iPath.Application.Fhir;
+using iPath.Application.Localization;
 using iPath.Blazor.Componenents.Admin.Communities;
 using iPath.Blazor.Componenents.Admin.Groups;
 using iPath.Blazor.Componenents.Admin.Questionnaires;
@@ -8,6 +10,7 @@ using iPath.Blazor.Componenents.Questionaiires;
 using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
 using iPath.Blazor.Server;
+using iPath.Blazor.ServiceLib.Fhir;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Translations;
 using Refit;
@@ -57,17 +60,20 @@ public static class RazorLibServiceRegistration
         services.AddLocalization();
 
 
-        // FHIR: coding & questionnaires
-        services.AddHttpClient<CodingService>(cfg => cfg.BaseAddress = new Uri(baseAddress));
-        // services.AddScoped<CodingService>();
+        // FHIR: questionnaires & coding
         services.AddSingleton<QuestionnaireCache>();
 
-        services.AddScoped<AppState>();
+        services.AddSingleton<IFhirDataLoader, HttpFhirDataLoader>();
+        services.AddKeyedSingleton<CodingService>("icdo", (sp, key) =>
+        {
+            return new CodingService(sp, "icdo");
+        });
 
 
         // DI for Extensions
         DocumentExtensions.Initialize(services.BuildServiceProvider());
 
+        services.AddScoped<AppState>();
 
         return services;
     }
