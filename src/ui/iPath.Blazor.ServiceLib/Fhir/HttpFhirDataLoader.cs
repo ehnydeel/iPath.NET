@@ -24,6 +24,7 @@ public class HttpFhirDataLoader : IFhirDataLoader
     {
         try
         {
+            _logger.LogInformation("Getting Fhir Resource {0} {1}", _baseAddress, id);
             var http = new HttpClient { BaseAddress = new Uri(_baseAddress) };
             var resp = await http.GetAsync(id);
             if (resp.IsSuccessStatusCode)
@@ -46,8 +47,8 @@ public class HttpFhirDataLoader : IFhirDataLoader
     {
         try
         {
-            var http = new HttpClient { BaseAddress = new Uri(_baseAddress) };
             _logger.LogInformation("Getting Fhir Resource {0} {1}", _baseAddress, id);
+            var http = new HttpClient { BaseAddress = new Uri(_baseAddress) };
             var resp = await http.GetAsync(id);
             if (resp.IsSuccessStatusCode)
             {
