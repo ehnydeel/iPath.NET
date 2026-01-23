@@ -1,3 +1,4 @@
+using iPath.Domain.Entities.Base;
 using System.Diagnostics;
 
 namespace iPath.Domain.Entities;
@@ -29,7 +30,7 @@ public class NotificationSettings
     public bool DailyEmailSummary { get; set; }
     public TimeOnly? SummaryEmailTime { get; set; }
 
-    public string? IcdoTopoCode { get; set; }
+    public ConceptFilter? BodySiteFilter { get; set; }
 }
 
 

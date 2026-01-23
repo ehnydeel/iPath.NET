@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Refit;
 using System.Runtime.CompilerServices;
 

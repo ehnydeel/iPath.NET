@@ -1,13 +1,32 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace iPath.Blazor.Componenents.Admin.Questionnaires;
 
-public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dialog, IPathApi api)
+public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dialog, IPathApi api, IStringLocalizer T, NavigationManager nm)
     : IViewModel
 {
     public MudDataGrid<QuestionnaireListDto> grid;
     public iPath.LHCForms.LhcForm preview;
+
+
+    public List<BreadcrumbItem> BreadCrumbs
+    {
+        get
+        {
+            var ret = new List<BreadcrumbItem> { new(T["Administration"], href: "admin") };
+            if (SelectedQuestionnaire is null)
+            {
+                ret.Add(new(T["Questionnaires"], href: null, disabled: true));
+            }
+            else
+            {
+                ret.Add(new(T["Questionnaires"], href: "admin/questionnaires"));
+                ret.Add(new(SelectedQuestionnaire.Name, href: null, disabled: true));
+            }
+            return ret;
+        }
+    }
+
 
     public async Task<GridData<QuestionnaireListDto>> GetData(GridState<QuestionnaireListDto> state, CancellationToken ct = default)
     {
@@ -37,6 +56,18 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
             }
         }
     }
+
+
+    public QuestionnaireEntity? SelectedQuestionnaire;
+    public async Task Load(Guid Id)
+    {
+        var resp = await api.GetQuestionnaireById(Id);
+        if (snackbar.CheckSuccess(resp))
+        {
+            SelectedQuestionnaire = resp.Content;
+        }
+    }
+
 
     public async Task Edit(QuestionnaireListDto item)
     {
@@ -79,23 +110,6 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
     public async Task Delete(QuestionnaireListDto item)
     {
         snackbar.Add("not implemented yet", Severity.Info);
-    }
-
-
-    public async Task OnRowClick(DataGridRowClickEventArgs<QuestionnaireListDto> e)
-    {
-        if (e.Item != null)
-        {
-            var resp = await api.GetQuestionnaireById(e.Item.Id);
-            if (resp.IsSuccessful)
-            {
-                await preview.LoadFormAsync(resp.Content.Resource);
-            }
-            else
-            {
-                snackbar.AddError(resp.ErrorMessage);
-            }
-        }
     }
 }
 

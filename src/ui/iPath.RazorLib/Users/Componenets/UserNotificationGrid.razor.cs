@@ -1,4 +1,5 @@
 using iPath.Blazor.Componenents.Admin.Users;
+using System.Diagnostics.CodeAnalysis;
 
 namespace iPath.Blazor.Componenents.Users;
 
@@ -103,7 +104,7 @@ public class UserNotificationModel
     {
         if (Dto.Settings != null)
         {
-            HasSettings = !String.IsNullOrEmpty(Dto.Settings?.IcdoTopoCode) || Dto.Settings.DailyEmailSummary;
+            HasSettings = Dto.Settings.BodySiteFilter is not null  || Dto.Settings.DailyEmailSummary;
         }
         _hasSettingsUpdate = SetChanged;
     }

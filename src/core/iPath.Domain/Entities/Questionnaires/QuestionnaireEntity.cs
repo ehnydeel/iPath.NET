@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using iPath.Domain.Entities.Base;
+using System.Diagnostics;
 
 namespace iPath.Domain.Entities;
 
@@ -23,6 +24,8 @@ public class QuestionnaireEntity : AuditableEntity
 
     public ICollection<QuestionnaireForGroup> Groups { get; set; } = [];
     public ICollection<QuestionnaireForCommunity> Communities { get; set; } = [];
+
+    public ConceptFilter? BodySiteFilter { get; set; }
 }
 
 

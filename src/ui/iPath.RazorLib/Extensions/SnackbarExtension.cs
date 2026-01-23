@@ -13,4 +13,17 @@ public static class SnackbarExtension
     {
         if (!resp.IsSuccessful) snack.Add(resp.ErrorMessage, Severity.Error);
     }
+
+    public static bool CheckSuccess(this ISnackbar snackbar, IApiResponse resp)
+    {
+        if (resp.IsSuccessful)
+        {
+            return true;
+        }
+        else
+        {
+            snackbar.AddError(resp.ErrorMessage);
+            return false;
+        }
+    }
 }

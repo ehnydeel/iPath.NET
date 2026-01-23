@@ -1,0 +1,52 @@
+﻿@using Microsoft.Extensions.DependencyInjection
+@using iPath.Domain.Entities.Base
+
+
+<h3>CodingFilterView</h3>
+
+<MudPaper MaxWidth="300">
+<MudStack>
+    @foreach (var cd in Codes)
+    {
+        <CodingLookup CodingService="@CodingService" ValueSetId="@ValueSetId" Value="cd" />
+    }
+    <MudButton OnClick="AddCode">add</MudButton>
+</MudStack>
+</MudPaper>
+
+@inject IServiceProvider sp
+
+@code {
+    [Parameter, EditorRequired]
+    public ConceptFilter Model { get; set; }
+
+    [Parameter, EditorRequired]
+    public string CodingService { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ValueSetId { get; set; }
+
+
+    List<CodeDisplay> Codes = new();
+
+    private CodingService srv;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (srv is null && RendererInfo.IsInteractive && !string.IsNullOrEmpty(CodingService))
+        {
+            srv = sp.GetKeyedService<CodingService>(CodingService);
+            await srv.LoadCodeSystem();
+            await srv.LoadValueSet(ValueSetId);
+            var vs = srv.GetValueSetDisplay(ValueSetId);
+            ;
+            Codes.Add(vs.FindConceptByCode("C40.1"));
+            Codes.Add(vs.FindConceptByCode("C10.3"));
+            Codes.Add(vs.FindConceptByCode("C45"));
+        }
+    }
+
+    private void AddCode(MouseEventArgs args)
+    {
+        Codes.Add(new CodeDisplay());
+    }
+}
