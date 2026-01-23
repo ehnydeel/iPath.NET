@@ -8,7 +8,6 @@
 
 @if (vm.SelectedRequest is not null)
 {
-    <ServiceRequestHeader />
 
     @if (vm.ActiveGroup.Settings.UseDescriptionWizzard)
     {
@@ -16,6 +15,8 @@
     }
     else
     {
+        <ServiceRequestHeader />
+
         <ServiceRequestEditForm Model="vm.SelectedRequest.Description" @bind-Owner="vm.RequestOwner" @ref="frm"
                                 GroupId="vm.SelectedRequest.GroupId.Value" Variant="Variant.Outlined" Class="my-8 z-50" />
 

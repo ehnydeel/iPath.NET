@@ -8,6 +8,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="FhirResources\CodeSystem\icdo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="FhirResources\ValueSet\icdo-morpho.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="FhirResources\ValueSet\icdo-topo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="DispatchR.Mediator" Version="2.1.1" />
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
@@ -24,6 +42,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\infrastructure\iPath.API\iPath.API.csproj" />
     <ProjectReference Include="..\..\src\infrastructure\iPath.Database.EFCore\iPath.Database.EFCore.csproj" />
+    <ProjectReference Include="..\..\src\ui\iPath.Blazor.ServiceLib\iPath.Blazor.ServiceLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

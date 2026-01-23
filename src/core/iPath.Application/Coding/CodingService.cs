@@ -1,5 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using Hl7.Fhir.Model;
+﻿using Hl7.Fhir.Model;
 using iPath.Application.Coding;
 using iPath.Application.Fhir;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,7 @@ public class CodingService
     private readonly Dictionary<string, ValueSetDisplay> _valueSet = new();
     private readonly string _codeSystemId;
     private CodeSystem _codeSystem;
+    private CodeSystemLookup? _lookup;
 
     public CodingService(IServiceProvider sp, string csKey)
     {
@@ -36,7 +36,8 @@ public class CodingService
     {
         if (_codeSystem is null && !string.IsNullOrEmpty(_codeSystemId))
         {
-            _codeSystem = await loader.GetResourceAsync<CodeSystem>($"CodeSystem/{_codeSystemId}");   
+            _codeSystem = await loader.GetResourceAsync<CodeSystem>($"CodeSystem/{_codeSystemId}");
+            _lookup = new CodeSystemLookup(_codeSystem);
         }
     }
 
@@ -89,5 +90,55 @@ public class CodingService
             }
         }
         return null;
+    }
+
+
+
+
+    public CodeLookupResult GetChildCodes(string root, bool includeRoot = true)
+    {
+        if (_lookup == null)
+            return CodeLookupResult.WithError("no codesystem loaded");
+
+        return _lookup.GetChildCodes(root, includeRoot);
+    }
+
+    public CodeLookupResult GetChildCodes(string root, string valueSetId, bool includeRoot = true)
+    {
+        if (_lookup == null)
+            return CodeLookupResult.WithError("no codesystem loaded");
+
+        if (string.IsNullOrWhiteSpace(valueSetId))
+            return CodeLookupResult.WithError("valueset id required");
+
+        valueSetId = valueSetId.ToLowerInvariant().Trim();
+        if (!_valueSet.ContainsKey(valueSetId))
+            return CodeLookupResult.WithError($"valueset '{valueSetId}' not loaded");
+
+        var provider = _valueSet[valueSetId];
+
+        var result = _lookup.GetChildCodes(root, includeRoot);
+        if (!result.IsSuccess)
+            return result;
+
+        // Filter out codes that are not marked as included in the ValueSet
+        var filtered = result.ChildCodes
+            .Where(code =>
+            {
+                var dsp = provider.FindConceptByCode(code);
+                return dsp is not null && dsp.InValueSet;
+            })
+            .ToHashSet();
+
+        return new CodeLookupResult(result.RootCode, filtered, result.Elapsed);
+    }
+
+
+    public bool IsChildCode(string childCode, string rootCode, bool includeRoot = true)
+    {
+        if (_lookup == null)
+            return false;
+
+        return _lookup.IsChildCode(childCode, rootCode, includeRoot);
     }
 }
