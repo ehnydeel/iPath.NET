@@ -104,13 +104,14 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
             var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
             var q = JsonSerializer.Deserialize<Questionnaire>(r.Resource, options);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             snackbar.AddError("Resource is not valid: " + ex.Message);
             return false;
         }
 
-        var resp = await api.CreateQuestionnaire(new UpdateQuestionnaireCommand(r.QuestionnaireId, r.Name, r.Resource, Settings:r.Settings, IsActive: r.IsActive, insert: false));
+        var resp = await api.CreateQuestionnaire(new UpdateQuestionnaireCommand(r.QuestionnaireId, r.Name, r.Resource,
+            Settings: r.Settings, IsActive: r.IsActive, insert: false));
         return snackbar.CheckSuccess(resp);
     }
 
@@ -149,7 +150,7 @@ public class EditQuestionnaireModel
 
     public string? Resource { get; set; }
 
-    public QuestionnaireSettings? Settings { get; set; } = null;
+    public QuestionnaireSettings Settings { get; set; } = null;
 
     public EditQuestionnaireModel()
     {
@@ -164,6 +165,6 @@ public class EditQuestionnaireModel
         Version = e.Version;
         IsActive = e.IsActive;
         Resource = e.Resource;
-        Settings = e.Settings;
+        Settings = e.Settings ?? new();
     }
 }

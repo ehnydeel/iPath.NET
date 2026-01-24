@@ -2,14 +2,16 @@
 
 <MudTreeView T="CodeDisplay" Items="@TreeItems" @ref="_treeView"
              SelectionMode="SelectionMode.MultiSelection"
-             AutoSelectParent="false"
+             AutoSelectParent="true"
              FilterFunc="MatchesName"
              CheckBoxColor="Color.Info"
              @bind-SelectedValues="Values"
              @bind-SelectedValues:after="OnValueChanged"
              Hover="true" Dense="true" Color="Color.Tertiary">
     <ItemTemplate>
-        <MudTreeViewItem T="CodeDisplay" Items="@context.Children" @bind-Expanded="@context.Expanded" Value="@context.Value" Text="@context.Value.ToDisplay()" />
+        <MudTreeViewItem T="CodeDisplay" Items="@context.Children"
+                         @bind-Expanded="@context.Expanded"
+                         Value="@context.Value" Text="@context.Value.ToDisplay()" />
     </ItemTemplate>
 </MudTreeView>
 
@@ -27,6 +29,7 @@
         {
             field = value;
             Values = value;
+            StateHasChanged();
         }
     }
 
@@ -106,8 +109,8 @@
         }
 
         // Propagate the collapsed selection (parents replacing fully-selected children)
-        Selection = Selection;
-        await SelectionChanged.InvokeAsync();
+        Selection = _selection;
+        await SelectionChanged.InvokeAsync(Selection);
     }
 
 

@@ -28,7 +28,7 @@
 
 @inject IServiceProvider sp;
 
-    @code {
+@code {
     [Parameter]
     public ConceptFilter? Filter { get; set; }
 
@@ -37,7 +37,7 @@
 
 
     CodingTreeFilter _treeView;
-    IReadOnlyCollection<CodeDisplay> _sel;
+    IReadOnlyCollection<CodeDisplay> _sel { get; set; }
 
     string sel => _sel is null ? "--" : string.Join(", ", _sel.Select(x => x.Code).ToArray());
 
@@ -50,32 +50,54 @@
     async Task OnChange()
     {
         StateHasChanged();
-        Filter.Concetps = _sel.ToArray().ToConcept(_coding.CodeSystemUrl).ToList();
-        await FilterChanged.InvokeAsync();
+        var list = _sel.ToArray().ToConcept(_coding.CodeSystemUrl).ToList();
+        if (list.IsEmpty())
+        {
+            Filter = null;
+        }
+        else
+        {
+            Filter = new() { Concetps = list };
+        }
+        await FilterChanged.InvokeAsync(Filter);
     }
 
 
     CodingService _coding;
+    ValueSetDisplay _valueset;
     protected override async Task OnInitializedAsync()
     {
         _coding = sp.GetRequiredKeyedService<CodingService>(system);
         var _loader = sp.GetRequiredService<IFhirDataLoader>();
 
+        // TODO: initilize in DI startup
         await _coding.LoadCodeSystem();
         await _coding.LoadValueSet(vsid);
+        _valueset = _coding.GetValueSetDisplay(vsid);
+
+        // if only one root node => start with it's childrend
+        // TODO: write an extension that finds the first node with more than 1 child
+        if (_valueset.DisplayTree.Count == 1)
+        {
+            BodySiteCodes = _valueset.DisplayTree.First().Children.ToTreeView();
+        }
+        else
+        {
+            BodySiteCodes = _valueset.DisplayTree.ToTreeView();
+        }
 
         LoadFilter();
     }
 
     private void LoadFilter()
     {
-        if (Filter is not null)
+        if (Filter is not null && _valueset is not null)
         {
-            var vs = _coding.GetValueSetDisplay(vsid);
             var mysel = new List<CodeDisplay>();
             foreach (var code in Filter.Concetps)
             {
-                mysel.Add(vs.FindConceptByCode(code.Code));
+                mysel.Add(_valueset.FindConceptByCode(code.Code));
+                // TODO: add all child concepts for display in tree
             }
             _sel = mysel;
         }

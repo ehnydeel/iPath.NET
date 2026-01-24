@@ -1,5 +1,6 @@
 ﻿@page "/admin/questionnaires/{id}"
 @page "/admin/questionnaires/{id}/{mode}"
+@using iPath.Domain.Entities.Base
 
 @inject QuestionnaireAdminViewModel vm
 
@@ -38,21 +39,21 @@ else
                 <MudTextField @bind-Value="@Model.Resource" Label=@T["FHIR Resource"] Variant="Variant.Outlined"
                               Lines="10" Margin="Margin.Dense" Typo="Typo.body2" />
             </MudForm>
-
-
-            <MudStack Row Class="mt-2">
-                <ProgressButton Text="Save" Icon="@Icons.Material.Filled.Save" OnClick=@(() => vm.Save(Model)) />
-                <MudButton Variant="Variant.Filled" OnClick="ReloadModel">Cancel</MudButton>
-            </MudStack>
         </MudTabPanel>
         <MudTabPanel Text=@T["Filter"] Icon="@Icons.Material.Filled.Filter">
-            <TopoTreeFilter Filter="@Model.Settings.BodySiteFilter" />
+            <TopoTreeFilter @bind-Filter="@Model.Settings.BodySiteFilter" />
         </MudTabPanel>
         <MudTabPanel Text=@T["Preview"] Icon="@Icons.Material.Filled.Preview">
             <iPath.LHCForms.LhcForm @ref="vm.PreviewForm" ReadOnly="false"
                                     Questionnaire="@Model.Resource" />
         </MudTabPanel>
     </MudTabs>
+
+
+    <MudStack Row Class="mt-2">
+        <ProgressButton Text="Save" Icon="@Icons.Material.Filled.Save" OnClick="Save" />
+        <MudButton Variant="Variant.Filled" OnClick="ReloadModel">Cancel</MudButton>
+    </MudStack>
 }
 
 
@@ -65,6 +66,7 @@ else
 
     QuestionnaireEntity q;
     EditQuestionnaireModel Model { get; set; } = new();
+    // ConceptFilter BodySiteFilter = new();
     int panelIndex = 0;
 
 
@@ -74,6 +76,7 @@ else
         {
             await vm.Load(guid);
             Model = new EditQuestionnaireModel(vm.SelectedQuestionnaire);
+            // BodySiteFilter = Model.Settings?.BodySiteFilter ?? new();
         }
         panelIndex = mode switch
         {
@@ -83,6 +86,14 @@ else
         };
         StateHasChanged();
     }
+
+    async Task Save()
+    {
+        Model.Settings ??= new();
+        // Model.Settings.BodySiteFilter = BodySiteFilter;
+        await vm.Save(Model);
+    }
+
     private void ReloadModel(MouseEventArgs args)
     {
         if (vm.SelectedQuestionnaire is not null)
