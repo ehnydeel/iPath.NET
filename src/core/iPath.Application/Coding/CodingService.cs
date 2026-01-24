@@ -127,7 +127,7 @@ public class CodingService
         var filtered = result.ChildCodes
             .Where(code =>
             {
-                var dsp = provider.FindConceptByCode(code);
+                var dsp = provider.GetByCode(code);
                 return dsp is not null && dsp.InValueSet;
             })
             .ToHashSet();

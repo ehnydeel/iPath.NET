@@ -131,7 +131,7 @@ public class ValueSetDisplay
     }
 
 
-    public CodeDisplay FindConceptByCode(string code)
+    public CodeDisplay GetByCode(string code)
     {
         return _values.FirstOrDefault(x => x.Code == code);
     }

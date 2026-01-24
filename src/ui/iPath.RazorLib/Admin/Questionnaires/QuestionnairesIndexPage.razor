@@ -7,17 +7,11 @@
 
 <IPathHeader Title=@T["Questionnaires"]>
     <ActionContent>
+        <MudSwitch @bind-Value="vm.ShowInactive" Label="inactive" />
         <MudFab StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="vm.Create" />
     </ActionContent>
 </IPathHeader>
 <MudDataGrid T="QuestionnaireListDto" ServerData="vm.GetData" Dense Striped @ref="vm.grid" RowClick="OnRowClick">
-    <ColGroup>
-        <col />
-        <col />
-        <col style="width: 80px;"/>
-        <col />
-        <col style="min-width: 40px;"/>
-    </ColGroup>
     <Columns>
         <PropertyColumn Property="q => q.QuestionnaireId" Title="Id" />
         <PropertyColumn Property="q => q.Name" Title="Name" />

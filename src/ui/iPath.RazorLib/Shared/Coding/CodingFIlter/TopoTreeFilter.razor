@@ -4,20 +4,34 @@
 
 @namespace iPath.Blazor.Componenents.Shared.Coding
 
-<MudPaper Class="pa-2">
-    <h3>@T["Body site filter (icd-o)"]</h3>
-    @if (RendererInfo.IsInteractive)
-    {
-        <MudStack AlignItems="AlignItems.Start">
-            <MudTextField T="string" Label="Search" Adornment="Adornment.Start"
-                          AdornmentIcon="@Icons.Material.Filled.Search"
-                          TextChanged="OnTextChanged" Immediate="true" Clearable="true" />
-            <CodingTreeFilter TreeItems="BodySiteCodes" @ref="_treeView"
-                              @bind-SelectedValues="SelectedValues" />
+<MudPaper Elevation="0">
+    <MudStack Row AlignItems="AlignItems.End">
+        <h3>@T["Body site filter (icd-o)"]</h3>
+        <MudSpacer />
+        <MudTextField T="string" Label="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Variant="Variant.Outlined" Margin="Margin.Dense"
+                      TextChanged="Search" Immediate="true" Clearable="true" />
 
-        </MudStack>
-        <div style="border: 1px; margin-top: 8px;">
-            <strong>selection: </strong> @sel
+    </MudStack>
+    <MudDivider />
+    @if (true || RendererInfo.IsInteractive)
+    {
+        <MudTreeView T="CodeDisplay" Items="@BodySiteCodes" @ref="_treeView"
+                     SelectionMode="SelectionMode.MultiSelection"
+                     FilterFunc="MatchesName"
+                     CheckBoxColor="Color.Info"
+                     MaxHeight="400px"
+                     @bind-SelectedValues="SelectedValues"
+                     Hover="true" Dense="true" Color="Color.Tertiary">
+            <ItemTemplate>
+                <MudTreeViewItem T="CodeDisplay" Items="@context.Children"
+                                 Value="@context.Value" Text="@context.Value.ToDisplay()" />
+            </ItemTemplate>
+        </MudTreeView>
+
+        <div style="border: 1px; margin-top: 8px; font-size: 0.7em;">
+            <strong>selection: </strong> @selStr<br />
+            <strong>filter: </strong> @filterStr
         </div>
     }
     else
@@ -36,32 +50,18 @@
     public EventCallback<ConceptFilter?> FilterChanged { get; set; }
 
 
-    CodingTreeFilter _treeView;
+    MudTreeView<CodeDisplay> _treeView;
     IReadOnlyCollection<CodeDisplay> SelectedValues { get; set; } = [];
 
-    string sel => SelectedValues is null ? "--" : string.Join(", ", SelectedValues.Select(x => x.Code).ToArray());
+    string selStr => SelectedValues is null ? "--" : string.Join(", ", SelectedValues.Select(x => x.Code).ToArray());
+    string filterStr => Filter?.Concetps is null ? "--" : string.Join(", ", Filter.Concetps.Select(x => x.Code).ToArray());
 
     public List<TreeItemData<CodeDisplay>> BodySiteCodes { get; private set; } = new();
+
 
     const string system = "icdo";
     const string vsid = "icdo-topo";
 
-    /*
-    async Task OnSelectionChange()
-    {
-        StateHasChanged();
-        var list = SelectedValues.ToArray().ToConcept(_coding.CodeSystemUrl).ToList();
-        if (list.IsEmpty())
-        {
-            Filter = null;
-        }
-        else
-        {
-            Filter = new() { Concetps = list };
-        }
-        await FilterChanged.InvokeAsync(Filter);
-    }
-    */
 
 
     CodingService _coding;
@@ -90,6 +90,12 @@
         LoadFilter();
     }
 
+    protected override void OnParametersSet()
+    {
+        LoadFilter();
+    }
+
+
     private void LoadFilter()
     {
         if (Filter is not null && _valueset is not null)
@@ -98,10 +104,10 @@
             foreach (var code in Filter.Concetps)
             {
                 var expanded = _coding.GetChildCodes(code.Code, true);
-                foreach (var x in expanded.ChildCodes) 
+                foreach (var x in expanded.ChildCodes)
                 {
-                    mysel.Add(_valueset.FindConceptByCode(x));
-                } 
+                    mysel.Add(_valueset.GetByCode(x));
+                }
             }
             SelectedValues = mysel;
         }
@@ -190,13 +196,34 @@
         }
         else
         {
+            Filter ??= new();
             Filter.Concetps = _selection.ToConcept(_coding.CodeSystemUrl).ToList();
         }
+
+        StateHasChanged();
     }
 
 
-    private async Task OnTextChanged(string term)
+    async Task Search(string searchPhrase)
     {
-        await _treeView.Search(term);
+        _searchPhrase = searchPhrase;
+        await _treeView.FilterAsync();
+    }
+
+    string _searchPhrase;
+
+    private Task<bool> MatchesName(ITreeItemData<CodeDisplay> item)
+    {
+        if (string.IsNullOrEmpty(item.Text))
+        {
+            return Task.FromResult(false);
+        }
+
+        return Task.FromResult(item.Text.Contains(_searchPhrase, StringComparison.OrdinalIgnoreCase));
+    }
+    private void OnChanged(IReadOnlyCollection<CodeDisplay> args)
+    {
+        Console.Write(".");
+        StateHasChanged();
     }
 }

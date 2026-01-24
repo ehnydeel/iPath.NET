@@ -1,7 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Serialization;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
@@ -12,6 +11,17 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
 {
     public MudDataGrid<QuestionnaireListDto> grid;
 
+    public bool ShowInactive { 
+        get => field;
+        set
+        {
+            if (field != value)
+            {
+                field = value;
+                grid.ReloadServerData();
+            }
+        }
+    }
 
     public List<BreadcrumbItem> BreadCrumbs
     {
@@ -34,7 +44,7 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
 
     public async Task<GridData<QuestionnaireListDto>> GetData(GridState<QuestionnaireListDto> state, CancellationToken ct = default)
     {
-        var query = state.BuildQuery(new GetQuestionnaireListQuery());
+        var query = state.BuildQuery(new GetQuestionnaireListQuery { AllVersions = ShowInactive });
         var resp = await api.GetQuestionnnaires(query);
         if (resp.IsSuccessful) return resp.Content.ToGridData();
         snackbar.AddError(resp.ErrorMessage);

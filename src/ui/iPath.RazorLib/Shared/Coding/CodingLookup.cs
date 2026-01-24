@@ -113,7 +113,7 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
 
             var vs = srv.GetValueSetDisplay(ValueSetId);
             if (vs is not null)
-                Value = vs.FindConceptByCode(code);
+                Value = vs.GetByCode(code);
         }
     }
 
