@@ -2,6 +2,7 @@
 using FluentResults;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Serialization;
+using iPath.Application.Features.Questionnaires;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
@@ -141,6 +142,24 @@ public class QuestionnaireAdminViewModel(ISnackbar snackbar, IDialogService dial
         {
             await PreviewForm.LoadFormAsync(SelectedQuestionnaire.Resource, "");
         }
+    }
+    public async Task<string> GetPreviewText()
+    {
+        try
+        {
+            var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
+            var q = JsonSerializer.Deserialize<Questionnaire>(PreviewForm.Questionnaire, options);
+
+            var qr = await PreviewForm.GetDataAsync();
+            var r = JsonSerializer.Deserialize<QuestionnaireResponse>(qr, options);
+
+            var q2t = new GenericQuestionnaireToTextService();
+            return q2t.CreateText(r, q);
+        }
+        catch(Exception ex)
+        {
+            return "Error: " + ex.Message;
+        }        
     }
 
 

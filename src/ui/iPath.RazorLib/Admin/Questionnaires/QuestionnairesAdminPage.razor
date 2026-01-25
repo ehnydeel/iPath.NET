@@ -64,6 +64,10 @@ else
         <MudTabPanel Text=@T["Preview"] Icon="@Icons.Material.Filled.Preview">
             <iPath.LHCForms.LhcForm @ref="vm.PreviewForm" ReadOnly="false"
                                     Questionnaire="@Model.Resource" />
+
+            <MudDivider Class="my-2" />
+            <MudButton OnClick="CreateText" Variant="Variant.Filled">To Text</MudButton>
+            @text
         </MudTabPanel>
     </MudTabs>
 
@@ -88,6 +92,7 @@ else
     int panelIndex = 0;
 
     TopoTreeFilter _topoTree;
+    string text;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -133,5 +138,10 @@ else
             snackbar.AddError(res.Errors.FirstOrDefault().Message);
         }
         StateHasChanged();
+    }
+
+    private async Task CreateText(MouseEventArgs args)
+    {
+        text = await vm.GetPreviewText();
     }
 }
