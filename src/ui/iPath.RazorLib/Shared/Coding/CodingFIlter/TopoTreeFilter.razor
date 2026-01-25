@@ -31,7 +31,7 @@
     {
         <MudAlert Severity="Severity.Warning">@error</MudAlert>
     }
-    </MudPaper>
+</MudPaper>
 
 @inject IServiceProvider sp;
 
@@ -131,11 +131,19 @@
     public void SaveFilter()
     {
         var _selectedCodes = BodySiteCodes.ToSelectedCodes();
-        Filter.Concetps = new();
-        foreach (var code in _selectedCodes)
+        if (_selectedCodes.Any())
         {
-            var c = _valueset.GetByCode(code);
-            Filter.Concetps.Add(c.ToConcept(_coding.CodeSystemUrl));
+            Filter ??= new();
+            Filter.Concetps = new();
+            foreach (var code in _selectedCodes)
+            {
+                var c = _valueset.GetByCode(code);
+                Filter.Concetps.Add(c.ToConcept(_coding.CodeSystemUrl));
+            }
+        }
+        else
+        {
+            Filter = null;
         }
         StateHasChanged();
     }
