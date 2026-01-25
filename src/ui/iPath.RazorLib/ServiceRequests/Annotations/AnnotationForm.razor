@@ -109,7 +109,7 @@
         {
             useQuestionnaire = true;
 
-            var q = await vm.GetQuesiotnnaire(SelectedQ.QuestinnaireId);
+            var q = await vm.GetQuesiotnnaireResource(SelectedQ.QuestinnaireId);
             if (q is not null)
             {
                 Model.Data.Questionnaire = new QuestionnaireResponseData { QuestionnaireId = SelectedQ.QuestinnaireId };

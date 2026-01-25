@@ -3,8 +3,8 @@
 
 <MudExpansionPanels>
     <MudExpansionPanel>
-        <TitleContent>
-            <strong>generated text:</strong> @Model.Questionnaire.GeneratedText
+        <TitleContent >
+            <strong>@QName:</strong> @Model.Questionnaire.GeneratedText
         </TitleContent>
         <ChildContent>
             <QuestionnaireResponseView Data="Model.Questionnaire" />
@@ -15,4 +15,12 @@
 @code {
     [Parameter]
     public RequestDescription Model { get; set; }
+
+    string QName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        QName = await @vm.QuestionnaireName(Model?.Questionnaire?.QuestionnaireId, Model?.Questionnaire?.Version);
+        QName ??= "generated text";
+    }
 }

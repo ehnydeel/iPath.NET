@@ -6,6 +6,7 @@ using iPath.Blazor.Componenents.ServiceRequests.Annotations;
 using iPath.Blazor.Componenents.Shared;
 using iPath.Domain.Config;
 using Refit;
+using System;
 using System.Linq;
 
 namespace iPath.Blazor.Componenents.ServiceRequests;
@@ -811,11 +812,11 @@ public class ServiceRequestViewModel(IPathApi api,
         return null;
     }
 
-    public async Task<string?> GetQuesiotnnaire(string questionnaireId, int? version = null)
-    {
-        return await qCache.GetQuestionnaireResourceAsync(questionnaireId, version);
-    }
+    public async Task<string?> GetQuesiotnnaireResource(string questionnaireId, int? version = null)
+        => await qCache.GetQuestionnaireResourceAsync(questionnaireId, version);
 
+    public async Task<string?> QuestionnaireName(string id, int? version = null) 
+        => await qCache.GetQuestionnaireNameAsync(id, version);
 
 
     public IEnumerable<QuestionnaireForGroupDto> AvailableAnnotationQuestionnaires(eAnnotationType annotationTyp)
@@ -842,8 +843,6 @@ public class ServiceRequestViewModel(IPathApi api,
     }
 
     private QuestionnaireForGroupDto PlainText => new QuestionnaireForGroupDto(Guid.Empty, "", "Plain Text", eQuestionnaireUsage.Annotation);
-
-
 
     public async Task EditDocument(DocumentDto document)
     {

@@ -32,7 +32,7 @@
         <MudTh Style="width: 12rem;"><MudTableSortLabel SortLabel="CreatedOn" T="ServiceRequestListDto" InitialDirection="SortDirection.Descending">Date</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Title" Class="ipath_node_title2" onclick="@(() => vm.GotoNode(context))">
+        <MudTd DataLabel="Title" Class="ipath_node_title2" @onclick="@(() => vm.GotoNode(context))">
             <MudLink Href=@($"request/{context.Id}")>
                 <MudHighlighter Text="@context.Title" HighlightedText="@vm.SearchString" Style="font-weight: bold;" />
             </MudLink>
@@ -40,9 +40,16 @@
             {
                 <span class="ml-1">(@context.Description.BodySite?.ToString())</span>
             }
-            <div><MudHighlighter Text="@context.SubTitle" HighlightedText="@vm.SearchString" /></div>
+            <MudHidden Breakpoint="Breakpoint.Xs">
+                <div><MudHighlighter Text="@context.SubTitle" HighlightedText="@vm.SearchString" /></div>
+            </MudHidden>
+            <MudHidden Breakpoint="Breakpoint.SmAndUp">
+                <div>
+                    <b>@context.Owner.Username</b>, @context.CreatedOn.ToString("d")
+                </div>
+            </MudHidden>
         </MudTd>
-        <MudTd>
+        <MudTd HideSmall="true">
             <div class="d-flex justify-end flex-grow-1">
                 @if (context.IsDraft)
                 {
@@ -55,11 +62,11 @@
                 <MudIcon Icon=@context.HasNewAnnotationIcon />
             </div>
         </MudTd>
-        <MudTd DataLabel="CaseType" Class="ipath_node_type2">
+        <MudTd DataLabel="CaseType" Class="ipath_node_type2" HideSmall="true">
             <MudHighlighter Text="@context.Description.CaseType" HighlightedText="@vm.SearchString" /><br />
             <i>@context.Description.BodySite?.Code</i>
         </MudTd>
-        <MudTd DataLabel="Owner" Class="ipath_node_sender2">
+        <MudTd DataLabel="Owner" Class="ipath_node_sender2" HideSmall="true">
             @if (GroupId.HasValue)
             {
                 <OwnerLink Owner="@context.Owner" />                
@@ -69,7 +76,7 @@
                 <GroupLink GroupId="@context.GroupId" />
             }
         </MudTd>
-        <MudTd DataLabel="CreatedOn" Class="ipath_node_date2">
+        <MudTd DataLabel="CreatedOn" Class="ipath_node_date2" HideSmall="true">
             @context.CreatedOn.ToString("d")<br />
             <MudHighlighter Text="@context.AccessionNo" HighlightedText="@vm.SearchString" Style="font-weight: bold;" />
         </MudTd>

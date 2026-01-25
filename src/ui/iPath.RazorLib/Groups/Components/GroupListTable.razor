@@ -11,17 +11,17 @@
         <MudTh Style="text-align: right;">@T["# Cases"]</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd Style="width: 75%">
+        <MudTd Style="width: 75%" DataLabel=@T["Group"]>
             <MudLink Href=@($"groups/{context.Id}")>@context.Name</MudLink>
         </MudTd>
-        <MudTd Style="width: 3em;">
+        <MudTd Style="width: 3em;" HideSmall="true">
             <MudStack Row>
                 <MudSpacer />
                 <MudIcon Icon=@context.NewNodeIcon />
                 <MudIcon Icon=@context.NewAnnotationIcon />
             </MudStack>
         </MudTd>
-        <MudTd Style="text-align: right; width: 5em;">
+        <MudTd Style="text-align: right; width: 5em;" HideSmall="true">
             @context.TotalNodes
         </MudTd>
     </RowTemplate>

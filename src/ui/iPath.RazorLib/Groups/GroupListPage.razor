@@ -11,33 +11,6 @@
 
 <GroupListTable ServerData="vm.GetTableAsync" OnRowClick=@((e) => vm.GotoGroup(e.Item)) ShowLegend="false" />
 
-    <!--
-<MudTable T="GroupListDto" ServerData="vm.GetTableAsync"
-          OnRowClick=@((e) => vm.GotoGroup(e.Item))
-          HeaderClass="ipath_table_header"
-          Dense="true" Hover="true">
-    <HeaderContent>
-        <MudTh><MudTableSortLabel T="GroupListDto" SortLabel="Name">Name</MudTableSortLabel></MudTh>
-        <MudTh></MudTh>
-        <MudTh Style="text-align: right;">@T["# Cases"]</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd Style="width: 75%">
-            <MudLink Href=@($"groups/{context.Id}")>@context.Name</MudLink>
-        </MudTd>
-        <MudTd Style="width: 3em;">
-            <MudStack Row>
-                <MudSpacer />
-                <MudIcon Icon=@context.NewNodeIcon />
-                <MudIcon Icon=@context.NewAnnotationIcon />
-            </MudStack>
-        </MudTd>
-        <MudTd Style="text-align: right; width: 5em;">
-            @context.TotalNodes
-        </MudTd>
-    </RowTemplate>
-</MudTable>
--->
 
 @if (vm.GroupCount == 0)
 {

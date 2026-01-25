@@ -8,11 +8,11 @@ namespace iPath.Blazor.ServiceLib.Services;
 
 public class QuestionnaireCacheClient(IMemoryCache cache, IPathApi api, ILogger<QuestionnaireCacheClient> logger) 
 {
-    public async Task<string?> GetQuestionnaireResourceAsync(String Id, int? Version = null)
+    public async Task<QuestionnaireEntity?> GetQuestionnaireAsync(string Id, int? Version = null)
     {
         if (string.IsNullOrEmpty(Id)) return null;
 
-        var chachekey = $"qr_{Id}" + (Version.HasValue ? $"_{Version}" : "");
+        var cachekey = $"qr_{Id}" + (Version.HasValue ? $"_{Version}" : "");
 
         if (!cache.TryGetValue(cache, out QuestionnaireEntity? q))
         {
@@ -24,13 +24,25 @@ public class QuestionnaireCacheClient(IMemoryCache cache, IPathApi api, ILogger<
                 q = resp.Content;
 
                 var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5));
-                cache.Set(chachekey, q, opts);
+                cache.Set(cachekey, q, opts);
             }
             else
             {
                 logger.LogWarning("loading questionnaire {0}/{1} failed: {2}, {3}", Id, Version, resp.StatusCode, resp.Error.Message);
             }
         }
-        return q?.Resource;
+        return q;
+    }
+
+    public async Task<string?> GetQuestionnaireResourceAsync(string Id, int? Version = null)
+        => (await GetQuestionnaireAsync(Id, Version))?.Resource;
+
+    public async Task<string?> GetQuestionnaireNameAsync(string Id, int? Version = null)
+        => (await GetQuestionnaireAsync(Id, Version))?.Name;
+
+    void ClearCache(string Id, int? Version = null)
+    {
+        var cachekey = $"qr_{Id}" + (Version.HasValue ? $"_{Version}" : "");
+        cache.Remove(cachekey);
     }
 }
