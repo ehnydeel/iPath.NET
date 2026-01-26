@@ -16,8 +16,14 @@
     <MudDivider />
     @if (RendererInfo.IsInteractive)
     {
-        <CodingTreeFilter TreeItems="BodySiteCodes" @ref="_treeView" SelectionChanged="OnChange" />
-
+        @if (BodySiteCodes is null)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else
+        {
+            <CodingTreeFilter TreeItems="BodySiteCodes" @ref="_treeView" SelectionChanged="OnChange" />
+        }
         <div style="border: 1px; margin-top: 8px; font-size: 0.7em;">
             <strong>filter: </strong> @FilterStr
         </div>
@@ -51,7 +57,7 @@
     // HashSet<string> _selectedCodes = new();
     string FilterStr => Filter is null ? "--" : Filter.ConceptCodesString;
 
-    public List<TreeItemData<CodeDisplay>> BodySiteCodes { get; private set; } = new();
+    public List<TreeItemData<CodeDisplay>> BodySiteCodes { get; private set; } = null!;
 
     const string cs = "icdo";
     const string vsid = "icdo-topo";

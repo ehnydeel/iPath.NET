@@ -146,13 +146,17 @@ public class ServiceRequestViewModel(IPathApi api,
         NotifyStateChanged();
     }
 
+
     public async Task ReloadNode()
     {
         if (SelectedRequest != null)
         {
-            var id = SelectedRequest.Id;
-            SelectedRequest = null;
-            await LoadNode(id);
+            var respN = await api.GetRequestById(SelectedRequest.Id);            
+            if (respN.IsSuccessful)
+            {
+                SelectedRequest = respN.Content;
+            }
+            NotifyStateChanged();
         }
     }
 
@@ -713,7 +717,7 @@ public class ServiceRequestViewModel(IPathApi api,
 
     public bool AnnotateDisabled => IsEditing;
 
-    public async Task Annotate(DocumentDto document = null, bool ReloadOnSave = true)
+    public async Task Annotate(DocumentDto document = null)
     {
         if (AnnotateDisabled) return;
 
@@ -729,7 +733,7 @@ public class ServiceRequestViewModel(IPathApi api,
         {
             if (data.Data.ValidateInput())
             {
-                await SubmitAnnotation(data, ReloadOnSave);
+                await SubmitAnnotation(data);
             }
         }
     }
@@ -763,7 +767,7 @@ public class ServiceRequestViewModel(IPathApi api,
         OnChange?.Invoke();
     }
 
-    public async Task SubmitAnnotation(AnnotationEditModel? data = null, bool ReloadOnSave = true)
+    public async Task SubmitAnnotation(AnnotationEditModel? data = null)
     {
         data ??= NewAnnotation;
         if (data is not null)
@@ -774,8 +778,7 @@ public class ServiceRequestViewModel(IPathApi api,
             if (resp.IsSuccessful)
             {
                 NewAnnotation = null;
-                if (ReloadOnSave)
-                    await ReloadNode();
+                await ReloadNode();
             }
             else
             {

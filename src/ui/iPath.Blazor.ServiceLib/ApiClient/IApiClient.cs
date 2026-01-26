@@ -1,10 +1,8 @@
 ﻿using FluentResults;
-using Humanizer;
 using iPath.Application.Features;
 using iPath.Application.Features.Documents;
 using iPath.Application.Features.ServiceRequests;
 using iPath.Application.Features.Notifications;
-using iPath.Application.Features.ServiceRequests;
 using iPath.Application.Features.Users;
 using iPath.Application.Localization;
 using iPath.Application.Querying;
@@ -104,6 +102,14 @@ public interface IPathApi
 
     [Put("/api/v1/groups/community/assign")]
     Task<IApiResponse> AssignGroupToCommunity(AssignGroupToCommunityCommand command);
+
+
+    [Delete("/api/v1/groups/{id}")]
+    Task<IApiResponse> DeleteGroup(Guid id);
+
+    [Delete("/api/v1/groups/drafts/{id}")]
+    Task<IApiResponse> DeleteGroupDrafts(Guid id);
+
     #endregion
 
 

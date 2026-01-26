@@ -429,6 +429,7 @@ public class GroupQuestionnareModel
 
     public string Id { get; init; }
     public string Name { get; init; }
+    public string Filter { get; init; } = "";
 
     public string NameAndId => $"{Name} [{Id}]";
 
@@ -436,12 +437,13 @@ public class GroupQuestionnareModel
 
     public Dictionary<eQuestionnaireUsage, bool> Usage = new();
 
-    public GroupQuestionnareModel(Guid QuestionnaireId, string Id, string Name, Guid GroupId)
+    public GroupQuestionnareModel(Guid QuestionnaireId, string Id, string Name, string? Filter, Guid GroupId)
     {
         this.QuestionnaireId = QuestionnaireId;
         this.Id = Id;
         this.Name = Name;
         this.GroupId = GroupId;
+        this.Filter = Filter ?? "";
 
         foreach (var e in QuestionnairesViewModel.Usages)
         {

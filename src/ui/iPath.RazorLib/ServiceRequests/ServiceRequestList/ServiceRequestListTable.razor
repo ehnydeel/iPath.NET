@@ -6,15 +6,18 @@
           RowsPerPage="25" Bordered="false" Dense="true" Hover="true">
     <ToolBarContent>
         <MudToolBar>
-            <MudTooltip Text="create a new case">
+            <MudTooltip Text=@T["create a new case"]>
                 <MudIconButton Icon="@Icons.Material.Outlined.Add"
                                OnClick="vm.CreateNewCase" Disabled="vm.CreateNewCaseDisabled" />
             </MudTooltip>
-            <MudTooltip Text="export data">
+            <MudTooltip Text=@T["export data"]>
                 <MudIconButton Icon="@Icons.Material.Outlined.Save" Disabled=@(!gvm.IsModerator) />
             </MudTooltip>
-            <MudTooltip Text="Group Settings">
+            <MudTooltip Text=@T["Group Settings"]>
                 <MudIconButton Icon="@Icons.Material.Outlined.Settings" OnClick="gvm.EditSettings" Disabled=@(!gvm.IsModerator) />
+            </MudTooltip>
+            <MudTooltip Text=@T["Delete all drafts in this group"]>
+                <MudIconButton Icon="@Icons.Material.Outlined.DeleteForever" OnClick="DeleteDrafts" hidden=@(!gvm.IsAdmin) />
             </MudTooltip>
         </MudToolBar>
         <MudSpacer />
@@ -119,4 +122,10 @@
     }
 
     MudTable<ServiceRequestListDto> table;
+
+    async Task DeleteDrafts()
+    {
+        await gvm.DeleteDrafts();
+        await table.ReloadServerData();
+    }
 }

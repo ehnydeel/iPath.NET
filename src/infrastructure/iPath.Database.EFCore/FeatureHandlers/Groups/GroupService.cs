@@ -220,6 +220,19 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
 
         await db.SaveChangesAsync(ct);
     }
+
+
+    public async Task DeleteGroupDraftsAsync(Guid groupId, CancellationToken ct = default)
+    {
+        if (sess.IsAdmin)
+        {
+            var group = await db.Groups.FirstOrDefaultAsync(g => g.Id == groupId, ct);
+            Guard.Against.NotFound(groupId, group);
+
+            await db.ServiceRequests.Where(x => x.IsDraft && x.GroupId == group.Id)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(b => b.DeletedOn, DateTime.UtcNow), ct);
+        }
+    }
     #endregion
 }
 

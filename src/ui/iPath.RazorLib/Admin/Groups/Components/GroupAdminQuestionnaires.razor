@@ -22,6 +22,7 @@ else
         </ToolBarContent>
         <Columns>
             <PropertyColumn Property="q => q.NameAndId" Title="Name" />
+            <PropertyColumn Property="q => q.Filter" Title="Body Site" />
             @foreach (var e in Usages)
             {
                 <TemplateColumn Title="@e.ToString()">
@@ -59,7 +60,7 @@ else
                 var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.qId);
                 if (item is null)
                 {
-                    item = new GroupQuestionnareModel(q.qId, q.QuestinnaireId, q.QuestinnaireName, Model.Id);
+                    item = new GroupQuestionnareModel(q.qId, q.QuestinnaireId, q.QuestinnaireName, q.Settings?.BodySiteFilter?.ConceptCodesString, Model.Id);
                     Items.Add(item);
                 }
                 item.Usage[q.Usage] = true;
@@ -74,7 +75,7 @@ else
             var item = Items.FirstOrDefault(x => x.QuestionnaireId == selectedQ.Id);
             if (item is null)
             {
-                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, selectedQ.Name, Model.Id);
+                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, selectedQ.Name, selectedQ.Filter, Model.Id);
                 Items.Add(item);
             }
             selectedQ = null;

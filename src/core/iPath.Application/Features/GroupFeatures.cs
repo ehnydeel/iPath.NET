@@ -50,6 +50,7 @@ public interface IGroupService
     Task<GroupListDto> CreateGroupAsync(CreateGroupCommand cmd, CancellationToken ct = default);
     Task UpdateGroupAsync(UpdateGroupCommand cmd, CancellationToken ct = default);
     Task DeleteGroupAsync(DeleteGroupCommand  cmd, CancellationToken ct = default);
+    Task DeleteGroupDraftsAsync(Guid groupId, CancellationToken ct = default);
 
 
     Task<GroupAssignedToCommunityEvent> AssignGroupToCommunityAsync(AssignGroupToCommunityCommand cmd, CancellationToken ct = default);
@@ -111,6 +112,7 @@ public record DeleteGroupCommand(Guid Id)
 {
     public string ObjectName => nameof(Group);
 }
+
 
 public class UpdateGroupCommand
     // : IRequest<UpdateGroupCommand, Task>, IEventInput

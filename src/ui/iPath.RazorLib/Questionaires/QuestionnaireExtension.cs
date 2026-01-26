@@ -18,7 +18,7 @@ public static class QuestionnaireExtension
             await coding.LoadCodeSystem();
 
             var allForms = list.Where(q => q.Usage == qUsage);
-            return allForms.Where(q => coding.InConceptFilter(BodySiteCode, q.Settings.BodySiteFilter)).ToList();
+            return allForms.Where(q => coding.InConceptFilter(BodySiteCode, q.Settings?.BodySiteFilter)).ToList();
         }
     }
 }

@@ -23,7 +23,7 @@ public partial class EditGroupQuestionnairesDialog(IPathApi api, IStringLocalize
             var item = Items.FirstOrDefault(x => x.QuestionnaireId == q.qId);
             if (item is null)
             {
-                item = new GroupQuestionnareModel(q.qId, q.QuestinnaireId, q.QuestinnaireName, Model.Id);
+                item = new GroupQuestionnareModel(q.qId, q.QuestinnaireId, q.QuestinnaireName, q.Settings?.BodySiteFilter?.ConceptCodesString, Model.Id);
             }
             item.Usage[q.Usage] = true;
         }
@@ -36,7 +36,7 @@ public partial class EditGroupQuestionnairesDialog(IPathApi api, IStringLocalize
             var item = Items.FirstOrDefault(x => x.QuestionnaireId == selectedQ.Id);
             if (item is null)
             {
-                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, selectedQ.Name , Model.Id);
+                item = new GroupQuestionnareModel(selectedQ.Id, selectedQ.QuestionnaireId, selectedQ.Name, selectedQ.Filter, Model.Id);
                 Items.Add(item);
             }
             selectedQ = null;

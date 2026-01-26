@@ -18,6 +18,7 @@
             <MudTh>@T["Annotation on any case"]</MudTh>
             <MudTh>@T["Annotation on my case"]</MudTh>
             <MudTh></MudTh>
+            <MudTh>@T["Body Site"]</MudTh>
         </MudTHeadRow>
     </HeaderContent>
     <RowTemplate>
@@ -29,6 +30,9 @@
         <MudTd DataLabel="NewAnnotationOnMyCase"><MudCheckBox @bind-Value="@context.NewAnnotationOnMyCase" /></MudTd>
         <MudTd>
             <MudIconButton Icon="@context.SettingsIcon" Size="Size.Small" OnClick=@(() => ShowBodySiteFilter(context)) />
+        </MudTd>
+        <MudTd>
+            <MudText Typo="Typo.body2">@context.Settings?.BodySiteFilter?.ConceptCodesString</MudText>
         </MudTd>
     </RowTemplate>
 </MudTable>

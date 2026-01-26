@@ -314,6 +314,7 @@ public class CommunityQuestionnareModel
 
     public string Id { get; init; }
     public string Name { get; init; }
+    public string Filter { get; init; }
 
     public string NameAndId => $"{Name} [{Id}]";
 
@@ -321,11 +322,12 @@ public class CommunityQuestionnareModel
 
     public Dictionary<eQuestionnaireUsage, bool> Usage = new();
 
-    public CommunityQuestionnareModel(Guid QuestionnaireId, string Id, string Name, Guid CommunityId)
+    public CommunityQuestionnareModel(Guid QuestionnaireId, string Id, string Name, string? Filter, Guid CommunityId)
     {
         this.QuestionnaireId = QuestionnaireId;
         this.Id = Id;
         this.Name = Name;
+        this.Filter = Filter ?? "";   
         this.CommunityId = CommunityId;
 
         foreach (var e in QuestionnairesViewModel.Usages)

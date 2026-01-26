@@ -5,8 +5,9 @@ namespace iPath.Blazor.Componenents.Groups;
 
 public class GroupViewModel(IPathApi api,
     AppState appState,
-    ISnackbar snackbar, 
+    ISnackbar snackbar,
     IDialogService dialog,
+    IStringLocalizer T,
     ServiceRequestViewModel nvm) : IViewModel
 {
     public GroupDto Model { get; private set; }
@@ -41,6 +42,26 @@ public class GroupViewModel(IPathApi api,
                 snackbar.ShowIfError(resp);
                 await LoadGroup(Model.Id);
             }
+        }
+    }
+
+
+
+    public bool IsAdmin => appState.IsAdmin;
+
+    public async Task DeleteDrafts()
+    {
+        if (Model is not null)
+        {
+            bool? result = await dialog.ShowMessageBoxAsync(
+                            T["Warning"],
+                            T["Are you sure that you want to delete all drafts in this group !"],
+                            yesText: T["Yes"], cancelText: T["Cancel"]);
+            if (result is null)
+                return;
+
+            var resp = await api.DeleteGroupDrafts(Model.Id);
+            snackbar.ShowIfError(resp);
         }
     }
 }
