@@ -28,7 +28,7 @@
         <MudTd DataLabel="NewAnnotation"><MudCheckBox @bind-Value="@context.NewAnnotation" /></MudTd>
         <MudTd DataLabel="NewAnnotationOnMyCase"><MudCheckBox @bind-Value="@context.NewAnnotationOnMyCase" /></MudTd>
         <MudTd>
-            <MudIconButton Icon="@context.SettingsIcon" Size="Size.Small" OnClick=@(() => ShowSettings(context)) />
+            <MudIconButton Icon="@context.SettingsIcon" Size="Size.Small" OnClick=@(() => ShowBodySiteFilter(context)) />
         </MudTd>
     </RowTemplate>
 </MudTable>

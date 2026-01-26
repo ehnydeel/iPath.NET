@@ -1,7 +1,7 @@
 ﻿
 using System.Diagnostics;
 
-namespace iPath.Domain.Entities.Base;
+namespace iPath.Domain.Entities;
 
 
 [DebuggerDisplay("Filter - {ConceptCodesString}")]

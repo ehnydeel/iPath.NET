@@ -8,7 +8,7 @@
 <MudBreadcrumbs Items="vm.BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="mt-2"
-         PanelClass="pa-6" Color="Color.Info" IconColor="Color.Surface"
+         TabPanelsClass="pa-6" Color="Color.Info" IconColor="Color.Surface"
          @bind-ActivePanelIndex="panelIndex">
     <MudTabPanel Text=@T["Profile"] Icon="@Icons.Material.Filled.Settings">
         <UserProfileAdmin User="@vm.SelectedUser" />
@@ -45,7 +45,8 @@
             {
                 nm.NavigateTo("admin/users");
                 return;
-            };
+            }
+            ;
             StateHasChanged();
         }
 

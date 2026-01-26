@@ -24,9 +24,12 @@ public class UpdateUserNotificationsHandler(iPathDbContext db, IMediator mediato
         foreach (var entity in list)
         {
             var dto = request.Notifications.FirstOrDefault(n => n.GroupId == entity.GroupId);
-            entity.NotificationSource = dto.Source;
-            entity.NotificationTarget = dto.Tartget;
-            entity.NotificationSettings = dto.Settings;
+            if (dto is not null)
+            {
+                entity.NotificationSource = dto.Source;
+                entity.NotificationTarget = dto.Tartget;
+                entity.NotificationSettings = dto.Settings;
+            }
         }
 
         // User is derived from Identity User and thus does not have domain events => save events directly

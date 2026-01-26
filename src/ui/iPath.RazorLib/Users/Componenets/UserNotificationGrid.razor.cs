@@ -1,5 +1,5 @@
+using Humanizer;
 using iPath.Blazor.Componenents.Admin.Users;
-using System.Diagnostics.CodeAnalysis;
 
 namespace iPath.Blazor.Componenents.Users;
 
@@ -55,8 +55,29 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, IPathApi api, I
         {
             var p = new DialogParameters<NotificationSettingsDialog> { { x => x.Model, model.Settings } };
             var o = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
-            var dlg = dialog.ShowAsync<NotificationSettingsDialog>("Settings", options: o, parameters: p);
+            var dlg = await dialog.ShowAsync<NotificationSettingsDialog>("Settings", options: o, parameters: p);
             model.UpdateHasSettings(true);
+            StateHasChanged();
+        }
+    }
+
+    async Task ShowBodySiteFilter(UserNotificationModel model)
+    {
+        if (model is not null)
+        {
+            model.Settings ??= new();
+
+            var p = new DialogParameters<NotificationBodySiteFilterDialog> { { x => x.Model, model } };
+            var o = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+            var dlg = await dialog.ShowAsync<NotificationBodySiteFilterDialog>("Settings", options: o, parameters: p);
+
+            var r = await dlg.Result;
+            if (r is not null)
+            {
+                await vm.UpdateNotifications(model);
+                model.UpdateHasSettings(true);
+            }
+
             StateHasChanged();
         }
     }
@@ -87,7 +108,7 @@ public class UserNotificationModel
     public Guid GroupId => Dto.GroupId;
     public string Groupname => Dto.Groupname;
 
-    public NotificationSettings Settings { get; private set; }
+    public NotificationSettings Settings { get; set; }
     private NotificationSettings _origSettings;
 
     public bool NewCase { get; set; }
@@ -153,4 +174,6 @@ public class UserNotificationModel
         var res = Dto with { Source = Source, Tartget = Target, Settings = this.Settings };
         return res;
     }
+
+    public Guid UserId => Dto.UserId;
 }

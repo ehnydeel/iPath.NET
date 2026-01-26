@@ -1,6 +1,6 @@
 ﻿@using Microsoft.Extensions.DependencyInjection
 @using iPath.Application.Fhir
-@using iPath.Domain.Entities.Base
+
 
 @namespace iPath.Blazor.Componenents.Shared.Coding
 
@@ -14,7 +14,7 @@
 
     </MudStack>
     <MudDivider />
-    @if (true || RendererInfo.IsInteractive)
+    @if (RendererInfo.IsInteractive)
     {
         <CodingTreeFilter TreeItems="BodySiteCodes" @ref="_treeView" SelectionChanged="OnChange" />
 

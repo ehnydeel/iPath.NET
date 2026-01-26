@@ -1,6 +1,4 @@
-﻿using iPath.Domain.Entities.Base;
-
-namespace iPath.Domain.Entities;
+﻿namespace iPath.Domain.Entities;
 
 public class QuestionnaireSettings
 {

@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using iPath.Blazor.Componenents.Users;
 using Microsoft.Extensions.Caching.Memory;
 using Refit;
 using System.Runtime.CompilerServices;
@@ -295,6 +296,10 @@ public class UserAdminViewModel(IPathApi api,
     public async Task UpdateCommunityMemberships(UpdateCommunityMembershipCommand cmd)
         => await ProcessUserDtoQuery(api.UpdateCommunityMemberships(cmd));
 
+
+    public async Task UpdateNotifications(UserNotificationModel model)
+        => await UpdateNotifications(new UpdateUserNotificationsCommand(UserId: model.UserId, Notifications: new[] { model.ToDto() } ));
+        
     public async Task UpdateNotifications(UpdateUserNotificationsCommand cmd)
         => await ProcessUserDtoQuery(api.UpdateUserNotification(cmd));
 

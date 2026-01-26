@@ -1,0 +1,73 @@
+﻿@namespace iPath.Blazor.Componenents.Users
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Notification Preferences: @Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="6" sm="6">
+                <MudSwitch @bind-Value="Model.Settings.DailyEmailSummary" Label=@T["Send email notifications as daily summany"] Color="Color.Success" />
+            </MudItem>
+            <MudItem xs="6" sm="6">
+                <MudTimePicker @bind-Value="Model.Settings.SummaryEmailTime" Label=@T["Schedule daily email at"] Disabled=@(!Model.Settings.DailyEmailSummary)
+                               Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel="true" />
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-2" />
+
+        <MudSwitch @bind-Value="HasBodySiteFilter" Label=@T["Body site filter active"] Color="Color.Success" />
+        @if (HasBodySiteFilter)
+        {
+            <TopoTreeFilter Filter="@Model.Settings.BodySiteFilter" @ref="filterView" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSavedHandler">Save</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="@(() => MudDialog.Close())">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public UserNotificationModel Model { get; set; }
+
+    TopoTreeFilter filterView;
+
+    private bool HasBodySiteFilter = false;
+
+    protected override void OnInitialized()
+    {
+        HasBodySiteFilter = Model?.Settings?.BodySiteFilter is not null;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Model is not null)
+        {
+            Model.Settings ??= new();
+        }
+    }
+
+    void OnSavedHandler()
+    {
+        if (!HasBodySiteFilter)
+        {
+            Model.Settings.BodySiteFilter = null;
+        }
+        else
+        {
+            filterView.SaveFilter();
+            Model.Settings.BodySiteFilter = filterView.Filter;
+        }
+
+        MudDialog.Close(true);
+    }
+}

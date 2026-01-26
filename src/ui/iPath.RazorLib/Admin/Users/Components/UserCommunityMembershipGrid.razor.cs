@@ -17,7 +17,7 @@ public partial class UserCommunityMembershipGrid(CommunityAdminViewModel cvm, Us
     List<CommunityMemberModel>? activeMemberShips = null;
 
 
-    Color SaveButtonColor => allMemberShips.Any(m => m.HasChange) ? Color.Primary : Color.Default;
+    Color SaveButtonColor => allMemberShips is not null && allMemberShips.Any(m => m.HasChange) ? Color.Primary : Color.Default;
 
 
 

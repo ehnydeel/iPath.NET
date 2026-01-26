@@ -1,6 +1,3 @@
-using iPath.Domain.Entities.Base;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace iPath.Blazor.Componenents.Shared.Coding;
 
 public partial class CodingFilterView(IServiceProvider sp)

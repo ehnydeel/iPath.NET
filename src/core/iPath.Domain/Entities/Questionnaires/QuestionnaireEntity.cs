@@ -1,5 +1,4 @@
-﻿using iPath.Domain.Entities.Base;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace iPath.Domain.Entities;
 

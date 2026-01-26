@@ -1,4 +1,3 @@
-using iPath.Domain.Entities.Base;
 using System.Diagnostics;
 
 namespace iPath.Domain.Entities;
@@ -21,7 +20,7 @@ public class GroupMember : BaseEntity
     public eNotificationSource NotificationSource { get; set; } = eNotificationSource.None;
     public eNotificationTarget NotificationTarget { get; set; } = eNotificationTarget.None;
 
-    public NotificationSettings? NotificationSettings { get; set; }
+    public NotificationSettings? NotificationSettings { get; set; } = new();
 }
 
 
