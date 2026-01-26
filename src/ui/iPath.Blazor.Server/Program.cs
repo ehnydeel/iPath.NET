@@ -228,7 +228,7 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(iPath.Blazor.Client._Imports).Assembly)
     .AddAdditionalAssemblies(typeof(iPath.RazorLib.Meta).Assembly);
 
-app.MapIPathApi();
+app.MapIPathApi(builder.Configuration);
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
