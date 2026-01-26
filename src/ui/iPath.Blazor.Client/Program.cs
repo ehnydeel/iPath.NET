@@ -24,7 +24,8 @@ try
 }
 catch (Exception ex)
 {
-    throw ex;
+    Console.WriteLine(ex.ToString());
+    // throw ex;
 }
 
 
@@ -36,6 +37,8 @@ builder.Services.AddAuthenticationStateDeserialization();
 
 builder.Services.AddTransient<baseAuthDelegationHandler>();
 
-await builder.Services.AddRazorLibServices(builder.HostEnvironment.BaseAddress, true);
+var baseAddress = builder.Configuration["BaseAddress"] ?? builder.HostEnvironment.BaseAddress;
+Console.WriteLine("Blazor WASM starting with Base: " + baseAddress);
+await builder.Services.AddRazorLibServices(baseAddress, true);
 
 await builder.Build().RunAsync();
