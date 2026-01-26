@@ -27,10 +27,11 @@ public static class MapEndpoints
 
         // OpenAPI Documentation
         var baseAddress = config["BaseAddress"];
+        Console.WriteLine("Starting openAPI on " + baseAddress);
         app.MapOpenApi("/openapi/v1.json");
         app.MapScalarApiReference(opts =>
         {
-            if (!string.IsNullOrEmpty(baseAddress))  opts.BaseServerUrl = baseAddress;
+            if (!string.IsNullOrEmpty(baseAddress)) opts.BaseServerUrl = baseAddress;
         });
 
         return route;
