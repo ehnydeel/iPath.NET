@@ -119,7 +119,6 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 
 
-
 var app = builder.Build();
 var opts = app.Services.GetRequiredService<IOptions<iPathConfig>>();
 

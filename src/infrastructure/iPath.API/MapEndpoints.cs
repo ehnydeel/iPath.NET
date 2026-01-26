@@ -1,6 +1,8 @@
 ﻿using iPath.API.Endpoints;
 using iPath.API.Middleware;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 
 namespace iPath.API;
@@ -29,9 +31,18 @@ public static class MapEndpoints
         var baseAddress = config["BaseAddress"];
         Console.WriteLine("Starting openAPI on " + baseAddress);
         app.MapOpenApi("/openapi/v1.json");
-        app.MapScalarApiReference(opts =>
+        app.MapScalarApiReference((opts, httpContext) =>
         {
-            if (!string.IsNullOrEmpty(baseAddress)) opts.BaseServerUrl = baseAddress;
+            if (!string.IsNullOrEmpty(baseAddress))
+            {
+                opts.Servers = [];
+                opts.Servers.Add(new ScalarServer(baseAddress, ""));
+                opts.BaseServerUrl = baseAddress;
+            }
+            opts.BaseServerUrl = "http://xxx/";
+
+            opts.WithTitle($"API for {httpContext.User.Identity?.Name}");
+            opts.PreserveSchemaPropertyOrder();
         });
 
         return route;
