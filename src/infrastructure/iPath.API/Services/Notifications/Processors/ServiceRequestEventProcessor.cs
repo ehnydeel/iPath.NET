@@ -3,6 +3,7 @@ using iPath.Domain.Notificxations;
 using iPath.EF.Core.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace iPath.API.Services.Notifications.Processors;
 
@@ -19,7 +20,12 @@ namespace iPath.API.Services.Notifications.Processors;
  */
 
 
-public class ServiceRequestEventProcessor(iPathDbContext db, INotificationQueue queue, [FromKeyedServices("icdo")] CodingService coding) : IServiceRequestEventProcessor
+public class ServiceRequestEventProcessor(
+    iPathDbContext db,
+    ILogger<ServiceRequestEventProcessor> logger,
+    INotificationQueue queue,
+    [FromKeyedServices("icdo")] CodingService coding)
+    : IServiceRequestEventProcessor
 {
     public async Task ProcessEvent(ServiceRequestEvent evt, CancellationToken ct)
     {
@@ -47,12 +53,9 @@ public class ServiceRequestEventProcessor(iPathDbContext db, INotificationQueue 
                         if (evt is AnnotationCreatedEvent)
                         {
                             // For NewAnnotationOnMyCase => filter by case owner 
-                            if (s.NotificationSource.HasFlag(eNotificationSource.NewAnnotationOnMyCase))
+                            if (s.NotificationSource.HasFlag(eNotificationSource.NewAnnotationOnMyCase) && (evt.ServiceRequest.OwnerId == s.UserId))
                             {
-                                if (evt.ServiceRequest.OwnerId == s.UserId)
-                                {
-                                    await Enqueue(eNodeNotificationType.NewAnnotation, evt, s, ct);
-                                }
+                                await Enqueue(eNodeNotificationType.NewAnnotation, evt, s, ct);
                             }
                             else if (s.NotificationSource.HasFlag(eNotificationSource.NewAnnotation))
                             {
@@ -101,11 +104,19 @@ public class ServiceRequestEventProcessor(iPathDbContext db, INotificationQueue 
         }
     }
 
-    protected async Task Enqueue(eNodeNotificationType t, ServiceRequestEvent n, eNotificationTarget target, bool dailySummary, Guid ReceiverId, CancellationToken ct)
+    protected async Task Enqueue(eNodeNotificationType t, ServiceRequestEvent evt, eNotificationTarget target, bool dailySummary, Guid ReceiverId, CancellationToken ct)
     {
-        var entity = Notification.Create(t, target, false, ReceiverId, n);
-        await db.NotificationQueue.AddAsync(entity, ct);
-        await db.SaveChangesAsync(ct);
-        await queue.EnqueueAsync(entity);
+        try
+        {
+            var entity = Notification.Create(t, target, false, ReceiverId, evt.ServiceRequest.Id);
+            await db.NotificationQueue.AddAsync(entity, ct);
+            await db.SaveChangesAsync(ct);
+            // enque for publishing
+            await queue.EnqueueAsync(entity.Id);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+        }
     }
 }

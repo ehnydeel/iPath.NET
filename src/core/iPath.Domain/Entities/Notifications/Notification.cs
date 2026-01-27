@@ -12,11 +12,14 @@ public class Notification : BaseEntity
     public Guid UserId {  get; private set; }
     public User User { get; private set; }
 
+    public Guid? ServiceRequestId { get; private set; }
+    public ServiceRequest? ServiceRequest { get; private set; }
+
     public eNodeNotificationType EventType { get; private set; } = eNodeNotificationType.None;
     public eNotificationTarget Target { get; private set; } = eNotificationTarget.None;
     public bool DailySummary { get; private set; }
 
-    public string Data { get; private set; }
+    public string? Data { get; private set; }
     public string? ErrorMessage { get; private set; }
 
 
@@ -41,17 +44,8 @@ public class Notification : BaseEntity
         };
     }
 
-    public static Notification Create(eNodeNotificationType type, eNotificationTarget target, bool dailySummary, Guid userId, ServiceRequestEvent evt)
+    public static Notification Create(eNodeNotificationType type, eNotificationTarget target, bool dailySummary, Guid userId, Guid ServiceRequestId)
     {
-        var options = new JsonSerializerOptions
-        {
-            IncludeFields = false,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
-        var context = new NodeNofiticationSerializerContext(options);
-        var json = JsonSerializer.Serialize(evt, typeof(ServiceRequestEvent), context);
-
         return new Notification
         {
             Id = Guid.CreateVersion7(),
@@ -61,7 +55,7 @@ public class Notification : BaseEntity
             Target = target,
             DailySummary = dailySummary,
             Status = NotificationStatus.Pending,
-            Data = json
+            ServiceRequestId = ServiceRequestId 
         };
     }
 

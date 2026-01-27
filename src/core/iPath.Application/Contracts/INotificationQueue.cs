@@ -2,9 +2,9 @@
 
 public interface INotificationQueue
 {
-    ValueTask EnqueueAsync(Notification item);
+    ValueTask EnqueueAsync(Guid id);
 
-    ValueTask<Notification> DequeueAsync(CancellationToken cancellationToken);
+    ValueTask<Guid> DequeueAsync(CancellationToken cancellationToken);
 
     int QueueSize { get; }
 }

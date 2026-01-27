@@ -3,6 +3,7 @@ using iPath.API.Services;
 using iPath.API.Services.Email;
 using iPath.API.Services.Notifications;
 using iPath.API.Services.Notifications.Processors;
+using iPath.API.Services.Notifications.Publisher;
 using iPath.API.Services.Storage;
 using iPath.API.Services.Thumbnail;
 using iPath.API.Services.Uploads;
@@ -79,6 +80,9 @@ public static class APIServicesRegistration
         services.AddSingleton<INotificationQueue>(ctx => new NotificationQueue(100));
         services.AddHostedService<Services.Notifications.ServiceRequestEventProcessor>();
         services.AddScoped<IServiceRequestEventProcessor, Services.Notifications.Processors.ServiceRequestEventProcessor>();
+
+        services.AddScoped<INotificationPublisher, EmailNotificationPublisher>();
+        services.AddHostedService<NotificationPublisher>();
 
 
         // Upload Handling

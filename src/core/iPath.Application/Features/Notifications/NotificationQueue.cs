@@ -13,11 +13,11 @@ namespace iPath.Application.Features.Notifications;
 
 public class NotificationQueue : INotificationQueue
 {
-    private readonly Channel<Notification> _channel;
+    private readonly Channel<Guid> _channel;
 
     public NotificationQueue(int maxQueueSize)
     {
-        _channel = Channel.CreateBounded<Notification>(new BoundedChannelOptions(maxQueueSize)
+        _channel = Channel.CreateBounded<Guid>(new BoundedChannelOptions(maxQueueSize)
         {
             SingleReader = false,
             SingleWriter = false,
@@ -25,17 +25,14 @@ public class NotificationQueue : INotificationQueue
         });
     }
 
-    public async ValueTask EnqueueAsync(Notification item)
+    public async ValueTask EnqueueAsync(Guid item)
     {
-        if (item != null)
+        if (item != Guid.Empty)
             await _channel.Writer.WriteAsync(item);
     }
 
-    public async ValueTask<Notification> DequeueAsync(CancellationToken cancellationToken)
-    {
-        var item = await _channel.Reader.ReadAsync(cancellationToken);
-        return item;
-    }
+    public async ValueTask<Guid> DequeueAsync(CancellationToken cancellationToken)
+        => await _channel.Reader.ReadAsync(cancellationToken);
 
     public int QueueSize => _channel.Reader.Count;
 }

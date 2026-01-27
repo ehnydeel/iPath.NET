@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Notification</title>
+    <style>
+        .cont {
+            width: 100vh;
+            border: 1px solid;
+            margin: 1em;
+        }
+        .title {
+            background-color: grey;
+            font-weight: bold;
+            padding: 8px;
+            border-bottom: 1px inset;
+        }
+        .sender {
+            background-color: grey;
+            padding: 8px;
+            border-bottom: 1px solid;
+        }
+        .desc{
+            padding: 1em;
+        }
+        .comments {
+            border-top: 1px inset;
+            margin-top: 1em;
+            padding: 1em;
+        }
+    </style>
+</head>
+    <body>
+        <b>{msg}</b>
+
+        <div class="cont">
+            <div class="title">{title}</div>
+            <div class="sender">{sender}</div>
+            <div class="desc">{description}</div>
+
+            <div class="comments">
+                <div>Comments</div>
+                {comments}
+            </div>
+        </div>
+    </body>
+</html>

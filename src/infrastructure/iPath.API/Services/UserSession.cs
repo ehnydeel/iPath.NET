@@ -12,6 +12,8 @@ public sealed class UserSession(iPathDbContext db, UserManager<User> um, IMemory
     : IUserSession
 {
     private SessionUserDto? _user;
+
+
     public SessionUserDto? User
     {
         get
@@ -19,9 +21,15 @@ public sealed class UserSession(iPathDbContext db, UserManager<User> um, IMemory
             if (_user is null)
             {
                 var ctx = acc.HttpContext;
-                if (ctx.User.Identity.IsAuthenticated)
+                if (ctx is null)
                 {
-                    if (Guid.TryParse(ctx?.User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, out var userid)){
+                    // no http context => Server Side Worker
+                    _user = SessionUserDto.Server;
+                }
+                else if (ctx.User.Identity.IsAuthenticated)
+                {
+                    if (Guid.TryParse(ctx?.User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, out var userid))
+                    {
 
                         var cachekey = userid.ToString();
                         if (!cache.TryGetValue(cachekey, out _user))

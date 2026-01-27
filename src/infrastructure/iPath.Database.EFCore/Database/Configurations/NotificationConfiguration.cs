@@ -10,5 +10,9 @@ internal class NotificationConfiguration : IEntityTypeConfiguration<Notification
 
         builder.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId).IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(n => n.ServiceRequest).WithMany()
+            .HasForeignKey(n => n.ServiceRequestId).IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

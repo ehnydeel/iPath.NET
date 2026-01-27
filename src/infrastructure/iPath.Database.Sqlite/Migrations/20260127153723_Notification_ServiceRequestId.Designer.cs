@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using iPath.EF.Core.Database;
 
@@ -11,9 +12,11 @@ using iPath.EF.Core.Database;
 namespace iPath.Database.Sqlite.Migrations
 {
     [DbContext(typeof(iPathDbContext))]
-    partial class iPathDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260127153723_Notification_ServiceRequestId")]
+    partial class Notification_ServiceRequestId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -644,6 +647,7 @@ namespace iPath.Database.Sqlite.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Data")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ErrorMessage")
