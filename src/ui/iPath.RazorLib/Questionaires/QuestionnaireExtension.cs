@@ -1,16 +1,15 @@
 ﻿using Hl7.Fhir.Model;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace iPath.Blazor.Componenents.Questionaires;
 
 public static class QuestionnaireExtension
 {
-    private static IServiceProvider _sp;
+    private static CodingService _coding;
 
-    public static void Initialize(IServiceProvider serviceProvider)
-    {        _sp = serviceProvider;
-        
+    public static void Initialize(CodingService coding)
+    {
+        _coding = coding;
     }
 
     extension(IEnumerable<QuestionnaireForGroupDto> list)
@@ -19,16 +18,14 @@ public static class QuestionnaireExtension
         {
             try
             {
-                var coding = _sp.GetKeyedService<CodingService>("icdo");
-
-                await coding.LoadCodeSystem();
+                await _coding.LoadCodeSystem();
 
                 var allForms = list.Where(q => q.Usage == qUsage);
-                return allForms.Where(q => coding.InConceptFilter(BodySiteCode, q.Settings?.BodySiteFilter)).ToList();
+                return allForms.Where(q => _coding.InConceptFilter(BodySiteCode, q.Settings?.BodySiteFilter)).ToList();
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("QuestionnaireExtension.FilterAsync() exception: " + ex.Message);
             }
 
             return new List<QuestionnaireForGroupDto>();

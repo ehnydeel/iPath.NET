@@ -1,5 +1,4 @@
 using iPath.API;
-using iPath.Application.Fhir;
 using iPath.Blazor.Server;
 using iPath.Blazor.Server.Components;
 using iPath.Blazor.Server.Components.Account;

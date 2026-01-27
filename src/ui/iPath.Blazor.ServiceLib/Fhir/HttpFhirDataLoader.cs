@@ -52,10 +52,12 @@ public class HttpFhirDataLoader : IFhirDataLoader
             var resp = await http.GetAsync(id);
             if (resp.IsSuccessStatusCode)
             {
-                var pr = PipeReader.Create(resp.Content.ReadAsStream(), new StreamPipeReaderOptions(leaveOpen: false));
+                var json = await resp.Content.ReadAsStringAsync();
+                // var pr = PipeReader.Create(resp.Content.ReadAsStream(), new StreamPipeReaderOptions(leaveOpen: false));
 
                 var options = new JsonSerializerOptions().ForFhir(ModelInfo.ModelInspector);
-                return await JsonSerializer.DeserializeAsync<T>(pr, options, ct);
+                return JsonSerializer.Deserialize<T>(json, options);
+                // return await JsonSerializer.DeserializeAsync<T>(pr, options, ct);
             }
             else
             {

@@ -9,6 +9,7 @@ using iPath.Blazor.Componenents.Shared;
 using iPath.Blazor.Componenents.Users;
 using iPath.Blazor.Server;
 using iPath.Blazor.ServiceLib.Fhir;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Translations;
 using Refit;
@@ -63,6 +64,7 @@ public static class RazorLibServiceRegistration
 
         services.AddHttpClient("Fhir", cfg => cfg.BaseAddress = new Uri(baseAddress + "api/v1/fhir/"));
         services.AddSingleton<IFhirDataLoader, HttpFhirDataLoader>();
+
         services.AddKeyedSingleton<CodingService>("icdo", (sp, key) =>
         {
             return new CodingService(sp, "icdo");
@@ -72,8 +74,7 @@ public static class RazorLibServiceRegistration
         // DI for Extensions
         var sp = services.BuildServiceProvider();
         DocumentExtensions.Initialize(sp);
-        QuestionnaireExtension.Initialize(sp);
-
+        QuestionnaireExtension.Initialize(sp.GetKeyedService<CodingService>("icdo"));
 
         services.AddScoped<AppState>();
 
@@ -101,20 +102,4 @@ public static class RazorLibServiceRegistration
 
         return services;
     }
-
-    private static IServiceCollection AddViewModelsDynamic(this IServiceCollection services)
-    {
-        // Register all IViewModel
-        var types = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(p => typeof(IViewModel).IsAssignableFrom(p) && !p.IsAbstract);
-        foreach (var vm in types)
-        {
-            services.Add(new ServiceDescriptor(vm.GetType(), vm, ServiceLifetime.Scoped));
-        }
-
-        return services;
-    }
-
-
 }

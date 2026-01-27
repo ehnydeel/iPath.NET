@@ -14,26 +14,37 @@ public class ServiceRequestCreateWizzardViewModel(IServiceProvider sp, ServiceRe
 
     public string CodingService { get; private set; }
 
+    public Action OnInitialized { get; set; }
+
     public async Task InitializeAsync(string CodingService, string ValueSetId, CancellationToken ct = default)
     {
-        this.CodingService = CodingService;
-        _coding = sp.GetRequiredKeyedService<CodingService>(CodingService);
-        _loader = sp.GetRequiredService<IFhirDataLoader>();
-        _cache = sp.GetRequiredService<QuestionnaireCacheClient>();
-
-        await _coding.LoadCodeSystem();
-        await _coding.LoadValueSet(ValueSetId);
-        var vs = _coding.GetValueSetDisplay(ValueSetId);
-        var r = vs.DisplayTree;
-
-        if (r.Count == 1)
+        try
         {
-            RootCodes = r.First().Children;
+            this.CodingService = CodingService;
+            _coding = sp.GetRequiredKeyedService<CodingService>(CodingService);
+            _loader = sp.GetRequiredService<IFhirDataLoader>();
+            _cache = sp.GetRequiredService<QuestionnaireCacheClient>();
+
+            await _coding.LoadCodeSystem();
+            await _coding.LoadValueSet(ValueSetId);
+            var vs = _coding.GetValueSetDisplay(ValueSetId);
+            var r = vs.DisplayTree;
+
+            if (r.Count == 1)
+            {
+                RootCodes = r.First().Children;
+            }
+            else
+            {
+                RootCodes = r;
+            }
+            OnInitialized?.Invoke();
         }
-        else
+        catch (Exception ex)
         {
-            RootCodes = r;
+            throw ex;
         }
+
     }
 
     // shortcut to RequestDescription

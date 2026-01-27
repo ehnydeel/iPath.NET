@@ -372,3 +372,27 @@
         padding: 8px;
         background-color: var(--neutral-layer-2);
     }
+
+
+
+
+.ipath_coding_grouplistitem {
+    display: grid;
+    grid-template-columns: 90px 8fr;
+    align-items: start;
+    width: 100%;
+    margin-left: -2em;
+    border-bottom: 1px inset;
+    padding: 2px;
+}
+
+.ipath_coding_grouplist_code  {
+    padding: 0px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.ipath_coding_grouplist_display {
+    line-height: 1em;
+    padding: 3px;
+}

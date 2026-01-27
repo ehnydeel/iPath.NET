@@ -19,13 +19,20 @@
                             {
                                 <MudTreeViewItem Value="i">
                                     <BodyContent>
-                                        <div style="display: grid; grid-template-columns: 3fr 7fr; align-items: start; width: 100%">
-                                            <div><h3>@i.Code</h3></div>
-                                            <div>@i.Display </div>
+                                        <div class="ipath_coding_grouplistitem">
+                                            <div class="ipath_coding_grouplist_code">@i.Code</div>
+                                            <div class="ipath_coding_grouplist_display">@i.Display </div>
                                         </div>
                                     </BodyContent>
                                 </MudTreeViewItem>
                             }
+                        }
+                        else
+                        {
+                            <div style="padding: 4px;">
+                                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+                                <span>Loading ICD-O codes ... </span>
+                            </div>
                         }
                     </MudTreeView>
                 </MudItem>
@@ -157,31 +164,48 @@
 
     string AutoSelectText => wizzardVM.TopoAutoSelect ? T["auto-select ON"] : T["auto-select OFF"];
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await InitializeVm();
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+        if (!string.IsNullOrEmpty(ValueSetId))
+        {
+            await InitializeVm();
+        }
+    }
+
+    async Task InitializeVm()
+    {
         if (wizzardVM is null && RendererInfo.IsInteractive)
         {
             wizzardVM = new ServiceRequestCreateWizzardViewModel(sp, vm);
+            wizzardVM.OnInitialized += StateHasChanged;
+            wizzardVM.OnComplete += OnCompleted;
 
             if (!string.IsNullOrEmpty(ValueSetId))
             {
                 await wizzardVM.InitializeAsync(CodingService, ValueSetId);
-                wizzardVM.OnComplete += OnCompleted;
             }
         }
     }
 
     public void Dispose()
     {
+        wizzardVM.OnInitialized -= StateHasChanged;
         wizzardVM.OnComplete -= OnCompleted;
     }
 
-    bool isCompleted = false;
+    bool isComplete = false;
 
     void OnCompleted()
     {
-        isCompleted = true;
+        isComplete = true;
+        InvokeAsync(StateHasChanged);
     }
 
 

@@ -1,7 +1,6 @@
 ﻿using iPath.Application.Features.Documents;
 using iPath.Domain.Config;
 using Microsoft.Extensions.DependencyInjection;
-using System.Drawing;
 using Size = System.Drawing.Size;
 
 namespace iPath.Blazor.Componenents.Documents;
@@ -13,7 +12,14 @@ public static class DocumentExtensions
     // Call this once at app startup!
     public static void Initialize(IServiceProvider serviceProvider)
     {
-        cfg = serviceProvider.GetRequiredService<IOptions<iPathClientConfig>>().Value;
+        try
+        {
+            cfg = serviceProvider.GetRequiredService<IOptions<iPathClientConfig>>().Value;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
 

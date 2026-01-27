@@ -22,8 +22,7 @@ public class CodingService
     {
         logger = sp.GetRequiredService<ILogger<CodingService>>();
         loader = sp.GetRequiredService<IFhirDataLoader>();
-        var config = sp.GetRequiredService<IConfiguration>();
-        _codeSystemId = config[$"CodeSystems:{csKey}"] ?? csKey;
+        _codeSystemId = csKey;
     }
 
     public CodingService(ILogger<CodingService> logger, IFhirDataLoader loader, string codeSystemId)
@@ -32,7 +31,6 @@ public class CodingService
         this.loader = loader;
         _codeSystemId = codeSystemId;
     }
-
 
     public async Task LoadCodeSystem()
     {
