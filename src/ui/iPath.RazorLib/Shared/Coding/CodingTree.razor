@@ -1,8 +1,10 @@
 ﻿<MudTreeView T="CodeDisplay" Items="@TreeItems"
-             @bind-SelectedValue="Value" @bind-SelectedValue:after="OnValueChanged"   
+             @bind-SelectedValue="Value" @bind-SelectedValue:after="OnValueChanged"
+             ExpandOnClick="@ExpandOnClick"
              Hover="true" Dense="true" Color="Color.Tertiary">
     <ItemTemplate>
-        <MudTreeViewItem T="CodeDisplay" Items="@context.Children" @bind-Expanded="@context.Expanded" Value="@context.Value" Text="@context.Value.ToDisplay()" />
+        <MudTreeViewItem T="CodeDisplay" Items="@context.Children" @bind-Expanded="@context.Expanded"
+                         Value="@context.Value" Text="@context.Value.ToDisplay()" TextTypo="@Typo" />
     </ItemTemplate>
 </MudTreeView>
 
@@ -20,4 +22,10 @@
     {
         await ValueChanged.InvokeAsync(Value);
     }
+
+    [Parameter]
+    public Typo Typo { get; set; }
+
+    [Parameter]
+    public bool ExpandOnClick { get; set; }
 }

@@ -5,6 +5,7 @@ namespace iPath.Blazor.Componenents.Groups;
 
 public class GroupViewModel(IPathApi api,
     AppState appState,
+    GroupCache cache,
     ISnackbar snackbar,
     IDialogService dialog,
     IStringLocalizer T,
@@ -33,7 +34,7 @@ public class GroupViewModel(IPathApi api,
         if (Model is not null)
         {
             var p = new DialogParameters<GroupSettingsDialog> { { x => x.Model, Model.Settings } };
-            DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = false, NoHeader = false };
+            DialogOptions opts = new() { MaxWidth = MaxWidth.Medium, FullWidth = true, NoHeader = false };
             var d = await dialog.ShowAsync<GroupSettingsDialog>("Group Settings", parameters: p, options: opts);
             var r = await d.Result;
             if (r?.Data is GroupSettings m)
@@ -42,6 +43,7 @@ public class GroupViewModel(IPathApi api,
                 snackbar.ShowIfError(resp);
                 await LoadGroup(Model.Id);
             }
+            await cache.ClearGroup(Model.Id);
         }
     }
 

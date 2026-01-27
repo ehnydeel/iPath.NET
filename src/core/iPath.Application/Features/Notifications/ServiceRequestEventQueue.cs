@@ -12,11 +12,11 @@ namespace iPath.Application.Features.Notifications;
  * 
  */
 
-public class EventNotificationDispatcherQueue : IEventNotificationDispatcherQueue
+public class ServiceRequestEventQueue : IServiceRequestEventQueue
 {
     private readonly Channel<ServiceRequestEvent> _channel;
 
-    public EventNotificationDispatcherQueue(int maxQueueSize)
+    public ServiceRequestEventQueue(int maxQueueSize)
     {
         _channel = Channel.CreateBounded<ServiceRequestEvent>(new BoundedChannelOptions(maxQueueSize)
         {

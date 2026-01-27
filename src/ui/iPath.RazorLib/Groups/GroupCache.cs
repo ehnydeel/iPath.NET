@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Hl7.Fhir.Model;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace iPath.Blazor.Componenents.Groups;
@@ -34,5 +35,19 @@ public class GroupCache(IMemoryCache cache, IPathApi api, ILogger<GroupCache> lo
         }
 
         return null;
+    }
+
+    public async Task ClearGroup(Guid Id)
+    {
+        try
+        {
+            await _cacheLock.WaitAsync();
+            var key = $"group_{Id}";
+            cache.Remove(key);
+        }
+        finally
+        {
+            _cacheLock.Release();
+        }
     }
 }

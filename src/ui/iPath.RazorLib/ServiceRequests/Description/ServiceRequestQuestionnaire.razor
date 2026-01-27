@@ -2,13 +2,13 @@
 @inject ServiceRequestViewModel vm
 
 <MudExpansionPanels>
-    <MudExpansionPanel>
+    <MudExpansionPanel ExpandedChanged="OnExpanded">
         <TitleContent >
             <strong>@QName (@T["automatically generated text"])</strong>
             <div>@Model.Questionnaire.GeneratedText</div>
         </TitleContent>
         <ChildContent>
-            <QuestionnaireResponseView Data="Model.Questionnaire" />
+            <QuestionnaireResponseView Data="Model.Questionnaire" @ref="qv"/>
         </ChildContent>
     </MudExpansionPanel>
 </MudExpansionPanels>
@@ -17,11 +17,17 @@
     [Parameter]
     public RequestDescription Model { get; set; }
 
-    string QName;
+    string? QName;
+    QuestionnaireResponseView qv;
 
     protected override async Task OnInitializedAsync()
     {
         QName = await @vm.QuestionnaireName(Model?.Questionnaire?.QuestionnaireId, Model?.Questionnaire?.Version);
         QName ??= "generated text";
+    }
+
+    private async Task OnExpanded(bool args)
+    {
+        await qv.LoadDataAsync();
     }
 }

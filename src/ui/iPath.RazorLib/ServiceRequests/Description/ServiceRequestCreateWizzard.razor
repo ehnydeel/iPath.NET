@@ -64,7 +64,8 @@
                     {
                         <MudText>@T["please select a body region"]</MudText>
                     }
-                    <CodingTree @bind-Value="@wizzardVM.Topo" @bind-Value:after="OnTopoSelected" TreeItems="@wizzardVM.BodySiteCodes" />
+                    <CodingTree @bind-Value="@wizzardVM.Topo" @bind-Value:after="OnTopoSelected"
+                                TreeItems="@wizzardVM.BodySiteCodes" ExpandOnClick="true" />
                 </MudItem>
             </MudGrid>
         </MudStep>
@@ -73,37 +74,55 @@
                  HasError="@(wizzardVM.Step2Complete == false)">
 
             <MudStack>
-                <MudGrid>
-                    <MudItem xs="12" sm="12" md="4">
+                <MudGrid Spacing="1">
+                    <MudItem xs="6" sm="@PatInfoFieldSmWith">
                         <MudTextField Label=@T["Accession No"] @bind-Value="@wizzardVM.Data.AccessionNo"
                                       Placeholder=@T["your reference- or lab-number"]
-                                      HelperText=@T["if you want to enter your won reference/accession no, please make sure it does not contain any patient details"]
                                       Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <GenderSelect Label=@T["Gender"] @bind-Value="@wizzardVM.Data.PatientInfo.Gender" Dense="true"
+                    <MudItem xs="6" sm="@PatInfoFieldSmWith">
+                        <GenderSelect Label=@T["Gender"] @bind-Value="@wizzardVM.Data.PatientInfo.Gender"
+                                      Required="true" Dense="true"
                                       Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
                     </MudItem>
-                    <MudItem xs="12" sm="6" md="4">
-                        <MudNumericField @bind-Value="@wizzardVM.Data.PatientInfo.Age" Label=@T["Age (years)"] Min="0" Max="199"
+                    <MudItem xs="6" sm="@PatInfoFieldSmWith">
+                        <MudNumericField @bind-Value="@wizzardVM.Data.PatientInfo.Age" Label=@T["Age (years)"]
+                                         Required="true" Min="0" Max="199"
                                          Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
                     </MudItem>
+
+                    @if (wizzardVM.CaseTypeActive)
+                    {
+                        @if (wizzardVM.CaseTypes.IsEmpty())
+                        {
+                            <MudTextField Label=@T["Case Type"] @bind-Value="@wizzardVM.Data.CaseType"
+                                          Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel="true" />
+                        }
+                        else
+                        {
+                            <MudItem xs="6" sm="@PatInfoFieldSmWith">
+                                <CaseTypeLookup Label=@T["Case Type"] GroupId="wizzardVM.GroupId" @bind-Value="wizzardVM.Data.CaseType"
+                                                Clearable="true" Dense="true" CoerceValue="true"
+                                                Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+                            </MudItem>
+                        }
+                    }
                 </MudGrid>
 
+                <!--
+                <MudText Typo="Typo.subtitle1" Class="mt-4">@T["Clinical Information"]</MudText>
+                -->
+                <MudTextField @bind-Value="@wizzardVM.Data.Text" Label=@T["Clinical History"]
+                              Lines="3" Required="@RequireClinicalInfoText"
+                              HelperText=@T["please make sure it does not contain any sensitive patient details like name or exact date of birth"]
+                              Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
 
-                @if (wizzardVM.Data.Questionnaire is null)
+                @if (wizzardVM.Data.Questionnaire is not null)
                 {
-                    <IPathHeader Typo="Typo.subtitle1" Class="mt-4" Title=@T["Clinical Information"] />
-                    <MudTextField @bind-Value="@wizzardVM.Data.Text" Required="true" Label=@T["Clinical History"] Lines="8"
-                                  HelperText=@T["please make sure it does not contain any sensitive patient details like name or exact date of birth"]
-                                  Variant="Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
-                }
-                else
-                {
-                    @if (wizzardVM.validForms.Count > 0)
+                    @if (wizzardVM.validForms.Count > 1)
                     {
-                        <MudStack Row AlignItems="AlignItems.Center">
-                            <MudText>Questionnaire</MudText>
+                        <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+                            <MudText>Case Submittion Forms</MudText>
                             <MudToggleGroup Color="Color.Default" T="QuestionnaireForGroupDto" Size="Size.Small"
                                             @bind-Value="@wizzardVM.SelectedQ" @bind-Value:after="@wizzardVM.LoadQuestionnaireForm">
                                 @foreach (var q in wizzardVM.validForms)
@@ -113,7 +132,6 @@
                             </MudToggleGroup>
                         </MudStack>
                     }
-
 
                     <iPath.LHCForms.LhcForm @ref="qrForm" ReadOnly="false" OnAfterRendered="wizzardVM.LoadQuestionnaireForm" />
                 }
@@ -161,6 +179,9 @@
     }
 
     private ServiceRequestCreateWizzardViewModel wizzardVM;
+
+    private int PatInfoFieldSmWith => wizzardVM.CaseTypeActive ? 3 : 4;
+    private bool RequireClinicalInfoText => wizzardVM?.Data?.Questionnaire is null;
 
     string AutoSelectText => wizzardVM.TopoAutoSelect ? T["auto-select ON"] : T["auto-select OFF"];
 

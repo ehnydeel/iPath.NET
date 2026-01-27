@@ -6,7 +6,8 @@ namespace iPath.Blazor.Componenents.Admin.Groups;
 public class GroupAdminViewModel(IPathApi api,
     ISnackbar snackbar,
     IDialogService dialog,
-    IMemoryCache cache,
+    IMemoryCache memCache,
+    GroupCache grpCache,
     IStringLocalizer T,
     ILogger<GroupAdminViewModel> logger)
     : IViewModel
@@ -73,7 +74,7 @@ public class GroupAdminViewModel(IPathApi api,
         try
         {
             await _cacheLock.WaitAsync();
-            if (!cache.TryGetValue<IEnumerable<GroupListDto>>(groupListCacheKey, out var grouplist))
+            if (!memCache.TryGetValue<IEnumerable<GroupListDto>>(groupListCacheKey, out var grouplist))
             {
                 var query = new GetGroupListQuery { PageSize = null, AdminList = true };
                 var resp = await api.GetGroupList(query);
@@ -82,7 +83,7 @@ public class GroupAdminViewModel(IPathApi api,
                     grouplist = resp.Content.Items.OrderBy(g => g.Name);
 
                     var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                    cache.Set(groupListCacheKey, grouplist, opts);
+                    memCache.Set(groupListCacheKey, grouplist, opts);
                 }
             }
             return grouplist;
@@ -101,7 +102,7 @@ public class GroupAdminViewModel(IPathApi api,
 
     private void DeleteGroupListCache()
     {
-        cache.Remove(groupListCacheKey);
+        memCache.Remove(groupListCacheKey);
     }
 
     public async Task<IEnumerable<GroupListDto>> Search(string? term, Guid? communityId, CancellationToken ct)
@@ -242,6 +243,8 @@ public class GroupAdminViewModel(IPathApi api,
             snackbar.AddWarning(resp.ErrorMessage);
             return false;
         }
+
+        await grpCache.ClearGroup(cmd.Id);
         return true;
     }
 

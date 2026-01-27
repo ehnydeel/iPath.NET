@@ -1,7 +1,6 @@
 ﻿using Hl7.Fhir.Model;
 using iPath.Application.Coding;
 using iPath.Application.Fhir;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -49,6 +48,8 @@ public class CodingService
         var vs = await loader.GetResourceAsync<ValueSet>($"ValueSet/{id}");
         if (vs is not null)
             LoadValueSet(vs, id);
+        else
+            logger.LogWarning("ValueSet {id} not found", id);
     }
 
 

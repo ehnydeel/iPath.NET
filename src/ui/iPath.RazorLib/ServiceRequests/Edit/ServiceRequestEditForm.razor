@@ -21,6 +21,7 @@
 
                 @if (useQuestionnaire)
                 {
+                    <MudTextField @bind-Value="Model.Text" Label=@T["Clinical information"] Lines="4" Variant="Variant" ShrinkLabel="true" Margin="Margin.Dense" />
                     <iPath.LHCForms.LhcForm @ref="lhcForm" ReadOnly="false" />
                 }
                 else if (useHtmlEditor)
@@ -34,30 +35,34 @@
                 }
                 else
                 {
-                    <MudTextField @bind-Value="Model.Text" Lines="6" AutoGrow="true" Variant="Variant" />
+                    <MudTextField @bind-Value="Model.Text" Label=@T["Clinical information"] Lines="6" Variant="@Variant" />
                 }
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="4">
-            <OwnerLookup Label=@T["Sender"] @bind-Value="Owner" @bind-Value:after="OnOwnerChanged" GroupId="vm.SelectedRequest.GroupId"
-                         Variant="Variant" Margin="@Margin" ShrinkLabel="true" Disabled="vm.DisableSenderChange" />
+            <OwnerLookup Label=@T["Sender"] @bind-Value="Owner" @bind-Value:after="OnOwnerChanged" GroupId="@vm.SelectedRequest.GroupId"
+                         Variant="@Variant" Margin="@Margin" ShrinkLabel="true" Disabled="vm.DisableSenderChange" />
 
-            @if (vm.ActiveGroup.Settings.UseCaseTypeField)
+            <MudTextField Label=@T["Accession No"] Placeholder=@T["Sender reference no"] @bind-Value="Model.AccessionNo"
+                          Variant="@Variant" Margin="@Margin" ShrinkLabel="true" />
+
+            @if (!vm.ActiveGroup.CaseTypeActive)
             {
                 @if (vm.ActiveGroup.Settings.CaseTypes.IsEmpty())
                 {
-                    <MudTextField Label=@T["Case Type"] @bind-Value="Model.CaseType" Variant="Variant" Margin="@Margin" ShrinkLabel="true" />
+                    <MudTextField Label=@T["Case Type"] @bind-Value="Model.CaseType" Variant="@Variant" Margin="@Margin" ShrinkLabel="true" />
                 }
                 else
                 {
-                    <CaseTypeLookup Label=@T["Case Type"] GroupId="GroupId" @bind-Value="Model.CaseType" Variant="Variant"
+                    <CaseTypeLookup Label=@T["Case Type"] GroupId="GroupId" @bind-Value="Model.CaseType" Variant="@Variant"
                                     Clearable="true" Dense="true" CoerceValue="true" Margin="@Margin" ShrinkLabel="true" />
                 }
             }
 
-            <MudTextField Label=@T["Accession No"] Placeholder=@T["Sender reference no"] @bind-Value="Model.AccessionNo" Variant="Variant" Margin="@Margin" ShrinkLabel="true" />
-
-            <DescriptionBodySite Model="Model" Group="vm.ActiveGroup" Margin="@Margin" />
+            @if (vm.ActiveGroup.Settings.DescriptionWithBodySite)
+            {
+                <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Concept="Model.BodySite" Margin="@Margin" />
+            }
         </MudItem>
     </MudGrid>
 </MudForm>

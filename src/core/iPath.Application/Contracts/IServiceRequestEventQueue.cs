@@ -1,6 +1,6 @@
 ﻿namespace iPath.Application.Contracts;
 
-public interface IEventNotificationDispatcherQueue
+public interface IServiceRequestEventQueue
 {
     int QueueSize { get; }
 

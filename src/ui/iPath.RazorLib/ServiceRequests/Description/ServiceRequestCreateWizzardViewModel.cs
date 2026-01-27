@@ -87,6 +87,24 @@ public class ServiceRequestCreateWizzardViewModel(IServiceProvider sp, ServiceRe
 
 
 
+    public Guid? GroupId => vm.ActiveGroup?.Id;
+
+    public bool CaseTypeActive => vm.ActiveGroup.CaseTypeActive;
+    public IReadOnlyCollection<string> CaseTypes
+    {
+        get
+        {
+            if (vm.ActiveGroup is not null && vm.ActiveGroup.Settings.UseCaseTypeField)
+            {
+                return vm.ActiveGroup.Settings.CaseTypes.ToList();
+            }
+            else
+            {
+                return new List<string>();  
+            }
+        }
+    }
+
 
     #region "-- Questionnaire Handling --"
 

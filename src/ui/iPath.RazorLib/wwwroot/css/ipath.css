@@ -192,7 +192,7 @@
     .ipath_node_description {
         all: unset;
         display: block;
-        padding: 2em;
+        padding: 1em;
         width: 100%;
     }
 

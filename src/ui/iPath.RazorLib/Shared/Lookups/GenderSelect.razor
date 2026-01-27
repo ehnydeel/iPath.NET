@@ -1,11 +1,12 @@
 ﻿@namespace iPath.Blazor.Componenents.Shared
 
 <MudSelect T="string" @bind-Value="Value" @bind-Value:after="OnValueChanged"
-           Label="@Label" ShrinkLabel="@ShrinkLabel" Margin="@Margin"
+           Required="@Required" Label="@Label"
+           ShrinkLabel="@ShrinkLabel" Margin="@Margin"
            Dense="@Dense" Variant="@Variant">
     <MudSelectItem Value=@("female")>Female</MudSelectItem>
-    <MudSelectItem Value=@("male") >Male</MudSelectItem>
-    <MudSelectItem Value=@("other") >Other</MudSelectItem>
+    <MudSelectItem Value=@("male")>Male</MudSelectItem>
+    <MudSelectItem Value=@("other")>Other</MudSelectItem>
     <MudSelectItem Value=@("unknown")>Unknown</MudSelectItem>
 </MudSelect>
 
@@ -32,4 +33,7 @@
 
     [Parameter]
     public string Label { get; set; } = "Gender";
+
+    [Parameter]
+    public bool Required { get; set; }
 }

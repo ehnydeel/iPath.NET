@@ -1,10 +1,23 @@
 ﻿using Hl7.Fhir.Model;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.State;
+
 
 namespace iPath.Blazor.Componenents.Shared.Coding;
 
-public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
+public class CodingLookup : MudAutocomplete<CodeDisplay>
 {
+    private readonly IServiceProvider sp;
+    public CodingLookup(IServiceProvider serviceProvider)
+    {
+        this.sp = serviceProvider;
+        using var registerScope = CreateRegisterScope();
+        _conceptState = registerScope.RegisterParameter<CodedConcept>(nameof(Concept))
+            .WithParameter(() => Concept)
+            .WithEventCallback(() => ConceptChanged);
+    }
+
+
     [Parameter]
     public string ValueSetId { get; set; }
 
@@ -16,39 +29,32 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
 
 
 
-    // Data-Binding to CodedConcept
+    private readonly ParameterState<CodedConcept> _conceptState; //separate field for storing parameter state
+
     [Parameter]
-    public CodedConcept Concept
-    {
-        get => Value.ToConcept(CodeSystemUrl);
-        set
-        {
-            field = value;
-            if (field != null)
-            {
-                SelectCode(field?.Code);
-            }
-            else
-            {
-                Value = null;
-            }
-        }
-    }
+    public CodedConcept Concept { get; set; }
 
     [Parameter]
     public EventCallback<CodedConcept> ConceptChanged { get; set; }
 
 
 
-    public string CodeSystemUrl => srv.CodeSystemUrl;
+    public string CodeSystemUrl { get; private set; }
 
-    protected CodingService srv;
+    protected ValueSetDisplay vs;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         this.ToStringFunc = x => x is null ? "" : $"{x.Display} [{x.Code}]";
         this.SearchFunc = Search; // (string? term, CancellationToken ct) => Search(term, ct);
-        base.OnInitialized();
+        await base.OnInitializedAsync();
+
+        await InitCS();
+        if (Concept is not null)
+        {
+            SelectCode(Concept.Code);
+        }
+
 
         // Subscribe to MudAutocomplete's ValueChanged and forward to ConceptChanged
         ValueChanged = EventCallback.Factory.Create<CodeDisplay>(this, async (CodeDisplay newValue) =>
@@ -58,11 +64,11 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
 
             // convert to CodedConcept and notify parent
             var concept = newValue?.ToConcept(CodeSystemUrl);
-            await ConceptChanged.InvokeAsync(concept);
+            await _conceptState.SetValueAsync(concept);
         });
     }
 
-    private bool _isReady => srv is not null;
+    private bool _isReady => vs is not null;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -77,9 +83,11 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
     {
         if (!string.IsNullOrEmpty(ValueSetId) && !_isReady)
         {
-            srv = sp.GetKeyedService<CodingService>(CodingService);
+            var srv = sp.GetKeyedService<CodingService>(CodingService);
             await srv.LoadCodeSystem();
+            CodeSystemUrl = srv.CodeSystemUrl;
             await srv.LoadValueSet(ValueSetId);
+            vs = srv.GetValueSetDisplay(ValueSetId);
         }
     }
 
@@ -92,8 +100,6 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
         else if (!string.IsNullOrEmpty(ValueSetId))
         {
             await InitCS();
-
-            var vs = srv.GetValueSetDisplay(ValueSetId);
             if (vs is not null)
                 return await vs.FindConcepts(term, ct);
         }
@@ -103,19 +109,18 @@ public class CodingLookup(IServiceProvider sp) : MudAutocomplete<CodeDisplay?>
 
     protected async Task SelectCode(string code)
     {
+        CodeDisplay newVal = null;
         if (Items != null)
         {
-            Value = Items.FirstOrDefault(x => x.Code == code);
+            newVal = Items.FirstOrDefault(x => x.Code == code);
         }
         else if (!string.IsNullOrEmpty(ValueSetId))
         {
-            await InitCS();
-
-            var vs = srv.GetValueSetDisplay(ValueSetId);
             if (vs is not null)
-                Value = vs.GetByCode(code);
+                newVal = vs.GetByCode(code);
         }
+        
+        await SelectOptionAsync(newVal);
     }
-
 
 }

@@ -8,6 +8,8 @@ public static class ServiceRequestExtensions
     {
         public string? FullTitle()
         {
+            if (dto is null) return "--";
+
             var parts = new List<string>();
             if (!string.IsNullOrEmpty(dto?.Title))
                 parts.Add(dto.Title);
@@ -67,7 +69,7 @@ public static class ServiceRequestExtensions
         {
             get
             {
-                return node.Description.FullTitle();
+                return node?.Description.FullTitle();
             }
         }
 

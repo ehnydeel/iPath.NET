@@ -6,14 +6,14 @@ using Microsoft.Extensions.Logging;
 namespace iPath.API.Services.Notifications;
 
 /*
- * The EventNotificationDispatcher is a background worker that reads the 
+ * The ServiceRequestEventProcessor is a background worker that reads the 
  * EventNotificationDispatcherQueue and transforms the events to notifications
  * with the help of an instance of INodeEventProcessor
  * 
  */
 
-public class EventNotificationDispatcher(IEventNotificationDispatcherQueue queue,
-    ILogger<EventNotificationDispatcher> logger,
+public class ServiceRequestEventProcessor(IServiceRequestEventQueue queue,
+    ILogger<ServiceRequestEventProcessor> logger,
     IServiceProvider services)
     : BackgroundService
 {
@@ -55,6 +55,7 @@ public class EventNotificationDispatcher(IEventNotificationDispatcherQueue queue
                 catch (Exception ex)
                 {
                     logger.LogError("Node Event Processing error: {Message}", ex.Message, ex);
+                    await Task.Delay(100);
                 }
             }
             else
@@ -62,7 +63,7 @@ public class EventNotificationDispatcher(IEventNotificationDispatcherQueue queue
                 logger.LogTrace("no event to notification processor for {0}", evt.GetType().Name);
             }
 
-            await Task.Delay(100);
+            await Task.Delay(1);
         }
     }
 }

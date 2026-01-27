@@ -27,5 +27,7 @@ public static class GroupExtensions
                 return true;
             return dto.Questionnaires.Any(q => q.Usage == usage);
         }
+
+        public bool CaseTypeActive => dto?.Settings is not null && dto.Settings.UseCaseTypeField;
     }
 }
