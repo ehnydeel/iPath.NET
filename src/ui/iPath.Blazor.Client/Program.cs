@@ -1,4 +1,3 @@
-using iPath.Application.Fhir;
 using iPath.Blazor.Server;
 using iPath.Domain.Config;
 using iPath.RazorLib;
@@ -39,6 +38,8 @@ builder.Services.AddTransient<baseAuthDelegationHandler>();
 
 var baseAddress = builder.Configuration["BaseAddress"] ?? builder.HostEnvironment.BaseAddress;
 Console.WriteLine("Blazor WASM starting with Base: " + baseAddress);
+
 await builder.Services.AddRazorLibServices(baseAddress, true);
 
+Console.WriteLine("Blazor WASM RunAsync()");
 await builder.Build().RunAsync();

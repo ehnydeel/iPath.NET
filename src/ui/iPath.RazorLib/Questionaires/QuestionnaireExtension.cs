@@ -1,24 +1,37 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Hl7.Fhir.Model;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace iPath.Blazor.Componenents.Questionaires;
 
 public static class QuestionnaireExtension
 {
-    private static CodingService coding;
+    private static IServiceProvider _sp;
 
     public static void Initialize(IServiceProvider serviceProvider)
-    {
-        coding = serviceProvider.GetKeyedService<CodingService>("icdo");
+    {        _sp = serviceProvider;
+        
     }
 
     extension(IEnumerable<QuestionnaireForGroupDto> list)
     {
         public async Task<IReadOnlyCollection<QuestionnaireForGroupDto>> FilterAsync(eQuestionnaireUsage qUsage, string? BodySiteCode)
         {
-            await coding.LoadCodeSystem();
+            try
+            {
+                var coding = _sp.GetKeyedService<CodingService>("icdo");
 
-            var allForms = list.Where(q => q.Usage == qUsage);
-            return allForms.Where(q => coding.InConceptFilter(BodySiteCode, q.Settings?.BodySiteFilter)).ToList();
+                await coding.LoadCodeSystem();
+
+                var allForms = list.Where(q => q.Usage == qUsage);
+                return allForms.Where(q => coding.InConceptFilter(BodySiteCode, q.Settings?.BodySiteFilter)).ToList();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return new List<QuestionnaireForGroupDto>();
         }
     }
 }
