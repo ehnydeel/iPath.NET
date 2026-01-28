@@ -396,3 +396,19 @@
     line-height: 1em;
     padding: 3px;
 }
+
+
+ipath_news_block {
+    all: initial;
+    padding: 4px;
+    border-bottom: 1px solid;
+}
+
+.ipath_news_title {
+    font-weight: bold;
+}
+
+.ipath_news_body {
+    padding-left: 2em;
+    border-bottom: 1px solid;
+}

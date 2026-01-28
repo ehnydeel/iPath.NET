@@ -1,0 +1,29 @@
+﻿@namespace iPath.Blazor.Componenents.Shared
+
+<MudCard>
+    <MudCardHeader Class="mud-theme-info">
+        <MudText Typo="Typo.subtitle2">Site news</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        @foreach (var n in LatestNews)
+        {
+            <div class="ipath_news_block">
+                <div class="ipath_news_title">@n.Title (@n.CreatedOn.ToShortDateString())</div>
+                <div class="ipath_news_body">@((MarkupString)n.Body)</div>
+            </div>
+        }
+    </MudCardContent>
+</MudCard>
+
+
+@inject IPathApi api
+@code {
+    List<WebContentDto> LatestNews = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var query = new GetWebContentsQuery { PageSize = 5 };
+        var resp = await api.GetWebContent(query);
+        LatestNews = resp.Content.Items.ToList();
+    }
+}
