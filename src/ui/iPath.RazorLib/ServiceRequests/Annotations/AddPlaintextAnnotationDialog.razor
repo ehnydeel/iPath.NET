@@ -11,7 +11,8 @@
 
             @if (Model.AskMorphology)
             {
-                <MorphoLookup Label="Morphology" @bind-Concept="Model.Data.Morphology" Dense="true" ShrinkLabel="true" Variant="Variant.Outlined" />
+                <MorphoLookup Label="Morphology" @bind-Concept="Model.Data.Morphology" ValueSetId="@vm.MorphologyValueSet"
+                              Dense="true" ShrinkLabel="true" Variant="Variant.Outlined" />
             }
         </DialogContent>
         <DialogActions>
@@ -36,5 +37,5 @@
 
     private void Save() => MudDialog.Close(DialogResult.Ok(Model));
 
-	private void Cancel() => MudDialog.Cancel();
+    private void Cancel() => MudDialog.Cancel();
 }

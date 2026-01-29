@@ -11,5 +11,10 @@ public class CommunitySettings
 
     public ICollection<string> CaseTypes { get; set; } = [];
 
+
+    public string? MorphologyValueSet { get; set; }
+    public string? TopographyValueSet { get; set; }
+
+
     public CommunitySettings Clone() => (CommunitySettings)MemberwiseClone();
 }

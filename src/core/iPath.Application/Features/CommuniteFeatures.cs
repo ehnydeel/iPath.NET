@@ -72,7 +72,7 @@ public record DeleteCommunityCommand(Guid Id)
 public static class CommunityExtensions
 {
     public static CommunityListDto? ToListDto(this Community? entity)
-        => entity is null ? null : new CommunityListDto(Id: entity.Id, Name: entity.Name, Owner: entity.Owner.ToOwnerDto());
+        => entity is null ? null : new CommunityListDto(Id: entity.Id, Name: entity.Name, Owner: entity.Owner.ToOwnerDto(), Settings: entity.Settings);
 
     public static CommunityListDto? ToListDto(this CommunityDto? dto)
         => dto is null ? null : new CommunityListDto(Id: dto.Id, Name: dto.Name, Owner: dto.Owner);    

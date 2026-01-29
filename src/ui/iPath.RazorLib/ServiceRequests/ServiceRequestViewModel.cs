@@ -47,7 +47,12 @@ public class ServiceRequestViewModel(IPathApi api,
 
     public DocumentDto? SelectedDocument { get; private set; }
 
+
     public GroupDto? ActiveGroup { get; private set; }
+
+    public string TopograhyValueSet => ActiveGroup.TopographyValueSet;
+
+    public string MorphologyValueSet => ActiveGroup.MorphologyValueSet;
 
 
     public bool IsRootNodeSelected
@@ -131,7 +136,7 @@ public class ServiceRequestViewModel(IPathApi api,
         {
             SelectedRequest = respN.Content;
 
-            // load Group
+            // load Group & Community
             if (SelectedRequest.GroupId.HasValue && (ActiveGroup is null || ActiveGroup.Id != SelectedRequest.GroupId))
             {
                 var respG = await api.GetGroup(SelectedRequest.GroupId.Value);
@@ -221,6 +226,8 @@ public class ServiceRequestViewModel(IPathApi api,
         return !IdList.IsEmpty();
     }
 
+
+    public string SelectedReuqestUrl => SelectedRequest is null ? NavUrl : $"request/{SelectedRequest.Id}";
 
     public async Task GoUpRequestPage()
     {

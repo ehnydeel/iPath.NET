@@ -61,7 +61,8 @@
 
             @if (vm.ActiveGroup.Settings.DescriptionWithBodySite)
             {
-                <TopoLookup Label="Body Site" Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" @bind-Concept="Model.BodySite" Margin="@Margin" />
+                <TopoLookup Label="Body Site" @bind-Concept="Model.BodySite" ValueSetId="@vm.TopograhyValueSet"
+                            Clearable="true" Variant="Variant.Outlined" Dense="true" ShrinkLabel="true" Margin="@Margin" />
             }
         </MudItem>
     </MudGrid>

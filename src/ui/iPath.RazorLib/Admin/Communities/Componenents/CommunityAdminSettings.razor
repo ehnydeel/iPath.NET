@@ -15,6 +15,22 @@
 
     <OwnerLookup Label=@T["Community Owner"] Class="mt-4" @bind-Value="EditModel.Owner" Variant="Variant.Outlined" Margin="Margin.Dense" />
 
+    <MudGrid Class="mt-4">
+        <MudItem xs="12" sm="6">
+            <MudTextField Label=@T["Topography ValueSet (Body Sites)"]
+                          @bind-Value="EditModel.Settings.TopographyValueSet"
+                          HelperText="icd-o topography codes by default"
+                          Variant="@Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField Label=@T["Morphology ValueSet"]
+                          @bind-Value="EditModel.Settings.MorphologyValueSet"
+                          HelperText="icd-o morphology codes by default"
+                          Variant="@Variant.Outlined" ShrinkLabel="true" Margin="Margin.Dense" />
+        </MudItem>
+    </MudGrid>
+
+
     <MudStack Row Class="mt-10" Spacing="2">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
         <MudButton Variant="Variant.Filled">Cancel</MudButton>

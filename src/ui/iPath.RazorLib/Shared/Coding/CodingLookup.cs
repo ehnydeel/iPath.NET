@@ -19,10 +19,10 @@ public class CodingLookup : MudAutocomplete<CodeDisplay>
 
 
     [Parameter]
-    public string ValueSetId { get; set; }
+    public string? ValueSetId { get; set; }
 
     [Parameter]
-    public string CodingService { get; set; } = "";
+    public string? CodingService { get; set; }
 
     [Parameter]
     public IEnumerable<CodeDisplay> Items { get; set; }

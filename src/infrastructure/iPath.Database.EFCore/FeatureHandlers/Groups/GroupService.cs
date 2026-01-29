@@ -13,6 +13,7 @@ public class GroupService(iPathDbContext db, IUserSession sess, ILogger<GroupSer
 
         var group = await db.Groups
             .AsNoTracking()
+            .Include(g => g.Community).ThenInclude(c => c.Owner)
             .Where(g => g.Id == GroupId)
             .Select(g => new GroupDto(Id: g.Id, Name: g.Name, Visibility: g.Visibility, Owner: g.Owner.ToOwnerDto(),
                                       Community: g.Community.ToListDto(),

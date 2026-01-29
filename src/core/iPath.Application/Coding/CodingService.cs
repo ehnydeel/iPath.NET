@@ -45,6 +45,7 @@ public class CodingService
 
     public async Task LoadValueSet(string id)
     {
+        logger.LogInformation("Loading ValueSet/{1}", id);
         var vs = await loader.GetResourceAsync<ValueSet>($"ValueSet/{id}");
         if (vs is not null)
             LoadValueSet(vs, id);

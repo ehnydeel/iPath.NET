@@ -1,5 +1,4 @@
-﻿using Hl7.Fhir.Utility;
-using iPath.Application;
+﻿using iPath.Application;
 using iPath.Application.Fhir;
 using iPath.LHCForms;
 using Microsoft.Extensions.DependencyInjection;

@@ -39,10 +39,16 @@ public class EmailNotificationPreview
         var annoHtml = "";
         foreach (var a in sr.Annotations.OrderBy(x => x.CreatedOn))
         {
+            var aText = a.Data.Text;
+            if (a.Data.Morphology is not null)
+            {
+                aText += "<div><b>Morphology:</b> " + a.Data.Morphology.ToString() + "</div>";
+            }
+
             annoHtml += $"""
 <tr>
     <td class="comment_sender">{a.Owner.Username}, {a.CreatedOn.ToShortDateString()}<div class="comment_sender_email">({a.Owner.Email})</div></td>
-    <td class="comment_text">{a.Data.Text}</td>
+    <td class="comment_text">{aText}</td>
 </tr>
 """;
         }

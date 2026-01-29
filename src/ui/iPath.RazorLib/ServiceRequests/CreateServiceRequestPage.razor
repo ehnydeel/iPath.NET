@@ -11,7 +11,7 @@
 
     @if (vm.ActiveGroup.Settings.UseDescriptionWizzard)
     {
-        <ServiceRequestCreateWizzard CodingService="icdo" ValueSetId="icdo-topo" />
+        <ServiceRequestCreateWizzard CodingService="icdo" ValueSetId="@vm.TopograhyValueSet" />
     }
     else
     {
@@ -38,7 +38,6 @@
     public string groupId { get; set; }
 
     private GroupDto Group = null!;
-
 
     ServiceRequestEditForm frm;
 

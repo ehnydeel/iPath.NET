@@ -155,8 +155,9 @@
         <MudText Typo="Typo.h6">@T["next steps"]</MudText>
         <MudDivider />
         <MudStack Row Spacing="4" Class="mt-4 mb-10">
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Create" OnClick="Reset">@T["Create another Request"]</MudButton>
-            <MudButton Variant="Variant.Filled" OnClick="vm.GoUp" StartIcon="@Icons.Material.Filled.List">@T["Back to list"]</MudButton>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Create" OnClick="Reset">@T["Create another request"]</MudButton>
+            <MudButton Color="Color.Info" Variant="Variant.Filled" Href="@vm.SelectedReuqestUrl" StartIcon="@Icons.Material.Filled.Preview">@T["Open request"]</MudButton>
+            <MudButton Variant="Variant.Filled" Href="@vm.NavUrl" StartIcon="@Icons.Material.Filled.List">@T["Back to list"]</MudButton>
             <MudSpacer />
         </MudStack>
     </CompletedContent>
