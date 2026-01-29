@@ -7,9 +7,9 @@
         <DialogContent>
             <OwnerLookup Label="Receiver" Variant="Variant.Outlined" @bind-Value="owner" @bind-Value:after="LoadPreview" />
             <MudDivider Class="my-2" />
-            <MudPaper Elevation="1">
+            <div>
                 @((MarkupString)html)
-            </MudPaper>
+            </div>
         </DialogContent>
         <DialogActions>
             <MudButton OnClick="@MudDialog.Cancel" Variant="Variant.Filled">Close</MudButton>

@@ -33,17 +33,16 @@
         </div>
 
 
+        @if (vm.SelectedRequest?.Description?.Questionnaire is not null)
+        {
+            <ServiceRequestQuestionnaire Model="@vm.SelectedRequest.Description" />
+        }
 
         @if (!string.IsNullOrEmpty(@vm.SelectedRequest?.Description?.Text))
         {
             <div class="ipath_node_description">
                 <MudHighlighter Text="@vm.SelectedRequest.DescriptionHtml" Markup="true" HighlightedText="@vm.SearchString" />
             </div>
-        }
-        
-        @if (vm.SelectedRequest?.Description?.Questionnaire is not null)
-        {
-            <ServiceRequestQuestionnaire Model="@vm.SelectedRequest.Description" />
         }
     }
     else
