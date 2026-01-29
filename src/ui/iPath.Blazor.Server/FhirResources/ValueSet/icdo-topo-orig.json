@@ -1293,39 +1293,9 @@
       },
       {
         "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
-        "version": "3.2.ipath",
-        "code": "C40.2",
-        "display": "Long bones of lower extremities and associated joints"
-      },
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
-        "version": "3.2.ipath",
-        "code": "C40.2.470",
-        "display": "Femur"
-      },
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
-        "version": "3.2.ipath",
-        "code": "C40.2.472",
-        "display": "Tibia"
-      },
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
-        "version": "3.2.ipath",
-        "code": "C40.2.473",
-        "display": "Fibula"
-      },
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
-        "version": "3.2.ipath",
-        "code": "C40.2.870",
-        "display": "Knee"
-      },
-      {
-        "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
         "version": "3.2",
-        "code": "C40.2.801",
-        "display": "Hip"
+        "code": "C40.2",
+        "display": "Knee joint, NOS"
       },
       {
         "system": "http://terminology.hl7.org/CodeSystem/icd-o-3",
