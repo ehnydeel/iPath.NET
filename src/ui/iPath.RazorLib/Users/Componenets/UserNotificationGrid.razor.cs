@@ -16,13 +16,15 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, UserViewModel u
     List<UserNotificationModel> Items = new();
 
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         await LoadData();
     }
 
     async Task LoadData()
-    { 
+    {
+        Items.Clear();
+
         if (User is not null)
         {
             var resp = await api.GetUserNotification(User.Id);
@@ -32,13 +34,17 @@ public partial class UserNotificationGrid(UserAdminViewModel vm, UserViewModel u
                 return;
             }
 
-            Items = new();
+            var tmp = new List<UserNotificationModel>();
             foreach(var i in resp.Content)
             {
                 var x = new UserNotificationModel(i, await uvm.GetProfileAsync(i.UserId));
-                Items.Add(x);
+                tmp.Add(x);
             }
+            Items = tmp;
+            Console.WriteLine($"Notifications - loaded {Items.Count} from api {resp.Content.Count()}");
         }
+
+        StateHasChanged();
     }
 
     async Task Save()
