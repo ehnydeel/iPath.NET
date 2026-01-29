@@ -398,17 +398,27 @@
 }
 
 
-ipath_news_block {
-    all: initial;
+.ipath_news_block {
     padding: 4px;
-    border-bottom: 1px solid;
+    margin-bottom: 8px;
 }
 
 .ipath_news_title {
     font-weight: bold;
+    border-bottom: 1px solid;
+    background-color: lightblue;
+    padding: 4px;
+}
+
+.ipath_news_author {
+    font-weight: normal;
+    padding-left: 1em;
 }
 
 .ipath_news_body {
-    padding-left: 2em;
-    border-bottom: 1px solid;
+    all: unset;
+}
+
+.ipath_news_body li {
+    margin-left: 2em;
 }

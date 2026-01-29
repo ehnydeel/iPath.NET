@@ -1,5 +1,6 @@
 ﻿using iPath.API.Endpoints;
 using iPath.API.Middleware;
+using iPath.EF.Core.FeatureHandlers;
 using Microsoft.Extensions.Configuration;
 using Scalar.AspNetCore;
 

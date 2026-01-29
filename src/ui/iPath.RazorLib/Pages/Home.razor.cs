@@ -9,7 +9,7 @@ public partial class Home(AppState appState, UserViewModel uvm, AuthenticationSt
     private UserProfile? MyProfile = null;
 
 
-    private bool ShowLoginButtons = false;
+    private bool AnonymousSession = false;
     private bool ShowProfileCompletion = false;
     private bool ShowUserLinks = false;
 
@@ -32,7 +32,7 @@ public partial class Home(AppState appState, UserViewModel uvm, AuthenticationSt
             }
             else
             {
-                ShowLoginButtons = true;
+                AnonymousSession = true;
             }
             StateHasChanged();
         }

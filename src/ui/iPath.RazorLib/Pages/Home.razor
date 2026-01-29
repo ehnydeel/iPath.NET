@@ -9,48 +9,73 @@
 <MudText Typo="Typo.h3" GutterBottom="true">iPath.NET</MudText>
 
 
-<MudPaper Width="100%" Elevation="0">
-    <MudGrid>
-        <MudItem xs="12" sm="6">
-            @if (RendererInfo.IsInteractive)
-            {
-                @if (ShowLoginButtons)
-                {
-                    <MudButton StartIcon="@Icons.Material.Filled.Login" Href="Account/Login" Variant="Variant.Filled" Color="Color.Primary">@T["Login"]</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Person" Href="Account/Register" Variant="Variant.Filled" Color="Color.Primary">@T["Sign Up"]</MudButton>
-                }
+<AuthorizeView>
+    <NotAuthorized>
+        @if (RendererInfo.IsInteractive)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Login" Href="Account/Login" Variant="Variant.Filled" Color="Color.Primary">@T["Login"]</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Person" Href="Account/Register" Variant="Variant.Filled" Color="Color.Primary">@T["Sign Up"]</MudButton>
+        }
+        else
+        {
+            <div>
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                loading ...
+            </div>
+        }
 
-                @if (ShowProfileCompletion)
-                {
-                    <MudAlert Severity="Severity.Warning" Class="my-8 px-8">
-                        <MudText Typo="Typo.body1">
-                            @T["You have not yet completed your Profile. Please fill in your data"]
-                        </MudText>
-                        <MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Person" Href="user/profile" Variant="Variant.Filled" Color="Color.Secondary">@T["My Profile"]</MudButton>
-                    </MudAlert>
-                }
-                @if (ShowUserLinks)
-                {
-                    <p>more to follow ...</p>
-                }
+        <NewsBlock Class="mt-5" />
+    </NotAuthorized>
 
-            }
-            else
-            {
-                <div>
-                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" Thickness="6" />
-                    loading ...
-                </div>
-            }
+    <Authorized>
+        <MudPaper Width="100%" Elevation="0">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    @if (RendererInfo.IsInteractive)
+                    {
+                        @if (ShowProfileCompletion)
+                        {
+                            <MudAlert Severity="Severity.Warning" Class="my-8 px-8">
+                                <MudText Typo="Typo.body1">
+                                    @T["You have not yet completed your Profile. Please fill in your data"]
+                                </MudText>
+                                <MudButton Class="mt-2" StartIcon="@Icons.Material.Filled.Person" Href="user/profile" Variant="Variant.Filled" Color="Color.Secondary">@T["My Profile"]</MudButton>
+                            </MudAlert>
+                        }
+                        @if (ShowUserLinks)
+                        {
+                            <MudCard>
+                                <MudCardHeader Class="mud-theme-info">
+                                    <MudText Typo="Typo.subtitle2">Recent activity</MudText>
+                                </MudCardHeader>
+                                <MudCardContent>
+                                    <div>more to come here ....</div>
+                                    <MudNavMenu>
+                                        <MudNavLink Href="user/groups" Icon="@Icons.Material.Filled.Groups">My Groups</MudNavLink>
+                                        <MudNavLink Href="user/cases" Icon="@Icons.Material.Filled.Folder">My Cases</MudNavLink>
+                                    </MudNavMenu>
+                                </MudCardContent>
+                            </MudCard>
+                        }
+                    }
+                    else
+                    {
+                        <div>
+                            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                            loading ...
+                        </div>
+                    }
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <NewsBlock />
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
 
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <NewsBlock />
-        </MudItem>
-    </MudGrid>
-</MudPaper>
+    </Authorized>
+</AuthorizeView>
 
-<MudDivider Class="my-5" />
+
 
 <!--
 <TopoLookup Class="mb-10" Variant="Variant.Outlined" />

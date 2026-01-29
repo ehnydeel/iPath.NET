@@ -15,7 +15,7 @@ public static class UserExtensions
         {
             if (string.IsNullOrEmpty(profile.FamilyName)) return false;
             if (string.IsNullOrEmpty(profile.FirstName)) return false;
-            if (string.IsNullOrEmpty(profile.Specialisation)) return false;
+            // if (string.IsNullOrEmpty(profile.Specialisation)) return false;
             return true;
         }
     }

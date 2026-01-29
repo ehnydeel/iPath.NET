@@ -1,4 +1,5 @@
 using iPath.Application.Features.CMS;
+using Tizzani.MudBlazor.HtmlEditor;
 
 namespace iPath.Blazor.Componenents.Admin.WebContent;
 
@@ -28,15 +29,29 @@ public partial class WebContentIndex(IPathApi api, ISnackbar snackbar)
         return new GridData<WebContentDto>();
     }
 
-    WebContentDto SelectedItem { 
+    WebContentDto SelectedItem
+    {
         get => field;
         set
         {
             field = value;
             SelectedModel = value is null ? null : new WebContentModel { Id = value.Id, Title = value.Title, Body = value.Body };
+            if (html is not null)
+                html.SetHtml(SelectedModel?.Body);
         }
     }
 
+    public string SelectedRowStyle(WebContentDto item, int rowIndex)
+    {
+        if (item is not null && SelectedItem is not null && item.Id == SelectedItem.Id)
+            return "background-color: var(--mud-palette-background-gray)";
+
+        return "";
+    }
+
+
+
+    MudHtmlEditor html;
     WebContentModel SelectedModel { get; set; }
 
     async Task AddContent()
@@ -53,7 +68,7 @@ public partial class WebContentIndex(IPathApi api, ISnackbar snackbar)
             {
                 var cmd = new UpdateWebContentCommand(Id: SelectedModel.Id.Value, Title: SelectedModel.Title, Body: SelectedModel.Body);
                 var resp = await api.UpdateWebContent(SelectedModel.Id.Value, cmd);
-                snackbar.CheckSuccess(resp);
+                snackbar.CheckSuccess(resp, "Content updated");
             }
             else
             {
@@ -64,7 +79,21 @@ public partial class WebContentIndex(IPathApi api, ISnackbar snackbar)
             await grid.ReloadServerData();
         }
     }
+
+    async Task Delete()
+    {
+        if (SelectedModel is not null)
+        {
+            var resp = await api.DeleteWebContent(SelectedModel.Id.Value);
+            snackbar.CheckSuccess(resp, "Content has been deleted");
+            SelectedModel = null;
+            SelectedItem = null;
+            StateHasChanged();
+            await grid.ReloadServerData();
+        }
+    }
 }
+
 
 public class WebContentModel
 {

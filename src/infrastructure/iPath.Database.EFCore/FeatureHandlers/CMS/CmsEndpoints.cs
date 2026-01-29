@@ -1,7 +1,10 @@
 ﻿using iPath.Application.Features.CMS;
-using Scalar.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
-namespace iPath.API;
+namespace iPath.EF.Core.FeatureHandlers;
 
 public static class CmsEndpoints
 {

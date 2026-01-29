@@ -1,6 +1,6 @@
 ﻿@namespace iPath.Blazor.Componenents.Shared
 
-<MudCard>
+<MudCard Class="@Class">
     <MudCardHeader Class="mud-theme-info">
         <MudText Typo="Typo.subtitle2">Site news</MudText>
     </MudCardHeader>
@@ -8,7 +8,7 @@
         @foreach (var n in LatestNews)
         {
             <div class="ipath_news_block">
-                <div class="ipath_news_title">@n.Title (@n.CreatedOn.ToShortDateString())</div>
+                <div class="ipath_news_title">@n.Title <span class="ipath_news_author">(by @n.Owner.Username at @n.CreatedOn.ToShortDateString())</span></div>
                 <div class="ipath_news_body">@((MarkupString)n.Body)</div>
             </div>
         }
@@ -17,7 +17,12 @@
 
 
 @inject IPathApi api
+
 @code {
+    [Parameter]
+    public string Class { get; set; }
+
+
     List<WebContentDto> LatestNews = new();
 
     protected override async Task OnInitializedAsync()

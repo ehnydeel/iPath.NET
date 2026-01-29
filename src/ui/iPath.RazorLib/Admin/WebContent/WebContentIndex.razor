@@ -6,12 +6,13 @@
 
 <MudGrid>
     <MudItem xs="12" sm="6">
-        <IPathHeader Title="static web content">
+        <IPathHeader Title="static web content" Typo="Typo.h6">
             <ActionContent>
                 <MudFab Size="Size.Small" EndIcon="@Icons.Material.Filled.Add" OnClick="AddContent" />
             </ActionContent>
         </IPathHeader>
-        <MudDataGrid T="WebContentDto" ServerData="GetDataAsync" @bind-SelectedItem="SelectedItem" @ref="grid">
+        <MudDataGrid T="WebContentDto" ServerData="GetDataAsync" @bind-SelectedItem="SelectedItem" @ref="grid"
+                     RowStyleFunc="SelectedRowStyle">
             <Columns>
                 <PropertyColumn Property="x => x.Title" />
                 <PropertyColumn Property="x => x.Owner.Username" />
@@ -23,22 +24,22 @@
         </MudDataGrid>
     </MudItem>
     <MudItem xs="12" sm="6">
-        @if (SelectedModel is null)
+        <IPathHeader Title="selected content" Typo="Typo.h6" />
+        @if (SelectedModel is not null)
         {
-            <IPathHeader Title="selected content" />
-        }
-        else
-        {
-            <IPathHeader Title="@SelectedModel.Title" />
             <MudForm Model="SelectedModel">
                 <MudTextField Label="Title" @bind-Value="SelectedModel.Title" Variant="Variant.Outlined" ShrinkLabel="true" />
 
-                <MudHtmlEditor @bind-Html="SelectedModel.Body">
+                <MudText Typo="Typo.subtitle1" Class="mt-2">Content</MudText>
+                <MudHtmlEditor @bind-Html="SelectedModel.Body" Outlined="true" @ref="html">
                     <MudHtmlToolbarOptions InsertImage="false" /> <!-- This will exclude the "insert image" toolbar option -->
                 </MudHtmlEditor>
             </MudForm>
 
-            <ProgressButton OnClick="Save" Text="Save" />
+            <MudStack Row Class="mt-2">
+                <ProgressButton OnClick="Save" Text="Save"  />
+                <ProgressButton OnClick="Delete" Text="Delete" Color="Color.Warning" />
+            </MudStack>
         }
     </MudItem>
 </MudGrid>
