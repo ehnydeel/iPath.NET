@@ -21,7 +21,7 @@ public class EmailRepository(iPathDbContext db, IEmailQueue queue)
     public async Task<PagedResultList<EmailMessage>> GetPage(PagedQuery<EmailMessage> query, CancellationToken ct)
     {
         var q = db.EmailStore.AsNoTracking()
-            .ApplyQuery(query);
+            .ApplyQuery(query, "CreatedOn DESC");
         return await q.ToPagedResultAsync(query, ct);
     }
 

@@ -36,7 +36,7 @@ public class GetUserListHandler(iPathDbContext db)
         // project
         var dto = q.Select(u => new UserListDto(Id: u.Id, Username: u.UserName, 
             Email: u.Email, Initials: u.Profile.Initials,
-            IsActive: u.IsActive, EmailConfirmed: u.EmailConfirmed,
+            IsActive: u.IsActive, EmailConfirmed: u.EmailConfirmed, isNew: u.IsNew,
             Roles: u.Roles.Select(r => r.Name).ToArray()));
 
         // pagination

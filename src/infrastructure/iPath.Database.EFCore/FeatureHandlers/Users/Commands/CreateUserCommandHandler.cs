@@ -9,9 +9,13 @@ public class CreateUserCommandHandler(UserManager<User> um, IMediator mediator)
     {
         var newUser = new User
         {
+            Id = Guid.CreateVersion7(),
             UserName = request.Username,
             Email = request.Email,
+            IsNew = true,
         };
+        newUser.AddUserCreatedEvent();
+
         var res = await um.CreateAsync(newUser);
         if (!res.Succeeded)
         {

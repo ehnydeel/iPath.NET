@@ -1,0 +1,47 @@
+﻿@page "/admin/events"
+
+<MudBreadcrumbs Items="BreadCrumbs" Class="mt-0 pt-0"></MudBreadcrumbs>
+
+
+<MudDataGrid T="EventEntity" ServerData="GetDataAsync" Dense="true" Hover="true" Striped="true" >
+    <Columns>
+        <PropertyColumn Property="x => x.ObjectName" />
+        <PropertyColumn Property="x => x.ObjectId" />
+        <PropertyColumn Property="x => x.EventName" />
+        <PropertyColumn Property="x => x.EventDate" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="EventEntity" PageSizeOptions="pageoptions" />
+    </PagerContent>
+</MudDataGrid>
+
+
+
+@inject IPathApi api
+
+@code {
+    int[] pageoptions = new[] { 25, 50, 100 };
+
+
+    public List<BreadcrumbItem> BreadCrumbs
+    {
+        get
+        {
+            var ret = new List<BreadcrumbItem> { new("Administration", href: "admin") };
+            ret.Add(new("Event Log", href: null, disabled: true));
+            return ret;
+        }
+    }
+
+
+    async Task<GridData<EventEntity>> GetDataAsync(GridState<EventEntity> state, CancellationToken ct)
+    {
+        var query = state.BuildQuery(new GetEventsQuery());
+        var resp = await api.GetEvents(query);
+
+        if (resp.IsSuccessful) return resp.Content.ToGridData();
+
+        snackbar.AddWarning(resp.ErrorMessage);
+        return new GridData<EventEntity>();
+    }
+}

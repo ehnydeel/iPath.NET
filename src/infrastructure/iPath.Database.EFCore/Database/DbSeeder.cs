@@ -55,7 +55,7 @@ public class DbSeeder(iPathDbContext db,
         User? admin = null;
         if (!db.Users.Any())
         {
-            admin = new User { Id = Guid.CreateVersion7(), UserName = "Admin", Email = "admin@test.com", IsActive = true, EmailConfirmed = true };
+            admin = new User { Id = Guid.CreateVersion7(), UserName = "Admin", Email = "admin@test.com", IsActive = true, IsNew = false, EmailConfirmed = true };
             var pwgen = new RandomPasswordGenerator();
             InitialAdminPassword = pwgen.GenerateRandomPassword();
             var res = await userManager.CreateAsync(admin, InitialAdminPassword);

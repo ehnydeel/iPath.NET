@@ -10,6 +10,7 @@ using iPath.Domain.Config;
 using iPath.Domain.Entities;
 using Refit;
 using iPath.Application.Features.CMS;
+using iPath.Application.Features.Admin;
 
 namespace iPath.Blazor.ServiceLib.ApiClient;
 
@@ -217,6 +218,10 @@ public interface IPathApi
     #region "-- Admin --"
     [Get("/api/v1/admin/roles")]
     Task<IApiResponse<IEnumerable<RoleDto>>> GetRoles();
+
+    [Post("/api/v1/admin/events")]
+    Task<IApiResponse<PagedResultList<EventEntity>>> GetEvents(GetEventsQuery query);
+
     #endregion
 
 

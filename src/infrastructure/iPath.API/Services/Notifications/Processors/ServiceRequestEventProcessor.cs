@@ -68,7 +68,7 @@ public class ServiceRequestEventProcessor(
                                 await Enqueue(eNodeNotificationType.NewAnnotation, evt, s, ct);
                             }
                         }
-                        else if (evt is ServiceRequestNodePublishedEvent)
+                        else if (evt is ServiceRequestPublishedEvent)
                         {
                             if (s.NotificationSource.HasFlag(eNotificationSource.NewCase))
                             {

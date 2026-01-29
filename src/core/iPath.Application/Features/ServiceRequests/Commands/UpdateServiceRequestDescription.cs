@@ -26,7 +26,7 @@ public static partial class ServiceRequestCommandExtensions
         sr.CreateEvent<ServiceRequestDescriptionUpdatedEvent, UpdateServiceRequestCommand>(request, userId);
         if (isPublishEvent)
         {
-            sr.CreateEvent<ServiceRequestNodePublishedEvent, UpdateServiceRequestCommand>(request, userId);
+            sr.CreateEvent<ServiceRequestPublishedEvent, UpdateServiceRequestCommand>(request, userId);
         }
 
         return sr;

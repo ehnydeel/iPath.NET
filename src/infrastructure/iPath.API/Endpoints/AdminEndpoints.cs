@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq.Dynamic.Core;
 using iPath.API.EndpointFilters;
 using Microsoft.Extensions.Options;
+using iPath.Application.Features.Admin;
 
 namespace iPath.API;
 
@@ -79,6 +80,14 @@ public static class AdminEndpoints
             .Produces<IEnumerable<RoleDto>>()
             .WithTags("Admin")
             .RequireAuthorization("Admin");
+
+
+        route.MapPost("admin/events", (GetEventsQuery query, [FromServices] IMediator mediator, CancellationToken ct)
+            => mediator.Send(query, ct))
+            .Produces<PagedResultList<EventEntity>>()
+            .WithTags("Admin")
+            .RequireAuthorization("Admin");
+
 
 
         route.MapGet("session", ([FromServices] IUserSession? sess) 

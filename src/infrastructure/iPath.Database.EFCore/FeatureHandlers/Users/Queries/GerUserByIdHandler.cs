@@ -14,6 +14,7 @@ public class GetUserByIdHandler(iPathDbContext db, IUserSession sess)
                 Email = u.Email,
                 Profile = u.Profile,
                 IsActive = u.IsActive,
+                IsNew = u.IsNew,
                 Roles = u.Roles.Select(r => new RoleDto(r.Id, r.Name)).ToArray(),
                 GroupMembership = u.GroupMembership.Select(m => new UserGroupMemberDto(GroupId: m.Group.Id, Groupname: m.Group.Name, 
                     Role: m.Role, IsConsultant: m.IsConsultant)).ToArray(),

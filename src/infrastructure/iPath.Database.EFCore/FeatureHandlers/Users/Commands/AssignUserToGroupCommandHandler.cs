@@ -23,6 +23,7 @@ public class AssignUserToGroupsCommandHandler(iPathDbContext db, IUserSession se
         {
             user.AddToGroup(group, request.role, request.isConsultant);
         }
+
         await db.SaveChangesAsync(cancellationToken);
 
         // Refresh the cache

@@ -14,6 +14,7 @@ public record UserDto
     public RoleDto[] Roles { get; init; } = [];
 
     public bool IsActive { get; init; }
+    public bool IsNew { get; init; }
 
     public DateTime CreatedOn { get; init; } 
 }

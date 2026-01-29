@@ -36,6 +36,11 @@ public class UpdateUserAccountCommandHandler(UserManager<User> um, RoleManager<R
             user.UpdateActive(request.IsActive.Value);
         }
 
+        if (request.IsNew.HasValue)
+        {
+            user.IsNew = request.IsNew.Value;
+        }
+
         if (request.Profile != null)
         {
             user.UpdateProfile(request.Profile);

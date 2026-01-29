@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace iPath.Application.Features.ServiceRequests;
 
-public static class NodeEventExtensions
+public static class ServiceRequestEventExtensions
 {
     public static EventEntity CreateEvent<TEvent, TInput>(this ServiceRequest node,
         TInput input,
