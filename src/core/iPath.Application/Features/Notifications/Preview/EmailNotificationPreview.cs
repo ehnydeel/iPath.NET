@@ -40,10 +40,8 @@ public class EmailNotificationPreview
         foreach (var a in sr.Annotations.OrderBy(x => x.CreatedOn))
         {
             annoHtml += $"""
-<div class="comment_block">
-    <div class="comment_sender">{a.Owner.Username}, {a.CreatedOn.ToShortDateString()}<div class="comment_sender_email">({a.Owner.Email})</div></div>
-    <div class="comment_text">{a.Data.Text}</div>
-</div>
+    <td class="comment_sender">{a.Owner.Username}, {a.CreatedOn.ToShortDateString()}<div class="comment_sender_email">({a.Owner.Email})</div></td>
+    <td class="comment_text">{a.Data.Text}</td>
 """;
         }
         body = body.Replace("{comments}", annoHtml);
@@ -81,29 +79,25 @@ public class EmailNotificationPreview
                 .comments {
                     border-top: 1px inset;
                     margin-top: 1em;
-                    padding: 1em;
                 }
                 .comments_title {
+                    padding: 8px;
                     font-weight: bold;
                     border-bottom: 1px solid;
                 }
-                .comment_block{
-                    display: grid;
-                    grid-template-columns: 160px auto;
-                    border-bottom: 1px solid;
-                }
                 .comment_sender{
-                    padding-left: 4px;
+                    vertical-align: top;
+                    padding: 4px;
                     background-color: lightgray;
-                    padding-bottom: 8px;
                 }
                 .comment_sender_email{
                     font-size: 0.8em;
                     font-style: italics;
                 }
                 .comment_text{
+                    vertical-align: top;
+                    padding: 4px;
                     padding-left: 1em;
-                    padding-bottom: 8px;
                 }
 
             </style>
@@ -114,9 +108,11 @@ public class EmailNotificationPreview
                     <div class="sender">{sender}</div>
                     <div class="desc">{description}</div>
 
-                    <div class="comments">
+                    <div class="comments">                    
                         <div class="comments_title">Comments</div>
+                        <table class="comments_table">
                         {comments}
+                        </table>
                     </div>
                 </div>
             </body>
