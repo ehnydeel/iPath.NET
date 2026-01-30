@@ -1,5 +1,5 @@
 ﻿namespace iPath.Application.Features.ServiceRequests;
 
-public class NodeExceptions
+public class ServiceRequestExceptions
 {
 }

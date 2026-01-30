@@ -256,7 +256,7 @@ public class ImportService(OldDB oldDb, iPathDbContext newDb,
                     // new => user can have only one role in a group
                     eMemberRole role = eMemberRole.User;
                     if ((gm.status & 4) != 0) role = eMemberRole.Moderator;
-                    if ((gm.status & 2) != 0) role = eMemberRole.Inactive;
+                    if ((gm.status & 2) != 0) role = eMemberRole.Banned;
                     if ((gm.status & 8) != 0) role = eMemberRole.Guest;
 
                     n.AddMember(DataImportExtensions.NewUserId(gm.user_id).Value, role);

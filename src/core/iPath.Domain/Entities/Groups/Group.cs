@@ -101,7 +101,7 @@ public enum eMemberRole
     None = 0,
     User = 1,
     Guest = 2,
-    Inactive = 3,
+    Banned = 3,
     Moderator = 4
 }
 

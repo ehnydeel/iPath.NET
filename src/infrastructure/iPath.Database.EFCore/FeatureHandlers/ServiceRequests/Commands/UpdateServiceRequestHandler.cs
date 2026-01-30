@@ -9,7 +9,7 @@ using iPath.EF.Core.FeatureHandlers.Users;
 using Microsoft.Identity.Client;
 using System.Text.Json;
 
-namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Commands;
 
 
 public class UpdateServiceRequestHandler(iPathDbContext db, IMediator mediator, 

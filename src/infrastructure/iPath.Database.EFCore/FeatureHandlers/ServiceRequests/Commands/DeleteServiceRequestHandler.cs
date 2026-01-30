@@ -1,6 +1,6 @@
 ﻿using Microsoft.Identity.Client.Extensions.Msal;
 
-namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Commands;
 
 
 public class DeleteServiceRequestCommandHandler(iPathDbContext db, IUserSession sess)

@@ -47,8 +47,8 @@ public class CommunityMemberModel
     }
     public bool IsBanned
     {
-        get => Role == eMemberRole.Inactive;
-        set => Role = value ? eMemberRole.Inactive : ToggleRole(Role);
+        get => Role == eMemberRole.Banned;
+        set => Role = value ? eMemberRole.Banned : ToggleRole(Role);
     }
     private eMemberRole ToggleRole(eMemberRole input)
     {

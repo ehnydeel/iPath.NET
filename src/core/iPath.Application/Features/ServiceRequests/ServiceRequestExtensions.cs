@@ -20,6 +20,17 @@ public static class ServiceRequestExtensions
 
             return string.Join(", ", parts);
         }
+
+        public bool ValidateInput()
+        {
+            if (dto is null) return false;
+            // if any of the main fields are filled, consider it valid
+            if (!string.IsNullOrWhiteSpace(dto.Text)) return true;
+            if (!string.IsNullOrWhiteSpace(dto.Title)) return true;
+            if (!string.IsNullOrWhiteSpace(dto.AccessionNo)) return true;
+            if (dto.Questionnaire is not null) return true;
+            return false;
+        }
     }
 
     extension(ServiceRequestListDto dto)

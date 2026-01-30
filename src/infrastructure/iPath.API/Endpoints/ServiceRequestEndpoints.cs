@@ -1,5 +1,6 @@
 ﻿
 using Ardalis.GuardClauses;
+using DispatchR;
 using iPath.Application.Features.Documents;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,6 +29,25 @@ public static class ServiceRequestEndpoints
             => await mediator.Send(request, ct))
             .Produces<IReadOnlyList<Guid>>()
             .RequireAuthorization();
+
+
+        grp.MapGet("updates", async ([FromServices] IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new GetServiceRequestUpdatesQuery(), ct))
+            .Produces<ServiceRequestUpdatesDto>()
+            .RequireAuthorization();
+
+        grp.MapGet("new", async ([FromServices] IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new GetNewServiceRequestsQuery(), ct))
+            .Produces<PagedResultList<ServiceRequestListDto>>()
+            .WithName("New Requests")
+            .RequireAuthorization();
+
+        grp.MapGet("newannotations", async ([FromServices] IMediator mediator, CancellationToken ct)
+            => await mediator.Send(new GetServiceRequestsWithNewAnnotationsQuery(), ct))
+            .Produces<PagedResultList<ServiceRequestListDto>>()
+            .WithName("New Annotations")
+            .RequireAuthorization();
+
 
         // Commands
         grp.MapPost("create", async (CreateServiceRequestCommand request, [FromServices] IMediator mediator, CancellationToken ct)

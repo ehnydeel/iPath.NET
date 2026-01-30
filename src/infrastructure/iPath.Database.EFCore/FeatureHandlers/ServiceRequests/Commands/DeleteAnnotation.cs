@@ -1,6 +1,6 @@
 ﻿using iPath.Application.Exceptions;
 
-namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Commands;
 
 public class DeleteAnnotationCommandHandler(iPathDbContext db, IUserSession sess)
     : IRequestHandler<DeleteAnnotationCommand, Task<Guid>>

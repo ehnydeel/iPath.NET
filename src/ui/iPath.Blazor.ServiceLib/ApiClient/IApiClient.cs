@@ -166,6 +166,10 @@ public interface IPathApi
 
     [Delete("/api/v1/requests/annotation/{id}")]
     Task<IApiResponse<Guid>> DeleteAnnotation(Guid id);
+
+
+    [Get("/api/v1/requests/updates")]
+    Task<IApiResponse<ServiceRequestUpdatesDto>> GetServiceRequestUpdates();
     #endregion
 
 

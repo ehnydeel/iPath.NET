@@ -1,4 +1,4 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes.Queries;
+﻿namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Queries;
 
 using DispatchR.Abstractions.Send;
 using EF = Microsoft.EntityFrameworkCore.EF;

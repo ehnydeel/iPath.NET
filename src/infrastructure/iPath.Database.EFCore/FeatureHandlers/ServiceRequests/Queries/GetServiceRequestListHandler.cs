@@ -1,6 +1,6 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes;
+﻿namespace iPath.EF.Core.FeatureHandlers.ServiceRequests;
 
-using iPath.EF.Core.FeatureHandlers.Nodes.Queries;
+using iPath.EF.Core.FeatureHandlers.ServiceRequests.Queries;
 using EF = Microsoft.EntityFrameworkCore.EF;
 
 public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
@@ -48,34 +48,11 @@ public class GetNodesQueryHandler(iPathDbContext db, IUserSession sess)
         IQueryable<ServiceRequestListDto> projected;
         if (!request.IncludeDetails)
         {
-            projected = q.Select(n => new ServiceRequestListDto
-            {
-                Id = n.Id,
-                NodeType = n.NodeType,
-                CreatedOn = n.CreatedOn,
-                IsDraft = n.IsDraft,
-                OwnerId = n.OwnerId,
-                Owner = new OwnerDto(n.OwnerId, n.Owner.UserName, n.Owner.Email),
-                GroupId = n.GroupId,
-                Description = n.Description
-            });
+            projected = q.ProjectToList();
         }
         else
         {
-            projected = q.Select(n => new ServiceRequestListDto
-            {
-                Id = n.Id,
-                NodeType = n.NodeType,
-                CreatedOn = n.CreatedOn,
-                IsDraft = n.IsDraft,
-                OwnerId = n.OwnerId,
-                Owner = new OwnerDto(n.OwnerId, n.Owner.UserName, n.Owner.Email),
-                GroupId = n.GroupId,
-                Description = n.Description,
-                AnnotationCount = n.Annotations.Count(),
-                LastAnnotationDate = n.Annotations.Max(a => a.CreatedOn),
-                LastVisit = n.LastVisits.Where(v => v.UserId == sess.User.Id).Max(v => v.Date)
-            });
+            projected = q.ProjectToListDetails(sess.User.Id);
         }
 
         // paginate

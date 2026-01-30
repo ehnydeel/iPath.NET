@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.Extensions.Logging;
 
-namespace iPath.EF.Core.FeatureHandlers.Nodes.Queries;
+namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Queries;
 
 
 public class GetServiceRequestByIdQueryHandler(iPathDbContext db, IUserSession sess, ILogger<GetServiceRequestByIdQueryHandler> logger)

@@ -1,4 +1,4 @@
-﻿namespace iPath.EF.Core.FeatureHandlers.Nodes.Commands;
+﻿namespace iPath.EF.Core.FeatureHandlers.ServiceRequests.Commands;
 
 public class UpdateNodeVisitCommandHandler(iPathDbContext db, IUserSession sess)
     : IRequestHandler<UpdateServiceRequestVisitCommand, Task<bool>>

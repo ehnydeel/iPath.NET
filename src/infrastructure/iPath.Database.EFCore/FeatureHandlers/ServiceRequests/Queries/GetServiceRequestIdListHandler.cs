@@ -1,6 +1,6 @@
-﻿using iPath.EF.Core.FeatureHandlers.Nodes.Queries;
+﻿using iPath.EF.Core.FeatureHandlers.ServiceRequests.Queries;
 
-namespace iPath.EF.Core.FeatureHandlers.Nodes;
+namespace iPath.EF.Core.FeatureHandlers.ServiceRequests;
 
 
 public class GetServiceRequestIdListHandler(iPathDbContext db, IUserSession sess)
