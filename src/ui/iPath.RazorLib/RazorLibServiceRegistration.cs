@@ -40,7 +40,7 @@ public static class RazorLibServiceRegistration
             .AddHttpMessageHandler<baseAuthDelegationHandler>();
 
         services.AddMemoryCache();
-        services.AddSingleton<GroupCache>();
+        services.AddSingleton<IGroupCache, GroupCacheClient>();
         services.AddViewModels();
 
         // Localization

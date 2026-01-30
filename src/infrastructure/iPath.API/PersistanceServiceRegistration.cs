@@ -1,4 +1,4 @@
-﻿using Hl7.FhirPath.Sprache;
+﻿using iPath.API.Services;
 using iPath.Application.Features.Notifications;
 using iPath.EF.Core.Database;
 using iPath.EF.Core.FeatureHandlers.Emails;
@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using System;
 
 
 namespace iPath.API;
@@ -65,6 +63,7 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IGroupService, GroupService>();
+        services.AddScoped<IGroupCache, GroupCacheServer>();
 
         // Google Workspace
         services.AddGoogleServices(config);

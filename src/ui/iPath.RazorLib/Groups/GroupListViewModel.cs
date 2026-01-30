@@ -1,6 +1,8 @@
-﻿namespace iPath.Blazor.Componenents.Groups;
+﻿using iPath.Application.Contracts;
 
-public class GroupListViewModel(IPathApi api, GroupCache cache, ISnackbar snackbar, IDialogService dialog, NavigationManager nm) : IViewModel
+namespace iPath.Blazor.Componenents.Groups;
+
+public class GroupListViewModel(IPathApi api, IGroupCache cache, ISnackbar snackbar, IDialogService dialog, NavigationManager nm) : IViewModel
 {
     public CommunityListDto? SelectedCommunity {  get; set; }
     public string SearchString { get; set; }

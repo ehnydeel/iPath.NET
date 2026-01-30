@@ -5,7 +5,7 @@ namespace iPath.Blazor.Componenents.Groups;
 
 public class GroupViewModel(IPathApi api,
     AppState appState,
-    GroupCache cache,
+    IGroupCache cache,
     ISnackbar snackbar,
     IDialogService dialog,
     IStringLocalizer T,

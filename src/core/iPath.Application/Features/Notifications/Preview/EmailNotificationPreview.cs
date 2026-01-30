@@ -2,16 +2,30 @@
 using iPath.Application.Features.Notifications;
 using iPath.Domain.Config;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace iPath.Application.Features.Notifications;
 
-public class EmailNotificationPreview(IOptions<iPathClientConfig> opts)
+public class EmailNotificationPreview(IOptions<iPathClientConfig> opts, IGroupCache cache)
     : IServiceRequestHtmlPreview
 {
     public string Name => "email";
 
-    public string CreatePreview(NotificationDto n, ServiceRequestDto sr)
+
+    public async Task<string> CreatePreview(NotificationDto n, ServiceRequestDto sr)
     {
+        var grp = await cache.GetGroupAsync(sr.GroupId.Value);
+        var grpLink = opts.Value.BaseAddress + $"<a href=\"groups/{grp.Id}\">{grp.Name}</a>";
+
+        var msg = n.EventType switch
+        {
+            Domain.Notificxations.eNodeNotificationType.NodePublished => "a new case has been published", 
+            Domain.Notificxations.eNodeNotificationType.NewAnnotation => "a new annotation has been published",
+            _ => ""
+        };
+        msg += " in " + grpLink + "<br /><br />";
+        var body = template.Replace("{msg}", msg);
+
         var link = opts.Value.BaseAddress + "request/" + sr.Id;
 
         var title = sr.Title;
@@ -23,7 +37,7 @@ public class EmailNotificationPreview(IOptions<iPathClientConfig> opts)
         {
             title += ", " + sr.Description.BodySite.ToString();
         }
-        var body = template.Replace("{title}", $"<a href=\"{link}\">{title}</a>");
+        body = body.Replace("{title}", $"<a href=\"{link}\">{title}</a>");
 
         var desc = "";
         if (!string.IsNullOrEmpty(sr.Description.Questionnaire?.GeneratedText))

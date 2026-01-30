@@ -1,4 +1,5 @@
-﻿using iPath.Blazor.Componenents.Admin.Users;
+﻿using iPath.Application.Contracts;
+using iPath.Blazor.Componenents.Admin.Users;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace iPath.Blazor.Componenents.Admin.Groups;
@@ -7,7 +8,7 @@ public class GroupAdminViewModel(IPathApi api,
     ISnackbar snackbar,
     IDialogService dialog,
     IMemoryCache memCache,
-    GroupCache grpCache,
+    IGroupCache grpCache,
     IStringLocalizer T,
     ILogger<GroupAdminViewModel> logger)
     : IViewModel

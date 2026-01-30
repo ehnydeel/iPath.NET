@@ -1,10 +1,9 @@
-﻿using Hl7.Fhir.Model;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace iPath.Blazor.Componenents.Groups;
+namespace iPath.API.Services;
 
-public class GroupCache(IMemoryCache cache, IPathApi api, ILogger<GroupCache> logger)
+public class GroupCacheServer(IMemoryCache cache, IGroupService srv, ILogger<GroupCacheServer> logger) : IGroupCache
 {
     private readonly SemaphoreSlim _cacheLock = new SemaphoreSlim(1);
     public async Task<GroupDto?> GetGroupAsync(Guid Id)
@@ -15,13 +14,9 @@ public class GroupCache(IMemoryCache cache, IPathApi api, ILogger<GroupCache> lo
             var key = $"group_{Id}";
             if (!cache.TryGetValue<GroupDto>(key, out var group))
             {
-                var resp = await api.GetGroup(Id);
-                if (resp.IsSuccessful)
-                {
-                    group = resp.Content;
-                    var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                    cache.Set(key, group, opts);
-                }
+                group = await srv.GetGroupByIdAsync(Id);
+                var opts = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                cache.Set(key, group, opts);
             }
             return group;
         }

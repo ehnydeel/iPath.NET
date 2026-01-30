@@ -1,6 +1,8 @@
-﻿namespace iPath.Blazor.Componenents.Shared.Lookups;
+﻿using iPath.Application.Contracts;
 
-public class CaseTypeLookup(GroupCache cache) : MudAutocomplete<string>
+namespace iPath.Blazor.Componenents.Shared.Lookups;
+
+public class CaseTypeLookup(IGroupCache cache) : MudAutocomplete<string>
 {
     [Parameter]
     public Guid? GroupId { get; set; }

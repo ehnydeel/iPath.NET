@@ -38,7 +38,7 @@ public class EmailNotificationPublisher(IMediator mediator, IEmailSender email, 
         var preview = previews.FirstOrDefault(x => x.Name == "email");
         if (preview != null)
         {
-            var html = preview.CreatePreview(n.ToDto(), sr);
+            var html = await preview.CreatePreview(n.ToDto(), sr);
             if (!string.IsNullOrEmpty(html))
             {
                 await email.SendMailAsync(n.User.Email, subject, html);
